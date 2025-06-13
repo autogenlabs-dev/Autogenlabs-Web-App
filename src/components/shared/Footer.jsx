@@ -99,11 +99,11 @@ const Footer = () => {
     }
   };
 
-  // Fallback background for the globe (CSS-only)
+
   const GlobeFallback = () => (
     <div className="w-full h-full relative overflow-hidden">
-      {/* Animated gradient globe effect */}
-      <div 
+
+      <div
         className="absolute inset-0 rounded-full opacity-30"
         style={{
           background: `
@@ -119,9 +119,9 @@ const Footer = () => {
           `
         }}
       />
-      
-      {/* Rotating grid pattern */}
-      <div 
+
+
+      <div
         className="absolute inset-0 opacity-20 animate-spin"
         style={{
           animationDuration: '60s',
@@ -157,7 +157,7 @@ const Footer = () => {
         {/* Glassmorphism background orbs */}
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-full blur-3xl" />
-        
+
         {/* Grid pattern */}
         <div className="absolute inset-0 opacity-5">
           <div className="w-full h-full" style={{
@@ -168,7 +168,7 @@ const Footer = () => {
             backgroundSize: '60px 60px'
           }} />
         </div>
-        
+
         {/* Glassmorphism accent line */}
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent z-0"></div>
       </div>
@@ -203,7 +203,7 @@ const Footer = () => {
             {/* Logo & Brand */}
             <div className="space-y-4">
               <div className="flex items-center">
-                <Image src={logo} alt='Company logo' width={30} height={30} loading='lazy'/>
+                <Image src={logo} alt='Company logo' width={30} height={30} loading='lazy' />
                 <span className="text-2xl font-bold text-white">utoGen Labs</span>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">

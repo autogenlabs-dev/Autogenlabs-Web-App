@@ -1,0 +1,22 @@
+{
+  "name": "autogen-labs",
+  "version": "1.0.0",
+  "description": "Autogen Labs - MCP Server Configuration",
+  "mcpServers": {
+    "git": {
+      "command": "git",
+      "args": ["mcp"],
+      "description": "Git operations through MCP"
+    },
+    "filesystem": {
+      "command": "node",
+      "args": ["./mcp/filesystem-server.js"],
+      "description": "File system operations"
+    }
+  },
+  "scripts": {
+    "mcp:start": "node ./mcp/server.js",
+    "mcp:git": "git mcp",
+    "mcp:fs": "node ./mcp/filesystem-server.js"
+  }
+}
