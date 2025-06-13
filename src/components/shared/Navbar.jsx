@@ -14,11 +14,19 @@ const Navbar = () => {
   const pathname = usePathname();
 
   useEffect(() => {
+    let ticking = false;
+
     const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          setScrolled(window.scrollY > 10);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
@@ -191,13 +199,12 @@ const Navbar = () => {
   }, [pathname]);
 
   return (
-    <nav className={`w-full px-6 md:px-44 py-4 fixed top-0 z-50 transition-all duration-300 ${
-      scrolled ? 'bg-[rgb(19_17_28_/_90%)] backdrop-blur-[5px]' : 'bg-transparent'
-    }`}>
+    <nav className={`w-full px-6 md:px-44 py-4 fixed top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-[rgb(19_17_28_/_90%)] backdrop-blur-[5px]' : 'bg-transparent'
+      }`}>
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo */}
         <Link href={"/"} className="flex items-center ">
-            <Image src={Logo} width={30} height={30} alt='Company Logo' loading='lazy'/>
+          <Image src={Logo} width={30} height={30} alt='Company Logo' loading='lazy' />
           <span className="text-xl font-medium text-white">utoGen Labs</span>
         </Link>
 
@@ -213,15 +220,14 @@ const Navbar = () => {
               {item.hasDropdown ? (
                 <button className="flex items-center space-x-1 text-gray-300 hover:text-white transition-colors py-2">
                   <span className="text-sm font-medium">{item.name}</span>
-                  <ChevronDown 
-                    className={`w-3 h-3 transition-transform duration-200 ${
-                      hoveredItem === item.name ? 'rotate-180' : ''
-                    }`} 
+                  <ChevronDown
+                    className={`w-3 h-3 transition-transform duration-200 ${hoveredItem === item.name ? 'rotate-180' : ''
+                      }`}
                   />
                 </button>
               ) : item.sectionId ? (
                 // Section scroll button
-                <button 
+                <button
                   onClick={(e) => handleSectionClick(e, item.sectionId)}
                   className="flex items-center space-x-1 text-gray-300 hover:text-white transition-colors py-2"
                 >
@@ -229,7 +235,7 @@ const Navbar = () => {
                 </button>
               ) : (
                 // Regular page link
-                <Link 
+                <Link
                   href={item.href}
                   className="flex items-center space-x-1 text-gray-300 hover:text-white transition-colors py-2"
                 >
@@ -300,14 +306,14 @@ const Navbar = () => {
 
         {/* Right Side Actions */}
         <div className="flex items-center space-x-4">
-          <Link 
-            href="#" 
+          <Link
+            href="/auth"
             className="text-gray-300 hover:text-white transition-colors text-sm font-medium"
           >
             Sign in
           </Link>
-          <Link 
-            href="#"
+          <Link
+            href="/auth"
             className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg transition-colors text-sm font-medium text-white"
           >
             Get Started
