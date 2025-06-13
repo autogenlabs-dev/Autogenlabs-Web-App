@@ -8,7 +8,7 @@ import { LazyVideo } from '@/components/ui/LazyLoader';
 const CopilotUIComponent = () => {
   const [currentText, setCurrentText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
-  
+
   const typewriterTexts = [
     "How can I optimize this React component?",
     "Explain this JavaScript function...",
@@ -43,8 +43,8 @@ const CopilotUIComponent = () => {
           <Paperclip size={14} />
           <span>Add Context...</span>
         </button>
-        
-        
+
+
         {/* Right Side - Icons */}
         <div className="flex items-center gap-2">
           <button className="p-1.5 hover:bg-[#3c3c3c] rounded text-gray-400 hover:text-gray-300 transition-colors">
@@ -65,12 +65,12 @@ const CopilotUIComponent = () => {
           <button className="text-gray-400 hover:text-gray-300 transition-colors">
             <span className="text-lg font-medium">@</span>
           </button>
-          
+
           {/* Microphone Icon */}
           <button className="text-gray-400 hover:text-gray-300 transition-colors">
             <Mic size={18} />
           </button>
-          
+
           {/* Input Field with Typewriter Effect */}
           <div className="flex-1 relative">
             <div className="bg-[#3c3c3c] rounded-lg px-4 py-3 min-h-[44px] flex items-center">
@@ -80,7 +80,7 @@ const CopilotUIComponent = () => {
               </span>
             </div>
           </div>
-          
+
           {/* Model Selector */}
           <div className="flex items-center gap-2 px-3 py-2 bg-[#3c3c3c] rounded-lg text-gray-300 text-sm">
             <span>Ask</span>
@@ -88,7 +88,7 @@ const CopilotUIComponent = () => {
             <span className="font-medium">AutoGen AI</span>
             <ChevronDown size={14} />
           </div>
-          
+
           {/* Send Button */}
           <motion.button
             className="p-2.5 bg-[#0e639c] hover:bg-[#1177bb] rounded-lg text-white transition-colors"
@@ -98,7 +98,7 @@ const CopilotUIComponent = () => {
             <Send size={16} />
           </motion.button>
         </div>
-        
+
         {/* Footer Text */}
         <div className="text-xs text-gray-500 mt-3 text-center">
           AutoGen AI can help with deployment, scaling, and infrastructure optimization.
@@ -111,7 +111,7 @@ const CopilotUIComponent = () => {
 export default function Hero() {
   const containerRef = useRef(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start start', 'end start']
@@ -148,46 +148,46 @@ export default function Hero() {
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='300' height='300' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='circuit' x='0' y='0' width='300' height='300' patternUnits='userSpaceOnUse'%3E%3Cg fill='none' stroke='%234ade80' stroke-width='0.4'%3E%3Cline x1='30' y1='75' x2='120' y2='75'/%3E%3Cline x1='180' y1='75' x2='270' y2='75'/%3E%3Cline x1='60' y1='150' x2='150' y2='150'/%3E%3Cline x1='210' y1='150' x2='300' y2='150'/%3E%3Cline x1='0' y1='225' x2='90' y2='225'/%3E%3Cline x1='180' y1='225' x2='270' y2='225'/%3E%3Cline x1='75' y1='30' x2='75' y2='120'/%3E%3Cline x1='75' y1='180' x2='75' y2='270'/%3E%3Cline x1='150' y1='60' x2='150' y2='150'/%3E%3Cline x1='225' y1='0' x2='225' y2='90'/%3E%3Cline x1='225' y1='180' x2='225' y2='300'/%3E%3Cpath d='M120,75 L150,75 L150,105'/%3E%3Cpath d='M150,150 L180,150 L180,180'/%3E%3Cpath d='M90,225 L120,225 L120,195'/%3E%3Ccircle cx='75' cy='75' r='2' fill='%234ade80' fill-opacity='0.3'/%3E%3Ccircle cx='150' cy='150' r='2' fill='%234ade80' fill-opacity='0.3'/%3E%3Ccircle cx='225' cy='225' r='2' fill='%234ade80' fill-opacity='0.3'/%3E%3C/g%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23circuit)'/%3E%3C/svg%3E")`
           }}
         />
-        
+
         {/* Animated Current Flow Lines */}
         <div className="absolute inset-0">
           {/* Horizontal flowing lines */}
-          <div className="absolute top-[25%] left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent opacity-20 animate-pulse" 
-               style={{ animation: 'flowHorizontal 8s ease-in-out infinite', animationDelay: '0s' }} />
+          <div className="absolute top-[25%] left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent opacity-20 animate-pulse"
+            style={{ animation: 'flowHorizontal 8s ease-in-out infinite', animationDelay: '0s' }} />
           <div className="absolute top-[50%] left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-green-400/30 to-transparent opacity-20"
-               style={{ animation: 'flowHorizontal 12s ease-in-out infinite', animationDelay: '2s' }} />
+            style={{ animation: 'flowHorizontal 12s ease-in-out infinite', animationDelay: '2s' }} />
           <div className="absolute top-[75%] left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent opacity-20"
-               style={{ animation: 'flowHorizontal 10s ease-in-out infinite', animationDelay: '4s' }} />
-          
+            style={{ animation: 'flowHorizontal 10s ease-in-out infinite', animationDelay: '4s' }} />
+
           {/* Vertical flowing lines */}
           <div className="absolute left-[25%] top-0 h-full w-[1px] bg-gradient-to-b from-transparent via-green-400/30 to-transparent opacity-20"
-               style={{ animation: 'flowVertical 9s ease-in-out infinite', animationDelay: '1s' }} />
+            style={{ animation: 'flowVertical 9s ease-in-out infinite', animationDelay: '1s' }} />
           <div className="absolute left-[50%] top-0 h-full w-[1px] bg-gradient-to-b from-transparent via-cyan-400/30 to-transparent opacity-20"
-               style={{ animation: 'flowVertical 11s ease-in-out infinite', animationDelay: '3s' }} />
+            style={{ animation: 'flowVertical 11s ease-in-out infinite', animationDelay: '3s' }} />
           <div className="absolute left-[75%] top-0 h-full w-[1px] bg-gradient-to-b from-transparent via-green-400/30 to-transparent opacity-20"
-               style={{ animation: 'flowVertical 13s ease-in-out infinite', animationDelay: '5s' }} />
+            style={{ animation: 'flowVertical 13s ease-in-out infinite', animationDelay: '5s' }} />
         </div>
-        
+
         {/* Pulsing Connection Points */}
         <div className="absolute inset-0">
-          <div className="absolute top-[25%] left-[25%] w-2 h-2 bg-green-400/40 rounded-full" 
-               style={{ animation: 'pulse 3s ease-in-out infinite' }} />
-          <div className="absolute top-[50%] left-[50%] w-2 h-2 bg-cyan-400/40 rounded-full" 
-               style={{ animation: 'pulse 4s ease-in-out infinite', animationDelay: '1s' }} />
-          <div className="absolute top-[75%] left-[75%] w-2 h-2 bg-green-400/40 rounded-full" 
-               style={{ animation: 'pulse 5s ease-in-out infinite', animationDelay: '2s' }} />
-          <div className="absolute top-[30%] left-[70%] w-1.5 h-1.5 bg-cyan-400/30 rounded-full" 
-               style={{ animation: 'pulse 3.5s ease-in-out infinite', animationDelay: '0.5s' }} />
-          <div className="absolute top-[60%] left-[30%] w-1.5 h-1.5 bg-green-400/30 rounded-full" 
-               style={{ animation: 'pulse 4.5s ease-in-out infinite', animationDelay: '1.5s' }} />
+          <div className="absolute top-[25%] left-[25%] w-2 h-2 bg-green-400/40 rounded-full"
+            style={{ animation: 'pulse 3s ease-in-out infinite' }} />
+          <div className="absolute top-[50%] left-[50%] w-2 h-2 bg-cyan-400/40 rounded-full"
+            style={{ animation: 'pulse 4s ease-in-out infinite', animationDelay: '1s' }} />
+          <div className="absolute top-[75%] left-[75%] w-2 h-2 bg-green-400/40 rounded-full"
+            style={{ animation: 'pulse 5s ease-in-out infinite', animationDelay: '2s' }} />
+          <div className="absolute top-[30%] left-[70%] w-1.5 h-1.5 bg-cyan-400/30 rounded-full"
+            style={{ animation: 'pulse 3.5s ease-in-out infinite', animationDelay: '0.5s' }} />
+          <div className="absolute top-[60%] left-[30%] w-1.5 h-1.5 bg-green-400/30 rounded-full"
+            style={{ animation: 'pulse 4.5s ease-in-out infinite', animationDelay: '1.5s' }} />
         </div>
-        
+
         {/* Gentle Glow */}
         <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-500/10 rounded-full blur-3xl animate-pulse" 
-               style={{animationDuration: '8s'}} />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" 
-               style={{animationDuration: '12s'}} />
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-500/10 rounded-full blur-3xl animate-pulse"
+            style={{ animationDuration: '8s' }} />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"
+            style={{ animationDuration: '12s' }} />
         </div>
       </motion.div>
 
@@ -260,7 +260,6 @@ export default function Hero() {
             >
               Download in Visual Studio
             </motion.button>
-            
             <motion.button
               className="bg-gray-800 hover:bg-gray-700 px-6 py-3 rounded-lg font-medium border border-gray-700 transition-colors"
               whileHover={{ scale: 1.05 }}
@@ -268,6 +267,7 @@ export default function Hero() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: isLoaded ? 1 : 0, x: isLoaded ? 0 : 20 }}
               transition={{ duration: 0.6, delay: 1.4 }}
+              onClick={() => window.location.href = '/docs'}
             >
               Get Started
             </motion.button>

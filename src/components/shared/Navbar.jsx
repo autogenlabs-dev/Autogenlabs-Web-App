@@ -132,8 +132,8 @@ const Navbar = () => {
           items: [
             {
               name: "Docs",
-              description: "Documentation for AutoGen",
-              icon: "📝",
+              description: "Complete guide and documentation",
+              icon: "📚",
               href: "/docs"
             },
             {
