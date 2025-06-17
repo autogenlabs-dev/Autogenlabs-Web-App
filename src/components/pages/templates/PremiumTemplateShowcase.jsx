@@ -1,7 +1,11 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { Star, Eye, Download, IndianRupee, DollarSign, Play } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { getPremiumTemplates } from '@/lib/templateData';
+import VideoPreviewModal from '@/components/ui/VideoPreviewModal';
 
 // Custom hook for intersection observer
 const useIntersectionObserver = (options = {}) => {
@@ -38,12 +42,12 @@ const useIntersectionObserver = (options = {}) => {
 };
 
 // Lazy loaded template card component
-const LazyTemplateCard = ({ template, index }) => {
+const LazyTemplateCard = ({ template, index, onVideoPreview }) => {
   const { elementRef, hasIntersected } = useIntersectionObserver({
     threshold: 0.1,
     rootMargin: '100px', // Start loading 100px before the element is visible
   });
-  
+
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
@@ -53,6 +57,12 @@ const LazyTemplateCard = ({ template, index }) => {
 
   const handleImageError = () => {
     setImageError(true);
+  };
+
+  const handleVideoPreview = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onVideoPreview(template);
   };
 
   const itemVariants = {
@@ -79,19 +89,44 @@ const LazyTemplateCard = ({ template, index }) => {
           background: `linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)`,
           backdropFilter: 'blur(20px)',
         }}
-      >
-        {/* Premium Badge */}
-        {template.premium && (
-          <div className="absolute top-4 right-4 z-20">
-            <div className="px-3 py-1 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold rounded-full">
-              Premium
+      >        {/* Top Row - Badges */}
+        <div className="absolute top-4 left-4 right-4 z-30 flex items-start justify-between">
+          {/* Rating Badge */}
+          {template.rating && (
+            <div className="px-2 py-1 bg-black/60 backdrop-blur-sm text-white text-xs font-medium rounded-full flex items-center gap-1 shadow-lg">
+              <Star size={12} className="fill-yellow-400 text-yellow-400" />
+              {template.rating}
             </div>
+          )}
+
+          {/* Right side badges */}
+          <div className="flex items-center gap-2">
+            {/* Video Preview Icon */}
+            {template.videoPreview && (
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onVideoPreview(template);
+                }}
+                className="w-8 h-8 bg-black/60 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-black/80 transition-colors shadow-lg"
+              >
+                <Play size={14} className="text-white fill-white ml-0.5" />
+              </button>
+            )}
+
+            {/* Premium Badge */}
+            {template.planType === 'Paid' && (
+              <div className="px-3 py-1 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold rounded-full shadow-lg">
+                Premium
+              </div>
+            )}
           </div>
-        )}
+        </div>
 
         {/* Template Preview Image Container */}
         <div className="relative h-40 overflow-hidden flex-shrink-0">
-          
+
           {/* Loading Placeholder */}
           {!hasIntersected && (
             <div className="w-full h-full bg-gradient-to-br from-gray-800/50 to-gray-900/50 flex items-center justify-center">
@@ -122,15 +157,13 @@ const LazyTemplateCard = ({ template, index }) => {
                   <div className="w-6 h-6 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
                 </div>
               )}
-              
               <Image
-                src={template.image}
+                src={template.previewImage}
                 alt={template.title}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                className={`object-cover transition-all duration-300 group-hover:scale-105 ${
-                  imageLoaded ? 'opacity-100' : 'opacity-0'
-                }`}
+                className={`object-cover transition-all duration-300 group-hover:scale-105 ${imageLoaded ? 'opacity-100' : 'opacity-0'
+                  }`}
                 onLoad={handleImageLoad}
                 onError={handleImageError}
                 priority={index < 2} // Prioritize first 2 images
@@ -138,7 +171,7 @@ const LazyTemplateCard = ({ template, index }) => {
                 placeholder="blur"
                 blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
               />
-              
+
               {/* Gradient overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
             </>
@@ -146,18 +179,33 @@ const LazyTemplateCard = ({ template, index }) => {
         </div>
 
         {/* Content */}
-        <div className="p-5 space-y-3 flex-1 flex flex-col">
-          <h3 className="text-sm font-bold text-white leading-tight line-clamp-2">
-            {template.title}
-          </h3>
+        <div className="p-5 space-y-3 flex-1 flex flex-col">          <h3 className="text-sm font-bold text-white leading-tight line-clamp-2">
+          {template.title}
+        </h3>
           <p className="text-gray-400 text-xs leading-relaxed flex-1 line-clamp-4">
-            {template.description}
+            {template.shortDescription}
           </p>
-          
+
+          {/* Rating and Price */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
+                <Star size={12} className="fill-yellow-400 text-yellow-400" />
+                <span className="text-xs text-gray-300">{template.rating}</span>
+              </div>
+              <span className="text-xs text-gray-500">({template.totalRatings})</span>
+            </div>
+            <div className="text-xs text-purple-400 font-medium">
+              {template.planType === 'Free' ? 'Free' : `₹${template.pricing.inr}`}
+            </div>
+          </div>
+
           {/* Action Button */}
-          <button className="text-purple-400 hover:text-purple-300 font-medium text-xs transition-colors self-start">
-            View Template →
-          </button>
+          <Link href={`/templates/${template.id}`}>
+            <button className="text-purple-400 hover:text-purple-300 font-medium text-xs transition-colors self-start">
+              View Template →
+            </button>
+          </Link>
         </div>
 
         {/* Glassmorphism Shine Effect */}
@@ -178,37 +226,16 @@ const LazyTemplateCard = ({ template, index }) => {
 };
 
 const PremiumTemplateShowcase = () => {
-  // Template cards data with optimized image URLs
-  const templateCards = [
-    {
-      id: 1,
-      title: "Infrastructure templates for modern developers.",
-      description: "Easy-to-customize deployment templates that drive performance and scale with you as your applications grow.",
-      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop&auto=format&q=75",
-      premium: true
-    },
-    {
-      id: 2,
-      title: "AutoGen & DevOps Templates for Agencies, Startups & Creators",
-      description: "Professional infrastructure solutions designed for rapid deployment and scaling.",
-      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop&auto=format&q=75",
-      premium: true
-    },
-    {
-      id: 3,
-      title: "You need a powerful infrastructure template.",
-      description: "Deploy enterprise-grade applications with our pre-configured templates and best practices.",
-      image: "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=600&h=400&fit=crop&auto=format&q=75",
-      premium: true
-    },
-    {
-      id: 4,
-      title: "Ultimate DevOps Kit and Deployment System for AutoGen",
-      description: "Revolutionary infrastructure templates with AI-powered optimization and scaling capabilities.",
-      image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&h=400&fit=crop&auto=format&q=75",
-      premium: true
-    }
-  ];
+  // Use real premium templates from data
+  const premiumTemplates = getPremiumTemplates();
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+
+  // Handle video preview
+  const handleVideoPreview = (template) => {
+    setSelectedTemplate(template);
+    setIsVideoModalOpen(true);
+  };
 
   // Partner/Technology logos
   const partners = [
@@ -262,7 +289,7 @@ const PremiumTemplateShowcase = () => {
         {/* Glassmorphism background orbs */}
         <div className="absolute top-20 left-1/4 w-96 h-96 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-full blur-3xl" />
         <div className="absolute bottom-20 right-1/4 w-96 h-96 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-full blur-3xl" />
-        
+
         {/* Grid pattern */}
         <div className="absolute inset-0 opacity-5">
           <div className="w-full h-full" style={{
@@ -276,7 +303,7 @@ const PremiumTemplateShowcase = () => {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8">
-        
+
         {/* Section Header */}
         <motion.div
           className="mb-16"
@@ -288,23 +315,21 @@ const PremiumTemplateShowcase = () => {
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
             Premium infrastructure sections
           </h2>
-        </motion.div>
-
-        {/* Template Cards Grid */}
+        </motion.div>        {/* Template Cards Grid */}
         <motion.div
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: false }}
-        >
-          {templateCards.map((template, index) => (
-            <LazyTemplateCard
-              key={template.id}
-              template={template}
-              index={index}
-            />
-          ))}
+        >          {premiumTemplates.map((template, index) => (
+          <LazyTemplateCard
+            key={template.id}
+            template={template}
+            index={index}
+            onVideoPreview={handleVideoPreview}
+          />
+        ))}
         </motion.div>
 
         {/* Partners/Technologies Section */}
@@ -330,7 +355,7 @@ const PremiumTemplateShowcase = () => {
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-purple-600/20 to-cyan-600/20 border border-white/10 flex items-center justify-center flex-shrink-0 group-hover:border-purple-500/30 transition-all duration-300">
                   <span className="text-xl">{partner.icon}</span>
                 </div>
-                
+
                 {/* Partner Info */}
                 <div className="space-y-1">
                   <h4 className="text-white font-semibold group-hover:text-purple-400 transition-colors">
@@ -341,10 +366,16 @@ const PremiumTemplateShowcase = () => {
                   </p>
                 </div>
               </motion.div>
-            ))}
-          </div>
+            ))}          </div>
         </motion.div>
       </div>
+
+      {/* Video Preview Modal */}
+      <VideoPreviewModal
+        isOpen={isVideoModalOpen}
+        onClose={() => setIsVideoModalOpen(false)}
+        template={selectedTemplate}
+      />
 
       {/* CSS for text truncation */}
       <style jsx>{`

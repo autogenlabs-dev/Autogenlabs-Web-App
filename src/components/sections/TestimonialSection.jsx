@@ -6,7 +6,6 @@ import { ThumbnailImage } from '../ui/OptimizedImage';
 const TestimonialSection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-
   const testimonials = [
     {
       id: 1,
@@ -14,6 +13,7 @@ const TestimonialSection = () => {
       role: "Lead Developer",
       company: "TechFlow Inc.",
       image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=300&h=300&fit=crop&crop=face&auto=format&q=80",
+      fallbackImage: "/logoAuto.webp", // Local fallback
       quote: "The deployment process is incredibly smooth. We went from manual deployments taking hours to automated deployments in minutes. The infrastructure management is seamless."
     },
     {
@@ -22,6 +22,7 @@ const TestimonialSection = () => {
       role: "CTO",
       company: "StartupVenture",
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face&auto=format&q=80",
+      fallbackImage: "/logoAuto.webp", // Local fallback
       quote: "Railway has transformed how we think about DevOps. The simplicity of connecting services and databases without complex configuration is game-changing for our small team."
     },
     {

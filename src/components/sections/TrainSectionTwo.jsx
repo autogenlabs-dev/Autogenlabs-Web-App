@@ -1,9 +1,32 @@
 'use client';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Image from 'next/image';
-import { useRef } from 'react';
+import SafeImage from '../ui/SafeImage';
+import { useRef, useState } from 'react';
 
 const MasonryImageCard = ({ src, alt, className = "", height = "h-64", delay = 0, priority = false }) => {
+  const [imageError, setImageError] = useState(false);
+  
+  // Fallback gradient based on image ID
+  const getGradientColor = (alt) => {
+    const gradients = [
+      'from-blue-500 to-purple-600',
+      'from-green-500 to-teal-600', 
+      'from-orange-500 to-red-600',
+      'from-pink-500 to-rose-600',
+      'from-indigo-500 to-blue-600',
+      'from-yellow-500 to-orange-600',
+      'from-purple-500 to-pink-600',
+      'from-teal-500 to-green-600'
+    ];
+    const index = alt.length % gradients.length;
+    return gradients[index];
+  };
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
   return (
     <motion.div
       className={`relative bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden ${height} ${className}`}
@@ -17,7 +40,7 @@ const MasonryImageCard = ({ src, alt, className = "", height = "h-64", delay = 0
       viewport={{ once: true, margin: "-50px" }}
     >
       <motion.div
-        className="w-full h-full"
+        className="relative w-full h-full"
         initial={{ scale: 1.2 }}
         whileInView={{ scale: 1 }}
         transition={{
@@ -27,18 +50,29 @@ const MasonryImageCard = ({ src, alt, className = "", height = "h-64", delay = 0
         }}
         viewport={{ once: true }}
       >
-        <Image
-          src={src}
-          alt={alt}
-          fill={true}
-          className="object-cover"
-          priority={priority}
-          quality={80}
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-          loading={priority ? "eager" : "lazy"}
-          placeholder="blur"
-          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAX/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
-        />
+        {imageError ? (
+          // Fallback gradient background
+          <div className={`w-full h-full bg-gradient-to-br ${getGradientColor(alt)} flex items-center justify-center`}>
+            <div className="text-white text-center px-4">
+              <div className="w-12 h-12 mx-auto mb-2 opacity-70">
+                <svg fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenOdd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenOdd" />
+                </svg>
+              </div>
+              <p className="text-xs opacity-80 font-medium">{alt}</p>
+            </div>
+          </div>        ) : (
+          <SafeImage
+            src={src}
+            alt={alt}
+            fill={true}
+            className="object-cover"
+            priority={priority}
+            quality={80}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+            onError={handleImageError}
+          />
+        )}
       </motion.div>
     </motion.div>
   );

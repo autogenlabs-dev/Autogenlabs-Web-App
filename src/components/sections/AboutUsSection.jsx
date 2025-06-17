@@ -110,12 +110,15 @@ const AboutUsSection = () => {
                 >
                   {/* Infrastructure illustration */}
                   <div className="flex flex-col items-center space-y-4">
-                   
-                    <DotLottieReact
-      src="/ai.lottie"
-      loop
-      autoplay
-    />
+                     <DotLottieReact
+                      src="/ai.lottie"
+                      loop={true}
+                      autoplay={true}
+                      style={{ width: '100%', height: '100%' }}
+                      onLoadError={(error) => {
+                        console.warn('Lottie animation failed to load:', error);
+                      }}
+                    />
                   
                   </div>
                   

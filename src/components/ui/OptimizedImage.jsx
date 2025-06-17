@@ -54,11 +54,15 @@ const OptimizedImage = ({
     setIsLoaded(true);
     onLoad?.(e);
   };
-
   // Handle image error
   const handleError = (e) => {
     setHasError(true);
     onError?.(e);
+    
+    // Log warning for external image failures
+    if (src && src.startsWith('https://images.unsplash.com')) {
+      console.warn(`Failed to load optimized image: ${src}. This might be due to rate limiting or access restrictions.`);
+    }
   };
 
   // Generate optimized blur placeholder

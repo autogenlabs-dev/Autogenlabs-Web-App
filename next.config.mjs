@@ -2,13 +2,15 @@
 const nextConfig = {
   // Performance optimizations
   experimental: {
-    optimizeCss: true,
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
+    // optimizeCss: true, // Temporarily disabled to fix build issues
+  },
+
+  // Turbopack configuration (moved from experimental)
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
       },
     },
   },
@@ -56,6 +58,56 @@ const nextConfig = {
     minimumCacheTTL: 86400, // 24 hours cache
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    
+    // Better error handling for external images
+    unoptimized: false,
+    loader: 'default',
+    
+    // Fallback configuration for image loading failures
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'picsum.photos',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.prod.website-files.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.builder.io',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'themewagon.com',
+        port: '',
+        pathname: '/**',
+      }
+    ],
+
+    // Modern image formats (WebP, AVIF)
+    formats: ['image/webp', 'image/avif'],
+
+    // Image optimization settings
+    minimumCacheTTL: 86400, // 24 hours cache
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    
+    // Better error handling for external images
+    unoptimized: false,
+    loader: 'default',
 
     // Custom image loader for better optimization
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
@@ -67,12 +119,6 @@ const nextConfig = {
 
   // Reduce bundle size
   poweredByHeader: false,
-
-  // Performance optimizations
-  swcMinify: true,
-
-  // Optimize CSS
-  optimizeFonts: true,
 
   // Bundle analyzer and optimizations
   webpack: (config, { dev, isServer }) => {
