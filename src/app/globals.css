@@ -112,6 +112,144 @@
   --sidebar-ring: oklch(0.552 0.016 285.938);
 }
 
+/* Masonry Layout Styles for Better Column Breaks */
+.break-inside-avoid {
+  break-inside: avoid;
+  page-break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+}
+
+/* Enhanced Masonry Styles for Supahero.io-like Layout */
+.masonry-container {
+  width: 100%;
+}
+
+/* True CSS Masonry using CSS Columns (supahero.io style) */
+.masonry-grid-container {
+  column-gap: 1.5rem;
+}
+
+.masonry-grid-container > * {
+  break-inside: avoid;
+  page-break-inside: avoid;
+  margin-bottom: 1.5rem;
+  display: inline-block;
+  width: 100%;
+}
+
+/* Enhanced column responsive design */
+@media (max-width: 767px) {
+  .masonry-grid-container {
+    columns: 1;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .masonry-grid-container {
+    columns: 2;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .masonry-grid-container {
+    columns: 3;
+  }
+}
+
+@media (min-width: 1280px) {
+  .masonry-grid-container {
+    columns: 4;
+  }
+}
+
+/* Ensure smooth transitions for cards */
+.masonry-grid-container > div {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Ensure smooth column transitions */
+.columns-1,
+.columns-2,
+.columns-3,
+.columns-4 {
+  column-gap: 1.5rem;
+}
+
+/* Prevent orphaned content */
+.columns-1 > *,
+.columns-2 > *,
+.columns-3 > *,
+.columns-4 > * {
+  display: inline-block;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+/* Custom heights for masonry effect */
+.h-80 { height: 20rem; }
+.h-96 { height: 24rem; }
+.h-\[28rem\] { height: 28rem; }
+.h-\[32rem\] { height: 32rem; }
+.h-\[36rem\] { height: 36rem; }
+
+/* Line clamp utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Masonry Grid Styles */
+.masonry-grid {
+  display: flex;
+  margin-left: -1.5rem;
+  width: auto;
+}
+
+.masonry-grid-column {
+  padding-left: 1.5rem;
+  background-clip: padding-box;
+}
+
+.masonry-grid-column > div {
+  margin-bottom: 1.5rem;
+}
+
+/* Responsive masonry columns */
+@media (max-width: 768px) {
+  .masonry-grid-column {
+    flex-basis: 100% !important;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .masonry-grid-column {
+    flex-basis: 50% !important;
+  }
+}
+
+@media (min-width: 1025px) and (max-width: 1536px) {
+  .masonry-grid-column {
+    flex-basis: 33.333% !important;
+  }
+}
+
+@media (min-width: 1537px) {
+  .masonry-grid-column {
+    flex-basis: 25% !important;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

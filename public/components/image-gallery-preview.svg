@@ -1,0 +1,61 @@
+<svg width="400" height="200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="galleryBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F8FAFC;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F1F5F9;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="400" height="200" fill="url(#galleryBg)"/>
+  
+  <!-- Gallery Container -->
+  <rect x="20" y="20" width="360" height="160" fill="white" stroke="#E2E8F0" rx="8"/>
+  
+  <!-- Gallery Header -->
+  <text x="35" y="40" fill="#1E293B" font-family="Arial, sans-serif" font-size="14" font-weight="bold">Image Gallery</text>
+  
+  <!-- Main Image -->
+  <rect x="35" y="50" width="180" height="100" fill="#CBD5E1" rx="4"/>
+  <rect x="45" y="60" width="40" height="30" fill="#94A3B8" rx="2"/>
+  <rect x="95" y="60" width="40" height="30" fill="#64748B" rx="2"/>
+  <rect x="145" y="60" width="40" height="30" fill="#475569" rx="2"/>
+  <rect x="45" y="100" width="40" height="30" fill="#334155" rx="2"/>
+  <rect x="95" y="100" width="40" height="30" fill="#1E293B" rx="2"/>
+  <rect x="145" y="100" width="40" height="30" fill="#0F172A" rx="2"/>
+  
+  <!-- Image counter -->
+  <rect x="170" y="130" width="35" height="15" fill="rgba(0,0,0,0.7)" rx="7"/>
+  <text x="187" y="140" fill="white" font-family="Arial, sans-serif" font-size="9" text-anchor="middle">1 / 6</text>
+  
+  <!-- Thumbnail Strip -->
+  <rect x="235" y="50" width="30" height="20" fill="#94A3B8" stroke="#3B82F6" stroke-width="2" rx="2"/>
+  <rect x="235" y="75" width="30" height="20" fill="#64748B" stroke="#E2E8F0" rx="2"/>
+  <rect x="235" y="100" width="30" height="20" fill="#475569" stroke="#E2E8F0" rx="2"/>
+  <rect x="235" y="125" width="30" height="20" fill="#334155" stroke="#E2E8F0" rx="2"/>
+  
+  <!-- Gallery Features -->
+  <text x="285" y="65" fill="#1E293B" font-family="Arial, sans-serif" font-size="11" font-weight="bold">Features:</text>
+  
+  <circle cx="290" cy="80" r="2" fill="#10B981"/>
+  <text x="298" y="84" fill="#374151" font-family="Arial, sans-serif" font-size="9">Lightbox</text>
+  
+  <circle cx="290" cy="95" r="2" fill="#10B981"/>
+  <text x="298" y="99" fill="#374151" font-family="Arial, sans-serif" font-size="9">Lazy Loading</text>
+  
+  <circle cx="290" cy="110" r="2" fill="#10B981"/>
+  <text x="298" y="114" fill="#374151" font-family="Arial, sans-serif" font-size="9">Navigation</text>
+  
+  <circle cx="290" cy="125" r="2" fill="#10B981"/>
+  <text x="298" y="129" fill="#374151" font-family="Arial, sans-serif" font-size="9">Responsive</text>
+  
+  <circle cx="290" cy="140" r="2" fill="#10B981"/>
+  <text x="298" y="144" fill="#374151" font-family="Arial, sans-serif" font-size="9">Zoom</text>
+  
+  <!-- Navigation arrows -->
+  <rect x="30" y="90" width="15" height="15" fill="rgba(0,0,0,0.5)" rx="7"/>
+  <polygon points="35,97.5 40,93 40,102" fill="white"/>
+  
+  <rect x="200" y="90" width="15" height="15" fill="rgba(0,0,0,0.5)" rx="7"/>
+  <polygon points="210,97.5 205,93 205,102" fill="white"/>
+</svg>

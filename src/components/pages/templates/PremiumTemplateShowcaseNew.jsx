@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Star, Eye, Download, IndianRupee, DollarSign, Play, ExternalLink } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getPremiumTemplates } from '@/lib/templateData';
+import { useTemplate } from '@/contexts/TemplateContext';
 
 // Custom hook for intersection observer
 const useIntersectionObserver = (options = {}) => {
@@ -227,7 +227,7 @@ const PremiumTemplateCard = ({ template, index }) => {
                             {template.planType === 'Paid' ? (
                                 <div className="flex items-center gap-1">
                                     <IndianRupee className="w-4 h-4 text-orange-400" />
-                                    <span className="text-lg font-bold text-orange-400">₹{template.pricing.inr}</span>
+                                    <span className="text-lg font-bold text-orange-400">₹{template.pricingINR || template.pricing_inr || 0}</span>
                                 </div>
                             ) : (
                                 <span className="text-lg font-bold text-green-400">Free</span>
@@ -242,7 +242,8 @@ const PremiumTemplateCard = ({ template, index }) => {
 
 // Main Component
 const PremiumTemplateShowcase = () => {
-    const premiumTemplates = getPremiumTemplates();
+    const { templates } = useTemplate();
+    const premiumTemplates = templates.filter(template => template.plan_type === 'Paid');
 
     const containerVariants = {
         hidden: { opacity: 0 },

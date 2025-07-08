@@ -1,13 +1,12 @@
 'use client';
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Play, Star, Plus, Code, Zap, Globe, Shield } from 'lucide-react';
+import { Play, Star, Plus, Code, Zap, Globe, Shield } from 'lucide-react';
 import Link from 'next/link';
-import { userRoles, mockUser } from '@/lib/templateData';
+import { useAuth } from '@/contexts/AuthContext';
 
 const TemplateLibraryHero = () => {
-  // Mock user - in real app, this would come from context/props
-  const user = mockUser;
+  const { user, isAuthenticated } = useAuth();
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -53,7 +52,8 @@ const TemplateLibraryHero = () => {
   ];
 
   return (
-    <section className="relative w-full bg-[linear-gradient(180deg,#040406_50%,#09080D_100%)] text-white overflow-hidden">
+    <section className="relative w-full min-h-screen bg-[linear-gradient(180deg,#040406_50%,#09080D_100%)] text-white overflow-hidden mt-0">
+      
       {/* Background Elements */}
       <div className="absolute inset-0">
         {/* Glassmorphism background orbs */}
@@ -72,6 +72,7 @@ const TemplateLibraryHero = () => {
         </div>
       </div>      {/* Main Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8 pt-32 pb-24">
+        
         <motion.div
           className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start mb-20"
           variants={containerVariants}
@@ -110,20 +111,11 @@ const TemplateLibraryHero = () => {
               </motion.p>
             </div>            {/* CTA Buttons */}
             <motion.div className="flex flex-col sm:flex-row gap-4" variants={itemVariants}>
-              <motion.button
-                className="inline-flex items-center justify-center gap-3 px-6 py-3 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-xl font-medium text-base transition-all duration-300 hover:from-purple-700 hover:to-cyan-700 hover:scale-105 shadow-lg hover:shadow-purple-500/25"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                Browse Templates
-                <ArrowRight size={18} />
-              </motion.button>
-
-              {/* Create Template Button - Only for developers */}
-              {user.isLoggedIn && user.role === userRoles.DEVELOPER && (
+              {/* Create Template Button - Only for authenticated users */}
+              {isAuthenticated && (
                 <Link href="/templates/create">
                   <motion.button
-                    className="inline-flex items-center justify-center gap-3 px-6 py-3 bg-transparent border-2 border-white/20 hover:border-green-500/50 hover:bg-green-500/10 text-white rounded-xl font-medium text-base transition-all duration-300"
+                    className="inline-flex items-center justify-center gap-3 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl font-medium text-base transition-all duration-300 shadow-lg hover:shadow-green-500/25"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >

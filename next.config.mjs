@@ -48,50 +48,16 @@ const nextConfig = {
         hostname: 'themewagon.com',
         port: '',
         pathname: '/**',
-      }
-    ],
-
-    // Modern image formats (WebP, AVIF)
-    formats: ['image/webp', 'image/avif'],
-
-    // Image optimization settings
-    minimumCacheTTL: 86400, // 24 hours cache
-    dangerouslyAllowSVG: true,
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    
-    // Better error handling for external images
-    unoptimized: false,
-    loader: 'default',
-    
-    // Fallback configuration for image loading failures
-    remotePatterns: [
+      },
       {
         protocol: 'https',
-        hostname: 'images.unsplash.com',
+        hostname: 'via.placeholder.com',
         port: '',
         pathname: '/**',
       },
       {
-        protocol: 'https',
-        hostname: 'picsum.photos',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'cdn.prod.website-files.com',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'cdn.builder.io',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'themewagon.com',
+        protocol: 'http',
+        hostname: 'via.placeholder.com',
         port: '',
         pathname: '/**',
       }
@@ -106,7 +72,7 @@ const nextConfig = {
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     
     // Better error handling for external images
-    unoptimized: false,
+    unoptimized: true, // Disable image optimization completely
     loader: 'default',
 
     // Custom image loader for better optimization

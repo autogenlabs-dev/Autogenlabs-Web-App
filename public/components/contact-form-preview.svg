@@ -1,0 +1,44 @@
+<svg width="400" height="200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="formGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#EFF6FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#DBEAFE;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="400" height="200" fill="url(#formGradient)"/>
+  
+  <!-- Form Container -->
+  <rect x="50" y="30" width="300" height="140" fill="white" stroke="#E5E7EB" rx="12" stroke-width="1"/>
+  
+  <!-- Form Title -->
+  <text x="70" y="55" fill="#1F2937" font-family="Arial, sans-serif" font-size="16" font-weight="bold">Contact Us</text>
+  
+  <!-- Name Field -->
+  <rect x="70" y="70" width="120" height="25" fill="#F9FAFB" stroke="#D1D5DB" rx="4"/>
+  <text x="75" y="85" fill="#6B7280" font-family="Arial, sans-serif" font-size="11">Your Name</text>
+  
+  <!-- Email Field -->
+  <rect x="210" y="70" width="120" height="25" fill="#F9FAFB" stroke="#D1D5DB" rx="4"/>
+  <text x="215" y="85" fill="#6B7280" font-family="Arial, sans-serif" font-size="11">Email Address</text>
+  
+  <!-- Message Field -->
+  <rect x="70" y="105" width="260" height="40" fill="#F9FAFB" stroke="#D1D5DB" rx="4"/>
+  <text x="75" y="120" fill="#6B7280" font-family="Arial, sans-serif" font-size="11">Your Message</text>
+  
+  <!-- Submit Button -->
+  <rect x="70" y="155" width="100" height="30" fill="#3B82F6" rx="6"/>
+  <text x="105" y="175" fill="white" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">Send Message</text>
+  
+  <!-- Features -->
+  <g transform="translate(250, 155)">
+    <circle cx="5" cy="5" r="2" fill="#10B981"/>
+    <text x="15" y="9" fill="#6B7280" font-family="Arial, sans-serif" font-size="9">Validation</text>
+  </g>
+  
+  <g transform="translate(250, 170)">
+    <circle cx="5" cy="5" r="2" fill="#10B981"/>
+    <text x="15" y="9" fill="#6B7280" font-family="Arial, sans-serif" font-size="9">Email Integration</text>
+  </g>
+</svg>

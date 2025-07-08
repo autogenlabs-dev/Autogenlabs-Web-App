@@ -1,21 +1,31 @@
 'use client';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { paymentApi, tokenUtils } from '../../lib/api';
 
 const PricingSection = () => {
   const [hoveredPlan, setHoveredPlan] = useState(null);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // USD to INR conversion rate (approximate)
+  const USD_TO_INR = 85;
 
   const pricingPlans = [
     {
-      id: 'starter',
+      id: 'free',
       name: 'Free',
       price: 0,
-      period: 'month',
+      priceINR: 0,
+      period: 'forever',
       description: 'A fast way to get started with AutoGen Labs',
       features: [
-        '50 agent mode or chat requests per month',
-        '2,000 completions per month',
-        'Access to Claude 3.5 Sonnet, GPT-4.1, and more'
+        'Up to 3 AI agents',
+        '100 messages per month',
+        'Basic chat interface',
+        'Community support',
+        'Basic templates',
+        'Standard response time'
       ],
       buttonText: 'Get Started Free',
       buttonVariant: 'secondary',
@@ -24,37 +34,177 @@ const PricingSection = () => {
     {
       id: 'pro',
       name: 'Pro',
-      price: 49,
+      price: 20,
+      priceINR: Math.round(20 * USD_TO_INR),
       period: 'month',
       description: 'Unlimited completions and chat with access to more models.',
       features: [
-        'Everything in Free and',
-        'Unlimited agent mode and chats with GPT-4.11',
-        'Unlimited code completions',
-        'Access to code review, Claude 3.7/4.0 Sonnet, Gemini 2.5 Pro, and more',
-        '6x more premium requests than Copilot Free to use the latest models, with the option to buy more2'
+        'Unlimited AI agents',
+        'Unlimited messages',
+        'Advanced chat interface',
+        'Priority support',
+        'All premium templates',
+        'Custom agent training',
+        'Advanced analytics',
+        'Team collaboration',
+        'API access'
       ],
       buttonText: 'Start Free Trial',
       buttonVariant: 'primary',
       popular: true
     },
     {
-      id: 'enterprise',
-      name: 'Enterprise',
-      price: 'Custom',
+      id: 'ultra',
+      name: 'Ultra',
+      price: 50,
+      priceINR: Math.round(50 * USD_TO_INR),
       period: 'month',
       description: 'Built for growing teams and enterprises',
       features: [
-        'Everything in Pro and',
-        'Access to all models, including Claude Opus 4, o3, and GPT-4.5',
-        '30x more premium requests than Copilot Free to use the latest models, with the option to buy more',
-        'Coding agent (preview)'
+        'Everything in Pro',
+        'Dedicated account manager',
+        'Custom deployment options',
+        'SSO integration',
+        'Advanced security features',
+        'SLA guarantee',
+        'Custom agent training',
+        'White-label options',
+        'Unlimited team members',
+        'Priority feature requests'
       ],
-      buttonText: 'Contact Sales',
-      buttonVariant: 'secondary',
+      buttonText: 'Get Ultra',
+      buttonVariant: 'primary',
       popular: false
     }
   ];
+
+  const handlePlanSelect = async (plan) => {
+    if (plan.id === 'free') {
+      // Redirect to signup/dashboard for free plan
+      window.location.href = '/auth';
+      return;
+    }
+
+    // Handle Pro and Ultra plan payments with Razorpay
+    const accessToken = tokenUtils.getAccessToken();
+    if (!accessToken) {
+      // Redirect to login if not authenticated
+      window.location.href = '/auth?redirect=/pricing';
+      return;
+    }
+
+    setSelectedPlan(plan);
+    setIsLoading(true);
+
+    try {
+      await initializeRazorpay(plan, accessToken);
+    } catch (error) {
+      console.error('Payment initialization failed:', error);
+      alert('Payment initialization failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const initializeRazorpay = async (plan, accessToken) => {
+    try {
+      // Create order through backend
+      const orderResponse = await paymentApi.createOrder(accessToken, plan.id, plan.price);
+      
+      if (!orderResponse.success) {
+        throw new Error(orderResponse.message || 'Failed to create order');
+      }
+
+      const orderDetails = orderResponse.order;
+
+      // Load Razorpay script
+      await loadRazorpayScript();
+
+      const options = {
+        key: orderDetails.key_id,
+        amount: orderDetails.amount,
+        currency: orderDetails.currency,
+        name: 'AutoGen Labs',
+        description: `${plan.name} Plan Subscription`,
+        image: '/logoAuto.webp',
+        order_id: orderDetails.order_id,
+        handler: function (response) {
+          handlePaymentSuccess(response, plan, accessToken);
+        },
+        prefill: {
+          name: '',
+          email: '',
+          contact: ''
+        },
+        notes: {
+          plan_id: plan.id,
+          plan_name: plan.name
+        },
+        theme: {
+          color: '#8B5CF6'
+        },
+        modal: {
+          ondismiss: function() {
+            setSelectedPlan(null);
+            setIsLoading(false);
+          }
+        }
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+
+    } catch (error) {
+      console.error('Payment initialization error:', error);
+      throw error;
+    }
+  };
+
+  const loadRazorpayScript = () => {
+    return new Promise((resolve, reject) => {
+      if (window.Razorpay) {
+        resolve();
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('Failed to load Razorpay script'));
+
+      document.body.appendChild(script);
+    });
+  };
+
+  const handlePaymentSuccess = async (paymentResponse, plan, accessToken) => {
+    try {
+      setIsLoading(true);
+      
+      const verificationData = {
+        razorpay_order_id: paymentResponse.razorpay_order_id,
+        razorpay_payment_id: paymentResponse.razorpay_payment_id,
+        razorpay_signature: paymentResponse.razorpay_signature,
+        plan_name: plan.id
+      };
+
+      const verificationResponse = await paymentApi.verifyPayment(accessToken, verificationData);
+      
+      if (verificationResponse.success && verificationResponse.verified) {
+        alert('Payment successful! Welcome to AutoGen ' + plan.name + '!');
+        window.location.href = '/dashboard';
+      } else {
+        throw new Error('Payment verification failed');
+      }
+      
+    } catch (error) {
+      console.error('Payment verification failed:', error);
+      alert('Payment verification failed. Please contact support with your payment ID: ' + paymentResponse.razorpay_payment_id);
+    } finally {
+      setIsLoading(false);
+      setSelectedPlan(null);
+    }
+  };
 
   const cardVariants = {
     initial: { scale: 1, y: 0 },
@@ -241,8 +391,18 @@ const PricingSection = () => {
                   <div className="flex items-baseline justify-center">
                     {typeof plan.price === 'number' ? (
                       <>
-                        <span className="text-4xl font-bold text-white">${plan.price}</span>
-                        <span className="text-gray-400 ml-2">/{plan.period}</span>
+                        <div className="text-center">
+                          <div className="flex items-baseline justify-center mb-2">
+                            <span className="text-4xl font-bold text-white">${plan.price}</span>
+                            <span className="text-gray-400 ml-2">/{plan.period}</span>
+                          </div>
+                          {plan.price > 0 && (
+                            <div className="text-lg text-purple-400">
+                              ₹{plan.priceINR.toLocaleString('en-IN')}
+                              <span className="text-sm text-gray-400">/{plan.period}</span>
+                            </div>
+                          )}
+                        </div>
                       </>
                     ) : (
                       <span className="text-4xl font-bold text-white">{plan.price}</span>
@@ -268,15 +428,21 @@ const PricingSection = () => {
 
                 {/* CTA Button */}
                 <motion.button
+                  onClick={() => handlePlanSelect(plan)}
+                  disabled={isLoading && selectedPlan?.id === plan.id}
                   className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-300 ${
                     plan.buttonVariant === 'primary'
                       ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-purple-500/25'
                       : 'bg-white/10 text-white border border-white/20 hover:bg-white/20 hover:border-white/30'
+                  } ${
+                    isLoading && selectedPlan?.id === plan.id 
+                      ? 'opacity-50 cursor-not-allowed' 
+                      : 'hover:scale-105'
                   }`}
-                  whileHover={{ scale: 1.02 }}
+                  whileHover={{ scale: isLoading && selectedPlan?.id === plan.id ? 1 : 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  {plan.buttonText}
+                  {isLoading && selectedPlan?.id === plan.id ? 'Processing...' : plan.buttonText}
                 </motion.button>
               </div>
 

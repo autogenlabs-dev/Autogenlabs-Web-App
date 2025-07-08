@@ -5,7 +5,7 @@ import { Star, Eye, Download, IndianRupee, DollarSign, Clock, Code, User } from 
 import Link from 'next/link';
 import Image from 'next/image';
 
-const TemplateCard = ({ template, user = null }) => {
+const TemplateCard = ({ template, user = null, cardHeight = 450 }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
     const [imageError, setImageError] = useState(false);
 
@@ -81,10 +81,11 @@ const TemplateCard = ({ template, user = null }) => {
             layout
         >
             <div
-                className="relative rounded-3xl border border-white/20 overflow-hidden shadow-2xl transition-all duration-300 group-hover:shadow-purple-500/20 group-hover:border-purple-500/30 h-[450px] flex flex-col"
+                className="relative rounded-3xl border border-white/20 overflow-hidden shadow-2xl transition-all duration-300 group-hover:shadow-purple-500/20 group-hover:border-purple-500/30 flex flex-col"
                 style={{
                     background: `linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)`,
                     backdropFilter: 'blur(20px)',
+                    height: `${cardHeight}px`,
                 }}
             >
                 {/* Badges */}
@@ -120,66 +121,77 @@ const TemplateCard = ({ template, user = null }) => {
                 </div>
 
                 {/* Template Preview Image */}
-                <div className="relative h-48 overflow-hidden flex-shrink-0">
-                    {/* Loading Placeholder */}
-                    {!imageLoaded && !imageError && (
-                        <div className="w-full h-full bg-gradient-to-br from-gray-800/50 to-gray-900/50 flex items-center justify-center">
-                            <div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
-                        </div>
+                <div 
+                    className="relative overflow-hidden flex-shrink-0"
+                    style={{ height: `${Math.floor(cardHeight * 0.55)}px` }}
+                >
+                    {/* Only show image if previewImages exists and has content */}
+                    {template.previewImages && template.previewImages.length > 0 && template.previewImages[0] ? (
+                        <>
+                            {/* Loading Placeholder */}
+                            {!imageLoaded && !imageError && (
+                                <div className="w-full h-full bg-gradient-to-br from-gray-800/50 to-gray-900/50 flex items-center justify-center">
+                                    <div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
+                                </div>
+                            )}
+
+                            {/* Error Placeholder */}
+                            {imageError && (
+                                <div className="w-full h-full bg-gradient-to-br from-gray-800/50 to-gray-900/50 flex items-center justify-center">
+                                    <div className="text-gray-400 text-center">
+                                        <div className="w-12 h-12 mx-auto mb-2 bg-gray-600 rounded-lg flex items-center justify-center">
+                                            <Code className="w-6 h-6" />
+                                        </div>
+                                        <p className="text-sm">Preview</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Actual Image */}
+                            <Image
+                                src={template.previewImages[0]}
+                                alt={template.title}
+                                fill
+                                className={`object-cover transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'
+                                    }`}
+                                onLoad={handleImageLoad}
+                                onError={handleImageError}
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            />
+                        </>
+                    ) : (
+                        /* Show blank space when no image exists */
+                        <div className="w-full h-full bg-transparent"></div>
                     )}
 
-                    {/* Error Placeholder */}
-                    {imageError && (
-                        <div className="w-full h-full bg-gradient-to-br from-gray-800/50 to-gray-900/50 flex items-center justify-center">
-                            <div className="text-gray-400 text-center">
-                                <div className="w-12 h-12 mx-auto mb-2 bg-gray-600 rounded-lg flex items-center justify-center">
-                                    <Code className="w-6 h-6" />
-                                </div>
-                                <p className="text-sm">Preview</p>
+                    {/* Hover Overlay - only show if image exists */}
+                    {template.previewImages && template.previewImages.length > 0 && template.previewImages[0] && (
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <div className="flex gap-3">
+                                <Link href={`/templates/${template.id}`}>
+                                    <motion.button
+                                        className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg text-white font-medium hover:bg-white/30 transition-colors duration-300 flex items-center gap-2"
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                    >
+                                        <Eye className="w-4 h-4" />
+                                        View Details
+                                    </motion.button>
+                                </Link>
+                                {template.liveDemoUrl && (
+                                    <motion.button
+                                        className="px-4 py-2 bg-purple-500/20 backdrop-blur-sm rounded-lg text-purple-400 font-medium hover:bg-purple-500/30 transition-colors duration-300 flex items-center gap-2"
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        onClick={() => window.open(template.liveDemoUrl, '_blank')}
+                                    >
+                                        <Download className="w-4 h-4" />
+                                        Demo
+                                    </motion.button>
+                                )}
                             </div>
                         </div>
                     )}
-
-                    {/* Actual Image */}
-                    {template.previewImage && (
-                        <Image
-                            src={template.previewImage}
-                            alt={template.title}
-                            fill
-                            className={`object-cover transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'
-                                }`}
-                            onLoad={handleImageLoad}
-                            onError={handleImageError}
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        />
-                    )}
-
-                    {/* Hover Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                        <div className="flex gap-3">
-                            <Link href={`/templates/${template.id}`}>
-                                <motion.button
-                                    className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg text-white font-medium hover:bg-white/30 transition-colors duration-300 flex items-center gap-2"
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                >
-                                    <Eye className="w-4 h-4" />
-                                    View Details
-                                </motion.button>
-                            </Link>
-                            {template.liveDemoUrl && (
-                                <motion.button
-                                    className="px-4 py-2 bg-purple-500/20 backdrop-blur-sm rounded-lg text-purple-400 font-medium hover:bg-purple-500/30 transition-colors duration-300 flex items-center gap-2"
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={() => window.open(template.liveDemoUrl, '_blank')}
-                                >
-                                    <Download className="w-4 h-4" />
-                                    Demo
-                                </motion.button>
-                            )}
-                        </div>
-                    </div>
                 </div>
 
                 {/* Template Info */}
@@ -191,7 +203,7 @@ const TemplateCard = ({ template, user = null }) => {
 
                     {/* Short Description */}
                     <p className="text-gray-400 text-sm mb-4 line-clamp-2 flex-grow">
-                        {template.shortDescription}
+                        {template.shortDescription || ''}
                     </p>
 
                     {/* Developer Info */}
@@ -228,11 +240,11 @@ const TemplateCard = ({ template, user = null }) => {
                                 <>
                                     <div className="flex items-center gap-1">
                                         <IndianRupee className="w-4 h-4 text-green-400" />
-                                        <span className="text-lg font-bold text-green-400">₹{template.pricing.inr}</span>
+                                        <span className="text-lg font-bold text-green-400">₹{template.pricingINR || template.pricing_inr || 0}</span>
                                     </div>
                                     <div className="flex items-center gap-1">
                                         <DollarSign className="w-4 h-4 text-green-400" />
-                                        <span className="text-lg font-bold text-green-400">${template.pricing.usd}</span>
+                                        <span className="text-lg font-bold text-green-400">${template.pricingUSD || template.pricing_usd || 0}</span>
                                     </div>
                                 </>
                             ) : (

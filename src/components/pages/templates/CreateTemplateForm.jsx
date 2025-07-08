@@ -4,8 +4,35 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Upload, X, Plus, Github, Globe, IndianRupee, DollarSign, Save, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { templateCategories, difficultyLevels, templateTypes, planTypes } from '@/lib/templateData';
+import { useTemplate } from '@/contexts/TemplateContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
 const CreateTemplateForm = () => {
+    const { createTemplate, loading, error } = useTemplate();
+    const { user, isAuthenticated } = useAuth(); // Use isAuthenticated instead of accessToken
+    const router = useRouter();
+    
+    // Debug authentication state
+    console.log('CreateTemplateForm: User:', user);
+    console.log('CreateTemplateForm: Is Authenticated:', isAuthenticated);
+    console.log('CreateTemplateForm: Access Token:', localStorage.getItem('access_token') ? 'Present' : 'Missing');
+    
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+        return (
+            <div className="min-h-screen bg-[linear-gradient(180deg,#040406_50%,#09080D_100%)] text-white flex items-center justify-center">
+                <div className="text-center">
+                    <h1 className="text-2xl font-bold mb-4">Authentication Required</h1>
+                    <p className="text-gray-400 mb-6">Please log in to create a template.</p>
+                    <Link href="/auth" className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                        Go to Login
+                    </Link>
+                </div>
+            </div>
+        );
+    }
+    
     const [formData, setFormData] = useState({
         title: '',
         category: '',
@@ -30,6 +57,8 @@ const CreateTemplateForm = () => {
     const [newDependency, setNewDependency] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
+    const [submitError, setSubmitError] = useState(null);
+    const [submitSuccess, setSubmitSuccess] = useState(false);
 
     const handleInputChange = (field, value) => {
         setFormData(prev => ({
@@ -64,23 +93,82 @@ const CreateTemplateForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log('🚀 Form submission started!');
+        console.log('🔍 User:', user);
+        console.log('🔍 Is Authenticated:', isAuthenticated);
+        console.log('🔍 Form Data:', formData);
+        console.log('🔍 Form Valid:', isFormValid());
+        
         setIsSubmitting(true);
+        setSubmitError(null);
+        setSubmitSuccess(false);
 
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            console.log('🔍 About to validate form...');
+            
+            if (!isFormValid()) {
+                console.log('❌ Form is not valid, stopping submission');
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            console.log('✅ Form validation passed');
+            
+            // Prepare template data for API
+            const templateData = {
+                title: formData.title,
+                category: formData.category,
+                type: formData.type,
+                language: formData.language,
+                difficulty_level: formData.difficultyLevel,
+                plan_type: formData.planType,
+                pricing_inr: parseInt(formData.pricingINR) || 0,
+                pricing_usd: parseInt(formData.pricingUSD) || 0,
+                short_description: formData.shortDescription,
+                full_description: formData.fullDescription,
+                preview_images: formData.previewImage ? [URL.createObjectURL(formData.previewImage)] : [], // Only add image if uploaded
+                git_repo_url: formData.gitRepoUrl,
+                live_demo_url: formData.liveDemoUrl,
+                dependencies: formData.dependencies,
+                tags: [], // You can add tags if needed
+                developer_name: formData.developerName,
+                developer_experience: formData.developerExperience,
+                is_available_for_dev: formData.isAvailableForDev,
+                code: formData.fullDescription, // Use description as code for now
+                readme_content: `# ${formData.title}\n\n${formData.fullDescription}\n\n## Dependencies\n${formData.dependencies.join(', ')}`,
+                featured: false,
+                popular: false
+            };
 
-            // In real app, this would make an API call to create the template
-            console.log('Template data to submit:', formData);
+            console.log('📦 Template data to submit:', templateData);
+            console.log('🔄 About to call createTemplate function...');
+            
+            if (!createTemplate) {
+                console.error('❌ createTemplate function is not available!');
+                throw new Error('Template creation function not available');
+            }
+            
+            console.log('✅ createTemplate function is available, calling it now...');
 
-            alert('Template submitted successfully! It will be reviewed and published soon.');
+            // Use the createTemplate function from context
+            const result = await createTemplate(templateData);
 
-            // Reset form or redirect
-            // window.location.href = '/templates';
+            console.log('Template created successfully:', result);
+            setSubmitSuccess(true);
+            
+            // Show success message
+            alert('Template created successfully!');
+            
+            // Redirect to templates page after a short delay
+            setTimeout(() => {
+                router.push('/templates');
+            }, 1500);
 
         } catch (error) {
-            console.error('Error submitting template:', error);
-            alert('Error submitting template. Please try again.');
+            console.error('Error creating template:', error);
+            const errorMessage = error.message || 'Failed to create template. Please try again.';
+            setSubmitError(errorMessage);
+            alert(`Error creating template: ${errorMessage}`);
         } finally {
             setIsSubmitting(false);
         }
@@ -96,7 +184,10 @@ const CreateTemplateForm = () => {
         const hasRequiredFields = requiredFields.every(field => formData[field]);
         const hasPricing = formData.planType === 'Free' || (formData.pricingINR && formData.pricingUSD);
 
-        return hasRequiredFields && hasPricing;
+        if (hasRequiredFields && hasPricing) {
+            return true;
+        }
+        return false;
     };
 
     return (
@@ -570,10 +661,11 @@ const CreateTemplateForm = () => {
                         <button
                             type="submit"
                             disabled={!isFormValid() || isSubmitting}
-                            className={`px-12 py-4 rounded-xl font-bold text-lg transition-all duration-300 flex items-center gap-3 ${isFormValid() && !isSubmitting
+                            className={`px-12 py-4 rounded-xl font-bold text-lg transition-all duration-300 flex items-center gap-3 ${
+                                isFormValid() && !isSubmitting
                                     ? 'bg-gradient-to-r from-purple-600 to-cyan-600 text-white hover:from-purple-700 hover:to-cyan-700 hover:scale-105 shadow-lg hover:shadow-purple-500/25'
                                     : 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                }`}
+                            }`}
                         >
                             {isSubmitting ? (
                                 <>

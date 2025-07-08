@@ -1,9 +1,10 @@
 'use client';
 import React, { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '../../../contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 import AuthBackground from './AuthBackground';
 import AuthLoadingState from './AuthLoadingState';
 import AuthHeader from './AuthHeader';
-import AuthSocialButtons from './AuthSocialButtons';
 import AuthForm from './AuthForm';
 import AuthStyles from './AuthStyles';
 
@@ -11,12 +12,23 @@ const AuthPage = () => {
     const [isSignIn, setIsSignIn] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
+    const [error, setError] = useState('');
     const [formData, setFormData] = useState({
         email: '',
         password: '',
         confirmPassword: '',
         name: ''
     });
+
+    const { login, signup, isAuthenticated, error: authError, clearError } = useAuth();
+    const router = useRouter();
+
+    // Redirect if already authenticated
+    useEffect(() => {
+        if (isAuthenticated) {
+            router.push('/');
+        }
+    }, [isAuthenticated, router]);
 
     // Optimized input change handler with useCallback to prevent unnecessary re-renders
     const handleInputChange = useCallback((e) => {
@@ -25,40 +37,70 @@ const AuthPage = () => {
             ...prev,
             [name]: value
         }));
-    }, []);
+        // Clear errors when user starts typing
+        if (error) setError('');
+        if (authError) clearError();
+    }, [error, authError, clearError]);
 
     // Fix hydration issue with useEffect
     useEffect(() => {
         setIsMounted(true);
     }, []);
 
+    const validateForm = () => {
+        if (!formData.email || !formData.password) {
+            setError('Email and password are required');
+            return false;
+        }
+
+        if (!isSignIn) {
+            if (!formData.name) {
+                setError('Name is required for signup');
+                return false;
+            }
+            if (formData.password !== formData.confirmPassword) {
+                setError('Passwords do not match');
+                return false;
+            }
+            if (formData.password.length < 8) {
+                setError('Password must be at least 8 characters long');
+                return false;
+            }
+        }
+
+        return true;
+    };
+
     const handleSubmit = useCallback(async (e) => {
         e.preventDefault();
-        setIsLoading(true);
+        
+        if (!validateForm()) {
+            return;
+        }
 
-        // Simulate API call
-        setTimeout(() => {
-            console.log('Form submitted:', formData);
-            setIsLoading(false);
-            alert(isSignIn ? 'Sign in successful!' : 'Account created successfully!');
-        }, 1500);
-    }, [formData, isSignIn]);
-
-    const handleGoogleAuth = useCallback(async () => {
         setIsLoading(true);
-        setTimeout(() => {
-            console.log('Google authentication clicked');
-            setIsLoading(false);
-        }, 1000);
-    }, []);
+        setError('');
 
-    const handleGitHubAuth = useCallback(async () => {
-        setIsLoading(true);
-        setTimeout(() => {
-            console.log('GitHub authentication clicked');
+        try {
+            if (isSignIn) {
+                await login({
+                    email: formData.email,
+                    password: formData.password
+                });
+            } else {
+                await signup({
+                    email: formData.email,
+                    password: formData.password,
+                    name: formData.name
+                });
+            }
+            // Success - redirect will happen via useEffect
+        } catch (error) {
+            setError(error.message || (isSignIn ? 'Login failed' : 'Signup failed'));
+        } finally {
             setIsLoading(false);
-        }, 1000);
-    }, []);
+        }
+    }, [formData, isSignIn, login, signup]);
 
     // Don't render animations until component is mounted on client
     if (!isMounted) {
@@ -76,35 +118,30 @@ const AuthPage = () => {
 
                         <AuthHeader isSignIn={isSignIn} />
 
-                        <AuthSocialButtons
-                            handleGoogleAuth={handleGoogleAuth}
-                            handleGitHubAuth={handleGitHubAuth}
-                            isLoading={isLoading}
-                        />
-
-                        {/* Divider */}
-                        <div className="relative mb-6">
-                            <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-white/20"></div>
+                        {/* Error Message */}
+                        {(error || authError) && (
+                            <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg text-red-200 text-sm">
+                                {error || authError}
                             </div>
-                            <div className="relative flex justify-center text-xs">
-                                <span className="px-3 bg-white/10 text-gray-300 backdrop-blur-sm rounded-full">Or continue with email</span>
-                            </div>
-                        </div>
+                        )}
 
                         <AuthForm
                             isSignIn={isSignIn}
                             formData={formData}
                             handleInputChange={handleInputChange}
                             handleSubmit={handleSubmit}
-                            isLoading={isLoading}
-                        />
+                            isLoading={isLoading}                        />
 
                         <div className="text-center mt-4">
                             <button
                                 type="button"
-                                onClick={() => setIsSignIn(!isSignIn)}
+                                onClick={() => {
+                                    setIsSignIn(!isSignIn);
+                                    setError('');
+                                    if (authError) clearError();
+                                }}
                                 className="text-sm text-gray-300 hover:text-white transition-colors duration-300 transform hover:scale-105"
+                                disabled={isLoading}
                             >
                                 {isSignIn ? "Don't have an account? Sign Up" : 'Already have an account? Sign In'}
                             </button>

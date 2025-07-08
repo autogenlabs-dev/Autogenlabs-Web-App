@@ -115,9 +115,6 @@ const AboutUsSection = () => {
                       loop={true}
                       autoplay={true}
                       style={{ width: '100%', height: '100%' }}
-                      onLoadError={(error) => {
-                        console.warn('Lottie animation failed to load:', error);
-                      }}
                     />
                   
                   </div>

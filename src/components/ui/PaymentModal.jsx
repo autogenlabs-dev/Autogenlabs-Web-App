@@ -15,7 +15,7 @@ const PaymentModal = ({ isOpen, onClose, template, selectedCurrency = 'inr' }) =
 
     if (!isOpen || !template) return null;
 
-    const price = selectedCurrency === 'inr' ? template.pricing.inr : template.pricing.usd;
+    const price = selectedCurrency === 'inr' ? (template.pricingINR || template.pricing_inr || 0) : (template.pricingUSD || template.pricing_usd || 0);
     const currency = selectedCurrency === 'inr' ? 'INR' : 'USD';
     const symbol = selectedCurrency === 'inr' ? '₹' : '$';
 

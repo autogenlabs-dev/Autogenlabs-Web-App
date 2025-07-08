@@ -9,6 +9,23 @@ const RatingSection = ({ template, user = null }) => {
     const [showReviewForm, setShowReviewForm] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    // Add comprehensive error protection
+    if (!template || typeof template !== 'object') {
+        return (
+            <div className="bg-white/5 rounded-2xl p-8 border border-white/10">
+                <div className="text-gray-400">Rating information not available</div>
+            </div>
+        );
+    }
+
+    // Provide default values with type checking
+    const safeTemplate = {
+        rating: typeof template.rating === 'number' ? template.rating : 0,
+        totalRatings: typeof template.totalRatings === 'number' ? template.totalRatings : 0,
+        title: template.title || 'Unknown Component',
+        ...template
+    };
+
     // Mock reviews data
     const mockReviews = [
         {
@@ -118,14 +135,14 @@ const RatingSection = ({ template, user = null }) => {
                     <div className="text-center lg:text-left">
                         <div className="flex items-center justify-center lg:justify-start gap-4 mb-4">
                             <div className="text-6xl font-bold text-white">
-                                {template.rating}
+                                {safeTemplate.rating ? safeTemplate.rating.toFixed(1) : '0.0'}
                             </div>
                             <div>
                                 <div className="flex items-center gap-1 mb-2">
-                                    {renderStars(template.rating, false, null, 'w-6 h-6')}
+                                    {renderStars(safeTemplate.rating || 0, false, null, 'w-6 h-6')}
                                 </div>
                                 <p className="text-gray-400">
-                                    Based on {template.totalRatings} reviews
+                                    Based on {safeTemplate.totalRatings || 0} reviews
                                 </p>
                             </div>
                         </div>

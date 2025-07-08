@@ -1,0 +1,38 @@
+<svg width="400" height="200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="navGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1D4ED8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="400" height="200" fill="#1F2937"/>
+  
+  <!-- Navigation Bar -->
+  <rect width="400" height="60" fill="url(#navGradient)"/>
+  
+  <!-- Logo -->
+  <circle cx="30" cy="30" r="15" fill="white"/>
+  <text x="55" y="37" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold">Logo</text>
+  
+  <!-- Navigation Items -->
+  <text x="150" y="37" fill="white" font-family="Arial, sans-serif" font-size="14">Home</text>
+  <text x="200" y="37" fill="white" font-family="Arial, sans-serif" font-size="14">About</text>
+  <text x="250" y="37" fill="white" font-family="Arial, sans-serif" font-size="14">Services</text>
+  <text x="310" y="37" fill="white" font-family="Arial, sans-serif" font-size="14">Contact</text>
+  
+  <!-- Mobile Menu Icon -->
+  <g transform="translate(360, 20)">
+    <rect width="20" height="2" fill="white" y="5"/>
+    <rect width="20" height="2" fill="white" y="9"/>
+    <rect width="20" height="2" fill="white" y="13"/>
+  </g>
+  
+  <!-- Content Area -->
+  <rect x="20" y="80" width="360" height="100" fill="#374151" rx="8"/>
+  <text x="30" y="105" fill="#9CA3AF" font-family="Arial, sans-serif" font-size="12">Navigation Component</text>
+  <text x="30" y="125" fill="#E5E7EB" font-family="Arial, sans-serif" font-size="14">Responsive navbar with dropdown menus</text>
+  <text x="30" y="145" fill="#E5E7EB" font-family="Arial, sans-serif" font-size="14">and mobile hamburger menu</text>
+  <text x="30" y="165" fill="#60A5FA" font-family="Arial, sans-serif" font-size="12">React • TypeScript • Tailwind CSS</text>
+</svg>

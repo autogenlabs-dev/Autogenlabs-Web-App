@@ -1,0 +1,31 @@
+<svg width="400" height="200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="heroGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667EEA;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764BA2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="400" height="200" fill="url(#heroGradient)"/>
+  
+  <!-- Hero Content -->
+  <text x="200" y="60" fill="white" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle">Build Amazing</text>
+  <text x="200" y="85" fill="white" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle">Products</text>
+  
+  <text x="200" y="110" fill="#E0E7FF" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">Create stunning applications with our</text>
+  <text x="200" y="125" fill="#E0E7FF" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">modern development platform</text>
+  
+  <!-- CTA Buttons -->
+  <rect x="150" y="140" width="80" height="30" fill="white" rx="15"/>
+  <text x="190" y="159" fill="#667EEA" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle">Get Started</text>
+  
+  <rect x="240" y="140" width="80" height="30" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1" rx="15"/>
+  <text x="280" y="159" fill="white" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">Learn More</text>
+  
+  <!-- Decorative Elements -->
+  <circle cx="50" cy="50" r="20" fill="rgba(255,255,255,0.1)"/>
+  <circle cx="350" cy="150" r="15" fill="rgba(255,255,255,0.1)"/>
+  <rect x="30" y="120" width="25" height="25" fill="rgba(255,255,255,0.1)" rx="5" transform="rotate(45 42.5 132.5)"/>
+  <rect x="330" y="30" width="20" height="20" fill="rgba(255,255,255,0.1)" rx="3" transform="rotate(30 340 40)"/>
+</svg>

@@ -1,11 +1,12 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Star, Eye, Download, IndianRupee, DollarSign, Play } from 'lucide-react';
+import { Star, Eye, Download, IndianRupee, DollarSign, Play, Heart, Trash2, Edit } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getPremiumTemplates } from '@/lib/templateData';
-import VideoPreviewModal from '@/components/ui/VideoPreviewModal';
+import { useTemplate } from '@/contexts/TemplateContext';
+import { useAuth } from '@/contexts/AuthContext';
+import SimpleModal from '@/components/ui/SimpleModal';
 
 // Custom hook for intersection observer
 const useIntersectionObserver = (options = {}) => {
@@ -42,7 +43,7 @@ const useIntersectionObserver = (options = {}) => {
 };
 
 // Lazy loaded template card component
-const LazyTemplateCard = ({ template, index, onVideoPreview }) => {
+const LazyTemplateCard = ({ template, index, onVideoPreview, isOwner = false, onEdit, onDelete }) => {
   const { elementRef, hasIntersected } = useIntersectionObserver({
     threshold: 0.1,
     rootMargin: '100px', // Start loading 100px before the element is visible
@@ -50,6 +51,8 @@ const LazyTemplateCard = ({ template, index, onVideoPreview }) => {
 
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const { toggleTemplateLike } = useTemplate();
+  const { user } = useAuth();
 
   const handleImageLoad = () => {
     setImageLoaded(true);
@@ -65,6 +68,30 @@ const LazyTemplateCard = ({ template, index, onVideoPreview }) => {
     onVideoPreview(template);
   };
 
+  const handleLike = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!user) return;
+    
+    try {
+      await toggleTemplateLike(template.id);
+    } catch (error) {
+      console.error('Failed to like template:', error);
+    }
+  };
+
+  const handleEdit = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onEdit && onEdit(template);
+  };
+
+  const handleDelete = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onDelete && onDelete(template);
+  };
+
   const itemVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: {
@@ -73,6 +100,11 @@ const LazyTemplateCard = ({ template, index, onVideoPreview }) => {
       transition: { duration: 0.6 }
     }
   };
+
+  // Get the first preview image
+  const previewImage = template.previewImages && template.previewImages.length > 0 
+    ? template.previewImages[0] 
+    : template.preview_image || 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop';
 
   return (
     <motion.div
@@ -89,7 +121,8 @@ const LazyTemplateCard = ({ template, index, onVideoPreview }) => {
           background: `linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)`,
           backdropFilter: 'blur(20px)',
         }}
-      >        {/* Top Row - Badges */}
+      >
+        {/* Top Row - Badges */}
         <div className="absolute top-4 left-4 right-4 z-30 flex items-start justify-between">
           {/* Rating Badge */}
           {template.rating && (
@@ -101,14 +134,30 @@ const LazyTemplateCard = ({ template, index, onVideoPreview }) => {
 
           {/* Right side badges */}
           <div className="flex items-center gap-2">
+            {/* Owner Actions */}
+            {isOwner && (
+              <>
+                <button
+                  onClick={handleEdit}
+                  className="w-8 h-8 bg-blue-500/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-blue-600/80 transition-colors shadow-lg"
+                  title="Edit template"
+                >
+                  <Edit size={14} className="text-white" />
+                </button>
+                <button
+                  onClick={handleDelete}
+                  className="w-8 h-8 bg-red-500/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-red-600/80 transition-colors shadow-lg"
+                  title="Delete template"
+                >
+                  <Trash2 size={14} className="text-white" />
+                </button>
+              </>
+            )}
+
             {/* Video Preview Icon */}
             {template.videoPreview && (
               <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  onVideoPreview(template);
-                }}
+                onClick={handleVideoPreview}
                 className="w-8 h-8 bg-black/60 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-black/80 transition-colors shadow-lg"
               >
                 <Play size={14} className="text-white fill-white ml-0.5" />
@@ -126,7 +175,6 @@ const LazyTemplateCard = ({ template, index, onVideoPreview }) => {
 
         {/* Template Preview Image Container */}
         <div className="relative h-40 overflow-hidden flex-shrink-0">
-
           {/* Loading Placeholder */}
           {!hasIntersected && (
             <div className="w-full h-full bg-gradient-to-br from-gray-800/50 to-gray-900/50 flex items-center justify-center">
@@ -158,12 +206,13 @@ const LazyTemplateCard = ({ template, index, onVideoPreview }) => {
                 </div>
               )}
               <Image
-                src={template.previewImage}
+                src={previewImage}
                 alt={template.title}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                className={`object-cover transition-all duration-300 group-hover:scale-105 ${imageLoaded ? 'opacity-100' : 'opacity-0'
-                  }`}
+                className={`object-cover transition-all duration-300 group-hover:scale-105 ${
+                  imageLoaded ? 'opacity-100' : 'opacity-0'
+                }`}
                 onLoad={handleImageLoad}
                 onError={handleImageError}
                 priority={index < 2} // Prioritize first 2 images
@@ -179,24 +228,46 @@ const LazyTemplateCard = ({ template, index, onVideoPreview }) => {
         </div>
 
         {/* Content */}
-        <div className="p-5 space-y-3 flex-1 flex flex-col">          <h3 className="text-sm font-bold text-white leading-tight line-clamp-2">
-          {template.title}
-        </h3>
+        <div className="p-5 space-y-3 flex-1 flex flex-col">
+          <h3 className="text-sm font-bold text-white leading-tight line-clamp-2">
+            {template.title}
+          </h3>
           <p className="text-gray-400 text-xs leading-relaxed flex-1 line-clamp-4">
-            {template.shortDescription}
+            {template.shortDescription || template.short_description}
           </p>
 
-          {/* Rating and Price */}
+          {/* Stats and Actions */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
+              {/* Rating */}
               <div className="flex items-center gap-1">
                 <Star size={12} className="fill-yellow-400 text-yellow-400" />
-                <span className="text-xs text-gray-300">{template.rating}</span>
+                <span className="text-xs text-gray-300">{template.rating || 0}</span>
               </div>
-              <span className="text-xs text-gray-500">({template.totalRatings})</span>
+              
+              {/* Likes */}
+              <button 
+                onClick={handleLike}
+                className={`flex items-center gap-1 hover:text-red-400 transition-colors ${
+                  template.liked ? 'text-red-400' : 'text-gray-400'
+                }`}
+              >
+                <Heart size={12} className={template.liked ? 'fill-current' : ''} />
+                <span className="text-xs">{template.likes || 0}</span>
+              </button>
+              
+              {/* Downloads */}
+              <div className="flex items-center gap-1 text-gray-400">
+                <Download size={12} />
+                <span className="text-xs">{template.downloads || 0}</span>
+              </div>
             </div>
+            
             <div className="text-xs text-purple-400 font-medium">
-              {template.planType === 'Free' ? 'Free' : `₹${template.pricing.inr}`}
+              {template.planType === 'Free' || template.plan_type === 'Free' 
+                ? 'Free' 
+                : `₹${template.pricingINR || template.pricing_inr || 0}`
+              }
             </div>
           </div>
 
@@ -225,17 +296,62 @@ const LazyTemplateCard = ({ template, index, onVideoPreview }) => {
   );
 };
 
-const PremiumTemplateShowcase = () => {
-  // Use real premium templates from data
-  const premiumTemplates = getPremiumTemplates();
+const PremiumTemplateShowcase = ({ showMyTemplates = false }) => {
+  const { templates, myTemplates, loading, updateFilters } = useTemplate();
+  const { user } = useAuth();
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
+  const [templateModalMode, setTemplateModalMode] = useState('create');
+  const [editingTemplate, setEditingTemplate] = useState(null);
+
+  // Choose which templates to show
+  const displayTemplates = showMyTemplates ? (myTemplates || []) : (templates || []);
+  
+  // Filter for premium templates if not showing user templates
+  const premiumTemplates = showMyTemplates 
+    ? displayTemplates 
+    : displayTemplates.filter(template => 
+        (template.rating && template.rating >= 4.7) || template.featured
+      ).slice(0, 4); // Show only 4 highly rated templates
 
   // Handle video preview
   const handleVideoPreview = (template) => {
     setSelectedTemplate(template);
     setIsVideoModalOpen(true);
   };
+
+  // Handle template edit
+  const handleEdit = (template) => {
+    setEditingTemplate(template);
+    setTemplateModalMode('edit');
+    setIsTemplateModalOpen(true);
+  };
+
+  // Handle template delete
+  const handleDelete = (template) => {
+    setEditingTemplate(template);
+    setTemplateModalMode('delete');
+    setIsTemplateModalOpen(true);
+  };
+
+  // Handle create new template
+  const handleCreateTemplate = () => {
+    setEditingTemplate(null);
+    setTemplateModalMode('create');
+    setIsTemplateModalOpen(true);
+  };
+
+  // Close template modal
+  const closeTemplateModal = () => {
+    setIsTemplateModalOpen(false);
+    setEditingTemplate(null);
+  };
+
+  useEffect(() => {
+    // We don't need to update filters here since we're filtering on the frontend
+    // The templates are already loaded by the TemplateContext
+  }, [showMyTemplates]);
 
   // Partner/Technology logos
   const partners = [
@@ -282,6 +398,19 @@ const PremiumTemplateShowcase = () => {
     }
   };
 
+  if (loading && premiumTemplates.length === 0) {
+    return (
+      <section className="relative w-full bg-[linear-gradient(180deg,#07060B_50%,#0A090E_100%)] py-20 overflow-hidden">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8">
+          <div className="text-center text-white">
+            <div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin mx-auto mb-4"></div>
+            <p>Loading templates...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="relative w-full bg-[linear-gradient(180deg,#07060B_50%,#0A090E_100%)] py-20 overflow-hidden">
       {/* Background Elements */}
@@ -303,7 +432,6 @@ const PremiumTemplateShowcase = () => {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8">
-
         {/* Section Header */}
         <motion.div
           className="mb-16"
@@ -312,70 +440,136 @@ const PremiumTemplateShowcase = () => {
           transition={{ duration: 0.6 }}
           viewport={{ once: false }}
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Premium infrastructure sections
-          </h2>
-        </motion.div>        {/* Template Cards Grid */}
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: false }}
-        >          {premiumTemplates.map((template, index) => (
-          <LazyTemplateCard
-            key={template.id}
-            template={template}
-            index={index}
-            onVideoPreview={handleVideoPreview}
-          />
-        ))}
-        </motion.div>
-
-        {/* Partners/Technologies Section */}
-        <motion.div
-          className="border-t border-white/10 pt-16"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          viewport={{ once: false }}
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {partners.map((partner, index) => (
-              <motion.div
-                key={index}
-                className="flex items-start gap-4 group cursor-pointer"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: index * 0.1 }}
-                viewport={{ once: false }}
-                whileHover={{ x: 5 }}
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                {showMyTemplates ? 'My Templates' : 'Premium infrastructure sections'}
+              </h2>
+              {showMyTemplates && (
+                <p className="text-gray-400 text-lg">
+                  Manage and edit your created templates
+                </p>
+              )}
+            </div>
+            {showMyTemplates && (
+              <button
+                onClick={handleCreateTemplate}
+                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-lg transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-purple-500/25"
               >
-                {/* Partner Icon */}
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-purple-600/20 to-cyan-600/20 border border-white/10 flex items-center justify-center flex-shrink-0 group-hover:border-purple-500/30 transition-all duration-300">
-                  <span className="text-xl">{partner.icon}</span>
-                </div>
-
-                {/* Partner Info */}
-                <div className="space-y-1">
-                  <h4 className="text-white font-semibold group-hover:text-purple-400 transition-colors">
-                    {partner.name}
-                  </h4>
-                  <p className="text-gray-400 text-sm leading-relaxed">
-                    {partner.description}
-                  </p>
-                </div>
-              </motion.div>
-            ))}          </div>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Create Template
+              </button>
+            )}
+          </div>
         </motion.div>
+
+        {/* Template Cards Grid */}
+        {premiumTemplates.length > 0 ? (
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: false }}
+          >
+            {premiumTemplates.map((template, index) => (
+              <LazyTemplateCard
+                key={template.id}
+                template={template}
+                index={index}
+                onVideoPreview={handleVideoPreview}
+                isOwner={showMyTemplates && user && template.userId === user.id}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            ))}
+          </motion.div>
+        ) : (
+          <div className="text-center text-gray-400 py-20">
+            <p className="text-lg">
+              {showMyTemplates ? 'No templates created yet.' : 'No premium templates available.'}
+            </p>
+            {showMyTemplates && (
+              <button 
+                onClick={handleCreateTemplate}
+                className="inline-block mt-4 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              >
+                Create Your First Template
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Partners/Technologies Section - Only show for public templates */}
+        {!showMyTemplates && (
+          <motion.div
+            className="border-t border-white/10 pt-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: false }}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {partners.map((partner, index) => (
+                <motion.div
+                  key={index}
+                  className="flex items-start gap-4 group cursor-pointer"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                  viewport={{ once: false }}
+                  whileHover={{ x: 5 }}
+                >
+                  {/* Partner Icon */}
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-purple-600/20 to-cyan-600/20 border border-white/10 flex items-center justify-center flex-shrink-0 group-hover:border-purple-500/30 transition-all duration-300">
+                    <span className="text-xl">{partner.icon}</span>
+                  </div>
+
+                  {/* Partner Info */}
+                  <div className="space-y-1">
+                    <h4 className="text-white font-semibold group-hover:text-purple-400 transition-colors">
+                      {partner.name}
+                    </h4>
+                    <p className="text-gray-400 text-sm leading-relaxed">
+                      {partner.description}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
       </div>
 
       {/* Video Preview Modal */}
-      <VideoPreviewModal
+      <SimpleModal
         isOpen={isVideoModalOpen}
         onClose={() => setIsVideoModalOpen(false)}
-        template={selectedTemplate}
-      />
+        title="Video Preview"
+      >
+        <div className="text-white">
+          <p>Video preview for: {selectedTemplate?.title}</p>
+          <div className="mt-4 p-4 bg-gray-800 rounded">
+            Video player will be implemented here
+          </div>
+        </div>
+      </SimpleModal>
+
+      {/* Template CRUD Modal */}
+      <SimpleModal
+        isOpen={isTemplateModalOpen}
+        onClose={closeTemplateModal}
+        title={templateModalMode === 'create' ? 'Create Template' : templateModalMode === 'edit' ? 'Edit Template' : 'Delete Template'}
+      >
+        <div className="text-white">
+          <p>Template {templateModalMode} functionality will be implemented here</p>
+          <div className="mt-4 p-4 bg-gray-800 rounded">
+            Form for template {templateModalMode} will be here
+          </div>
+        </div>
+      </SimpleModal>
 
       {/* CSS for text truncation */}
       <style jsx>{`
