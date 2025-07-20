@@ -74,6 +74,12 @@ const AuthPage = () => {
     const handleSubmit = useCallback(async (e) => {
         e.preventDefault();
         
+        // Prevent multiple submissions
+        if (isLoading) {
+            console.log('⚠️ Form submission already in progress, ignoring');
+            return;
+        }
+        
         if (!validateForm()) {
             return;
         }
@@ -82,25 +88,30 @@ const AuthPage = () => {
         setError('');
 
         try {
+            console.log('🔄 Form submission started:', isSignIn ? 'login' : 'signup');
+            
             if (isSignIn) {
-                await login({
+                const result = await login({
                     email: formData.email,
                     password: formData.password
                 });
+                console.log('✅ Login completed:', result);
             } else {
-                await signup({
+                const result = await signup({
                     email: formData.email,
                     password: formData.password,
                     name: formData.name
                 });
+                console.log('✅ Signup completed:', result);
             }
             // Success - redirect will happen via useEffect
         } catch (error) {
+            console.error('❌ Form submission error:', error);
             setError(error.message || (isSignIn ? 'Login failed' : 'Signup failed'));
         } finally {
             setIsLoading(false);
         }
-    }, [formData, isSignIn, login, signup]);
+    }, [formData, isSignIn, login, signup, isLoading, validateForm]);
 
     // Don't render animations until component is mounted on client
     if (!isMounted) {

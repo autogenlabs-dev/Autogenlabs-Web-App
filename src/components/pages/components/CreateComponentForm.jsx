@@ -1,11 +1,14 @@
 'use client';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Upload, X, Plus, Github, Globe, IndianRupee, DollarSign, Save, Eye } from 'lucide-react';
+import { ArrowLeft, Upload, X, Plus, Github, Globe, IndianRupee, DollarSign, Save, Eye, CheckCircle, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { componentCategories, difficultyLevels, componentTypes, planTypes } from '@/lib/componentData';
+import { componentApi } from '@/lib/componentApi';
 
 const CreateComponentForm = () => {
+    const router = useRouter();
     const [formData, setFormData] = useState({
         title: '',
         category: '',
@@ -31,6 +34,8 @@ const CreateComponentForm = () => {
     const [newTag, setNewTag] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
+    const [submitStatus, setSubmitStatus] = useState(null); // 'success', 'error', null
+    const [submitMessage, setSubmitMessage] = useState('');
 
     const handleInputChange = (field, value) => {
         setFormData(prev => ({
@@ -93,22 +98,50 @@ const CreateComponentForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
+        setSubmitStatus(null);
+        setSubmitMessage('');
 
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
-            // In real app, this would make an API call to create the component
-            console.log('Component data to submit:', formData);
-
-            alert('Component submitted successfully! It will be reviewed and published soon.');
-
-            // Reset form or redirect
-            // window.location.href = '/components';
+            console.log('🚀 Starting component creation...');
+            console.log('📋 Form data:', formData);
+            
+            // Transform form data to backend format (now async to handle file conversion)
+            console.log('🔄 Transforming form data...');
+            const backendData = await componentApi.transformFormDataToBackend(formData);
+            console.log('📤 Backend data:', backendData);
+            
+            // Create component via API (authentication handled automatically)
+            console.log('📡 Sending to API...');
+            const response = await componentApi.createComponent(backendData);
+            
+            setSubmitStatus('success');
+            setSubmitMessage('Component created successfully! Redirecting...');
+            
+            // Redirect to component detail page after a short delay
+            setTimeout(() => {
+                router.push(`/components/${response.id}`);
+            }, 2000);
 
         } catch (error) {
-            console.error('Error submitting component:', error);
-            alert('Error submitting component. Please try again.');
+            console.error('Component creation error:', error);
+            setSubmitStatus('error');
+            
+            // Remove all authentication-specific error handling
+            // Just show the actual error message from the API
+            if (error.status === 422) {
+                // Handle validation errors
+                if (error.details && error.details.detail) {
+                    const validationErrors = error.details.detail.map(err => `${err.loc.join('.')}: ${err.msg}`).join(', ');
+                    setSubmitMessage(`Validation error: ${validationErrors}`);
+                } else {
+                    setSubmitMessage('Please check your form data - some fields have invalid values.');
+                }
+            } else if (error.status === 400) {
+                setSubmitMessage('Please check your form data and try again');
+            } else {
+                // Show the exact error message from the API
+                setSubmitMessage(error.message || 'Failed to create component. Please try again.');
+            }
         } finally {
             setIsSubmitting(false);
         }
@@ -123,9 +156,10 @@ const CreateComponentForm = () => {
 
         const hasRequiredFields = requiredFields.every(field => formData[field]);
         const hasPricing = formData.planType === 'Free' || (formData.pricingINR && formData.pricingUSD);
-        const hasImages = formData.previewImages.length > 0;
+        // Make preview images optional for now since file upload isn't fully implemented
+        // const hasImages = formData.previewImages.length > 0;
 
-        return hasRequiredFields && hasPricing && hasImages;
+        return hasRequiredFields && hasPricing; // && hasImages;
     };
 
     return (
@@ -621,7 +655,7 @@ const CreateComponentForm = () => {
                     </div>
 
                     {/* Submit Button */}
-                    <div className="flex justify-center pt-8">
+                    <div className="flex flex-col items-center pt-8">
                         <button
                             type="submit"
                             disabled={!isFormValid() || isSubmitting}
@@ -643,6 +677,26 @@ const CreateComponentForm = () => {
                                 </>
                             )}
                         </button>
+
+                        {/* Submit Status Messages */}
+                        {submitStatus && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className={`mt-4 p-4 rounded-lg flex items-center gap-2 ${
+                                    submitStatus === 'success' 
+                                        ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+                                        : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                                }`}
+                            >
+                                {submitStatus === 'success' ? (
+                                    <CheckCircle className="w-5 h-5 flex-shrink-0" />
+                                ) : (
+                                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                                )}
+                                <span>{submitMessage}</span>
+                            </motion.div>
+                        )}
                     </div>
                 </motion.form>
             </div>

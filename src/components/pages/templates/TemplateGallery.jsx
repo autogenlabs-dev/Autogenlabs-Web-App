@@ -4,12 +4,12 @@ import { motion } from 'framer-motion';
 import { Search, Grid3X3, List, Star, Download, Eye, Heart, Code } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { componentApi } from '@/lib/componentApi';
-import { componentCategories } from '@/lib/componentData';
+import { templateApi } from '@/lib/apiTemplates';
+import { templateCategories } from '@/lib/templateData';
 
-const ComponentGallery = () => {
+const TemplateGallery = () => {
   const [mounted, setMounted] = useState(false);
-  const [components, setComponents] = useState([]);
+  const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -19,52 +19,52 @@ const ComponentGallery = () => {
   const [selectedPlan, setSelectedPlan] = useState('All');
   const [sortBy, setSortBy] = useState('popular');
   const [viewMode, setViewMode] = useState('grid');
-  const [filteredComponents, setFilteredComponents] = useState([]);
+  const [filteredTemplates, setFilteredTemplates] = useState([]);
 
   useEffect(() => {
     setMounted(true);
-    fetchComponents();
+    fetchTemplates();
   }, []);
 
-  const fetchComponents = async () => {
+  const fetchTemplates = async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await componentApi.getComponents({
+      const response = await templateApi.getAllTemplates({
         limit: 100
       });
       
-      const transformedComponents = response.components.map(component => 
-        componentApi.transformComponentData(component)
+      const transformedTemplates = response.templates.map(template => 
+        templateApi.transformTemplateData(template)
       );
       
-      setComponents(transformedComponents);
-      setFilteredComponents(transformedComponents);
+      setTemplates(transformedTemplates);
+      setFilteredTemplates(transformedTemplates);
     } catch (err) {
-      console.error('Failed to fetch components:', err);
+      console.error('Failed to fetch templates:', err);
       setError(err.message);
       // Fallback to empty array
-      setComponents([]);
-      setFilteredComponents([]);
+      setTemplates([]);
+      setFilteredTemplates([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // Filter and sort components
+  // Filter and sort templates
   useEffect(() => {
-    let filtered = components.filter(component => {
-      const matchesSearch = component.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           component.shortDescription.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = selectedCategory === 'All' || component.category === selectedCategory;
-      const matchesDifficulty = selectedDifficulty === 'All' || component.difficultyLevel === selectedDifficulty;
-      const matchesType = selectedType === 'All' || component.type === selectedType;
-      const matchesPlan = selectedPlan === 'All' || component.planType === selectedPlan;
+    let filtered = templates.filter(template => {
+      const matchesSearch = template.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           template.shortDescription.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = selectedCategory === 'All' || template.category === selectedCategory;
+      const matchesDifficulty = selectedDifficulty === 'All' || template.difficultyLevel === selectedDifficulty;
+      const matchesType = selectedType === 'All' || template.type === selectedType;
+      const matchesPlan = selectedPlan === 'All' || template.planType === selectedPlan;
 
       return matchesSearch && matchesCategory && matchesDifficulty && matchesType && matchesPlan;
     });
 
-    // Sort components
+    // Sort templates
     switch (sortBy) {
       case 'popular':
         filtered.sort((a, b) => b.downloads - a.downloads);
@@ -82,8 +82,8 @@ const ComponentGallery = () => {
         break;
     }
 
-    setFilteredComponents(filtered);
-  }, [components, searchTerm, selectedCategory, selectedDifficulty, selectedType, selectedPlan, sortBy]);
+    setFilteredTemplates(filtered);
+  }, [templates, searchTerm, selectedCategory, selectedDifficulty, selectedType, selectedPlan, sortBy]);
 
   const getDifficultyColor = (level) => {
     switch (level) {
@@ -113,7 +113,7 @@ const ComponentGallery = () => {
         <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8">
           <div className="text-center">
             <div className="w-12 h-12 bg-gray-300 rounded-full animate-pulse mx-auto"></div>
-            <p className="text-gray-400 mt-4">Loading components...</p>
+            <p className="text-gray-400 mt-4">Loading templates...</p>
           </div>
         </div>
       </section>
@@ -129,7 +129,7 @@ const ComponentGallery = () => {
             <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full animate-spin mx-auto">
               <div className="w-full h-full rounded-full border-2 border-white/20 border-t-white"></div>
             </div>
-            <p className="text-gray-400 mt-4">Loading components...</p>
+            <p className="text-gray-400 mt-4">Loading templates...</p>
           </div>
         </div>
       </section>
@@ -145,10 +145,10 @@ const ComponentGallery = () => {
             <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-red-400 text-2xl">⚠</span>
             </div>
-            <h3 className="text-xl font-semibold text-red-400 mb-2">Failed to load components</h3>
+            <h3 className="text-xl font-semibold text-red-400 mb-2">Failed to load templates</h3>
             <p className="text-gray-400 mb-4">{error}</p>
             <button 
-              onClick={fetchComponents}
+              onClick={fetchTemplates}
               className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors"
             >
               Try Again
@@ -178,15 +178,29 @@ const ComponentGallery = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Component{' '}
-            <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-              Library
-            </span>
-          </h2>
-          <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-            Discover our curated collection of beautiful, modern UI components with advanced filtering
-          </p>
+          <div className="flex flex-col items-center justify-between mb-6 md:flex-row">
+            <div className="text-center md:text-left mb-4 md:mb-0">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Template{' '}
+                <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+                  Library
+                </span>
+              </h2>
+              <p className="text-lg text-gray-400 max-w-2xl">
+                Discover our curated collection of beautiful, modern UI templates with advanced filtering
+              </p>
+            </div>
+            
+            {/* Create Template Button */}
+            <Link href="/templates/create">
+              <button className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-emerald-500/25 flex items-center gap-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Create Template
+              </button>
+            </Link>
+          </div>
         </motion.div>
 
         {/* Search and Filters */}
@@ -202,7 +216,7 @@ const ComponentGallery = () => {
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Search components..."
+              placeholder="Search templates..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500/50"
@@ -218,7 +232,7 @@ const ComponentGallery = () => {
               className="p-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:border-blue-500/50"
             >
               <option value="All" className="bg-gray-800">All Categories</option>
-              {componentCategories.map(category => (
+              {templateCategories.map(category => (
                 <option key={category} value={category} className="bg-gray-800">
                   {category}
                 </option>
@@ -300,17 +314,19 @@ const ComponentGallery = () => {
 
           {/* Results Count */}
           <div className="text-sm text-gray-400">
-            Showing {filteredComponents.length} component{filteredComponents.length !== 1 ? 's' : ''}
+            Showing {filteredTemplates.length} template{filteredTemplates.length !== 1 ? 's' : ''}
           </div>
-        </motion.div>        {/* Components Layout - TRUE MASONRY using CSS Columns */}
+        </motion.div>
+
+        {/* Templates Layout - TRUE MASONRY using CSS Columns */}
         {viewMode === 'grid' ? (
           <div className="masonry-grid-container columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-0">
-            {filteredComponents.map((component, index) => {
+            {filteredTemplates.map((template, index) => {
               const cardHeight = getCardHeight(index);
               
               return (
                 <motion.div
-                  key={component.id}
+                  key={template.id}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-100px" }}
@@ -343,14 +359,14 @@ const ComponentGallery = () => {
                           return categoryImageMap[category] || '/components/navbar-preview.svg';
                         };
 
-                        const imageSource = (component.previewImages && component.previewImages.length > 0) 
-                          ? component.previewImages[0] 
-                          : getCategoryImage(component.category);
+                        const imageSource = (template.previewImages && template.previewImages.length > 0) 
+                          ? template.previewImages[0] 
+                          : getCategoryImage(template.category);
 
                         return (
                           <Image
                             src={imageSource}
-                            alt={component.title}
+                            alt={template.title}
                             fill
                             className="object-cover transition-all duration-700 group-hover:scale-110"
                             sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
@@ -368,12 +384,12 @@ const ComponentGallery = () => {
                     
                     {/* Status Badges */}
                     <div className="absolute top-4 left-4 flex gap-2 z-10">
-                      {component.featured && (
+                      {template.featured && (
                         <span className="px-3 py-1.5 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold rounded-full shadow-lg backdrop-blur-sm">
                           Featured
                         </span>
                       )}
-                      {component.popular && (
+                      {template.popular && (
                         <span className="px-3 py-1.5 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-xs font-bold rounded-full shadow-lg backdrop-blur-sm">
                           Popular
                         </span>
@@ -382,14 +398,14 @@ const ComponentGallery = () => {
 
                     {/* Plan Type Badge */}
                     <div className="absolute top-4 right-4 z-10">
-                      <span className={`px-3 py-1.5 text-xs font-bold rounded-full backdrop-blur-sm shadow-lg ${getPlanColor(component.planType)}`}>
-                        {component.planType}
+                      <span className={`px-3 py-1.5 text-xs font-bold rounded-full backdrop-blur-sm shadow-lg ${getPlanColor(template.planType)}`}>
+                        {template.planType}
                       </span>
                     </div>
 
                     {/* View Details Button - Centered */}
                     <div className="absolute inset-0 flex items-center justify-center z-10">
-                      <Link href={`/components/${component.id}`}>
+                      <Link href={`/templates/${template.id}`}>
                         <button className="px-6 py-3 bg-white/20 backdrop-blur-md border border-white/30 text-white font-semibold rounded-full transition-all duration-300 hover:bg-white/30 hover:scale-105 transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100">
                           <Eye className="w-5 h-5 inline-block mr-2" />
                           View Details
@@ -410,9 +426,9 @@ const ComponentGallery = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            {filteredComponents.map((component, index) => (
+            {filteredTemplates.map((template, index) => (
               <motion.div
-                key={component.id}
+                key={template.id}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
@@ -420,10 +436,10 @@ const ComponentGallery = () => {
                 whileHover={{ scale: 1.01 }}
                 className="group"
               >
-                <Link href={`/components/${component.id}`} className="block">
+                <Link href={`/templates/${template.id}`} className="block">
                   <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:bg-white/10 flex gap-6 p-6">
                     
-                    {/* Component Preview */}
+                    {/* Template Preview */}
                     <div className="relative bg-gradient-to-br from-gray-800 to-gray-900 overflow-hidden w-48 h-32 flex-shrink-0 rounded-xl">
                       {(() => {
                         // Get fallback image based on category
@@ -443,14 +459,14 @@ const ComponentGallery = () => {
                           return categoryImageMap[category] || '/components/navbar-preview.svg';
                         };
 
-                        const imageSource = (component.previewImages && component.previewImages.length > 0) 
-                          ? component.previewImages[0] 
-                          : getCategoryImage(component.category);
+                        const imageSource = (template.previewImages && template.previewImages.length > 0) 
+                          ? template.previewImages[0] 
+                          : getCategoryImage(template.category);
 
                         return (
                           <Image
                             src={imageSource}
-                            alt={component.title}
+                            alt={template.title}
                             fill
                             className="object-cover transition-transform duration-300 group-hover:scale-110"
                             onError={(e) => {
@@ -462,18 +478,18 @@ const ComponentGallery = () => {
                       })()}
                     </div>
 
-                    {/* Simplified Component Info - Only Basic Info */}
+                    {/* Simplified Template Info - Only Basic Info */}
                     <div className="flex-1 flex items-center justify-between">
                       <div className="flex-1">
                         <h3 className="font-semibold text-xl text-white mb-2 group-hover:text-blue-400 transition-colors">
-                          {component.title}
+                          {template.title}
                         </h3>
                         <div className="flex items-center gap-3">
                           <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-lg text-sm border border-blue-500/30">
-                            {component.category}
+                            {template.category}
                           </span>
-                          <span className={`px-3 py-1 text-sm font-medium rounded-full border ${getPlanColor(component.planType)}`}>
-                            {component.planType}
+                          <span className={`px-3 py-1 text-sm font-medium rounded-full border ${getPlanColor(template.planType)}`}>
+                            {template.planType}
                           </span>
                         </div>
                       </div>
@@ -494,7 +510,7 @@ const ComponentGallery = () => {
         )}
 
         {/* No Results */}
-        {filteredComponents.length === 0 && (
+        {filteredTemplates.length === 0 && (
           <motion.div
             className="text-center py-16"
             initial={{ opacity: 0, y: 20 }}
@@ -505,7 +521,7 @@ const ComponentGallery = () => {
             <div className="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6">
               <Search className="w-12 h-12 text-gray-400" />
             </div>
-            <h3 className="text-2xl font-bold text-white mb-4">No Components Found</h3>
+            <h3 className="text-2xl font-bold text-white mb-4">No Templates Found</h3>
             <p className="text-gray-400 mb-8">Try adjusting your search criteria or filters</p>
             <button 
               onClick={() => {
@@ -526,4 +542,4 @@ const ComponentGallery = () => {
   );
 };
 
-export default ComponentGallery;
+export default TemplateGallery;

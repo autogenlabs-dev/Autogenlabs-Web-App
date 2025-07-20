@@ -90,12 +90,16 @@ export const AuthProvider = ({ children }) => {
         setError(null);
         
         try {
+            console.log('🔄 Login attempt for:', credentials.email);
             const response = await authApi.login(credentials.email, credentials.password);
+            console.log('✅ Login response received:', response);
             
             // Store tokens
-            tokenUtils.setTokens(response.access_token, response.refresh_token);              // Set user data
+            tokenUtils.setTokens(response.access_token, response.refresh_token);
+            
+            // Set user data
             const userData = response.user;
-            setUser({
+            const userState = {
                 id: userData.id,
                 name: userData.full_name || userData.first_name || userData.name || userData.email.split('@')[0],
                 firstName: userData.first_name || (userData.full_name ? userData.full_name.split(' ')[0] : (userData.name ? userData.name.split(' ')[0] : userData.email.split('@')[0])),
@@ -104,16 +108,22 @@ export const AuthProvider = ({ children }) => {
                 role: userData.role || 'user',
                 avatar: '/public/logoAuto.webp',
                 ...userData
-            });
+            };
+            
+            setUser(userState);
+            console.log('✅ Login successful, user state set:', userState);
             
             return { success: true, user: userData };
         } catch (error) {
+            console.error('❌ Login failed:', error);
             setError(error.message || 'Login failed');
             throw error;
         } finally {
             setLoading(false);
         }
-    };    const signup = async (userData) => {
+    };
+
+    const signup = async (userData) => {
         setLoading(true);
         setError(null);
         
@@ -153,15 +163,38 @@ export const AuthProvider = ({ children }) => {
 
     const logout = async () => {
         setLoading(true);
+        setError(null);
+        
         try {
-            // No backend call, just clear tokens and user state
+            // Get access token before clearing it
+            const accessToken = tokenUtils.getAccessToken();
+            
+            // Call backend logout endpoint if we have a token
+            if (accessToken) {
+                try {
+                    await authApi.logout(accessToken);
+                    console.log('✅ Backend logout successful');
+                } catch (error) {
+                    console.warn('⚠️ Backend logout failed, continuing with local cleanup:', error);
+                }
+            }
+            
+            // Clear tokens and user state
             tokenUtils.clearTokens();
             setUser(null);
-            setError(null);
+            console.log('✅ Local logout completed');
+            
+        } catch (error) {
+            console.error('❌ Logout error:', error);
+            // Even if there's an error, clear local state
+            tokenUtils.clearTokens();
+            setUser(null);
         } finally {
             setLoading(false);
         }
-    };    const updateUser = (updates) => {
+    };
+
+    const updateUser = (updates) => {
         setUser(prev => prev ? { ...prev, ...updates } : null);
     };
 

@@ -100,11 +100,26 @@ export const authApi = {
     },
 
     /**
-     * Logout user (no backend endpoint needed)
+     * Logout user and invalidate tokens on backend
      */
-    async logout() {
-        // No backend call needed
-        return { success: true };
+    async logout(accessToken) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            // Even if the backend call fails, we should still clear local tokens
+            const result = await handleApiResponse(response);
+            return result;
+        } catch (error) {
+            console.warn('Backend logout failed, but continuing with local cleanup:', error);
+            // Return success anyway since local cleanup is more important
+            return { success: true, message: 'Logged out locally' };
+        }
     },
 
     /**

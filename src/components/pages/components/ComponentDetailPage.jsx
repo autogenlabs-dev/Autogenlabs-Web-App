@@ -4,11 +4,15 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Star, Eye, Download, IndianRupee, DollarSign, Clock, Code, User, Globe, Github, Heart, Share2, ExternalLink, ChevronLeft, ChevronRight, Layers } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { sampleComponents, mockUser } from '@/lib/componentData';
+import { mockUser } from '@/lib/componentData';
+import { componentApi } from '@/lib/componentApi';
 import PaymentModal from '@/components/ui/PaymentModal';
 import SafeRatingSection from '@/components/ui/SafeRatingSection';
 
 const ComponentDetailPage = ({ componentId }) => {
+    const [component, setComponent] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [userRating, setUserRating] = useState(0);
     const [isLiked, setIsLiked] = useState(false);
@@ -18,10 +22,45 @@ const ComponentDetailPage = ({ componentId }) => {
 
     useEffect(() => {
         setMounted(true);
-    }, []);
+        if (componentId) {
+            fetchComponent();
+        }
+    }, [componentId]);
 
-    // Find component by ID
-    const component = sampleComponents.find(c => c.id === parseInt(componentId));
+    const fetchComponent = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            console.log('🔍 Fetching component with ID:', componentId);
+            const component = await componentApi.getComponent(componentId);
+            console.log('📦 Raw component data received:', component);
+            console.log('💰 Pricing data:', {
+                pricingINR: component.pricingINR,
+                pricingUSD: component.pricingUSD,
+                pricing_inr: component.pricing_inr,
+                pricing_usd: component.pricing_usd,
+                planType: component.planType,
+                plan_type: component.plan_type
+            });
+            console.log('🖼️ Image data:', {
+                previewImages: component.previewImages,
+                preview_images: component.preview_images
+            });
+            console.log('👨‍💻 Developer data:', {
+                developerName: component.developerName,
+                developer_name: component.developer_name,
+                developerExperience: component.developerExperience,
+                developer_experience: component.developer_experience
+            });
+            setComponent(component);
+        } catch (err) {
+            console.error('Failed to fetch component:', err);
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const user = mockUser;
 
     if (!mounted) {
@@ -34,17 +73,38 @@ const ComponentDetailPage = ({ componentId }) => {
         );
     }
 
-    if (!component) {
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-[linear-gradient(180deg,#040406_50%,#09080D_100%)] text-white flex items-center justify-center">
+                <div className="text-center">
+                    <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full animate-spin mx-auto mb-4">
+                        <div className="w-full h-full rounded-full border-2 border-white/20 border-t-white"></div>
+                    </div>
+                    <p className="text-gray-400">Loading component...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error || !component) {
         return (
             <div className="min-h-screen bg-[linear-gradient(180deg,#040406_50%,#09080D_100%)] text-white flex items-center justify-center">
                 <div className="text-center">
                     <h1 className="text-4xl font-bold mb-4">Component Not Found</h1>
-                    <p className="text-gray-400 mb-8">The component you're looking for doesn't exist.</p>
-                    <Link href="/components">
-                        <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-xl font-semibold transition-all duration-300 hover:scale-105">
-                            Back to Components
+                    <p className="text-gray-400 mb-8">{error || "The component you're looking for doesn't exist."}</p>
+                    <div className="flex gap-4 justify-center">
+                        <Link href="/components">
+                            <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-xl font-semibold transition-all duration-300 hover:scale-105">
+                                Back to Components
+                            </button>
+                        </Link>
+                        <button 
+                            onClick={fetchComponent}
+                            className="px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-xl font-semibold transition-all duration-300"
+                        >
+                            Try Again
                         </button>
-                    </Link>
+                    </div>
                 </div>
             </div>
         );
@@ -85,7 +145,7 @@ const ComponentDetailPage = ({ componentId }) => {
     };
 
     const handlePurchase = () => {
-        if (component.planType === 'Free') {
+        if ((component.planType === 'Free' || component.plan_type === 'Free')) {
             // Handle free download
             alert('Free component download started!');
         } else {
@@ -103,10 +163,11 @@ const ComponentDetailPage = ({ componentId }) => {
     // Image navigation with extensive safety
     const nextImage = () => {
         try {
-            if (!component?.previewImages?.length) return;
+            const images = component?.previewImages || component?.preview_images;
+            if (!images?.length) return;
             setSelectedImageIndex((prev) => {
-                const newIndex = prev === component.previewImages.length - 1 ? 0 : prev + 1;
-                return Math.max(0, Math.min(newIndex, component.previewImages.length - 1));
+                const newIndex = prev === images.length - 1 ? 0 : prev + 1;
+                return Math.max(0, Math.min(newIndex, images.length - 1));
             });
         } catch (error) {
             console.error('Error in nextImage:', error);
@@ -115,10 +176,11 @@ const ComponentDetailPage = ({ componentId }) => {
 
     const prevImage = () => {
         try {
-            if (!component?.previewImages?.length) return;
+            const images = component?.previewImages || component?.preview_images;
+            if (!images?.length) return;
             setSelectedImageIndex((prev) => {
-                const newIndex = prev === 0 ? component.previewImages.length - 1 : prev - 1;
-                return Math.max(0, Math.min(newIndex, component.previewImages.length - 1));
+                const newIndex = prev === 0 ? images.length - 1 : prev - 1;
+                return Math.max(0, Math.min(newIndex, images.length - 1));
             });
         } catch (error) {
             console.error('Error in prevImage:', error);
@@ -177,7 +239,8 @@ const ComponentDetailPage = ({ componentId }) => {
                             <div className="relative h-96 bg-gray-900">
                                 {(() => {
                                     try {
-                                        const images = component?.previewImages;
+                                        const images = component?.previewImages || component?.preview_images;
+                                        console.log('🖼️ ComponentDetail: Preview images:', images);
                                         if (!images || !Array.isArray(images) || images.length === 0) {
                                             return (
                                                 <div className="flex items-center justify-center h-full text-gray-400">
@@ -220,7 +283,7 @@ const ComponentDetailPage = ({ componentId }) => {
                                 })()}
 
                                 {/* Navigation Arrows */}
-                                {component?.previewImages?.length > 1 && (
+                                {((component?.previewImages?.length || component?.preview_images?.length) > 1) && (
                                     <>
                                         <button
                                             onClick={prevImage}
@@ -238,23 +301,24 @@ const ComponentDetailPage = ({ componentId }) => {
                                 )}
 
                                 {/* Image Counter */}
-                                {component?.previewImages?.length > 1 && (
+                                {((component?.previewImages?.length || component?.preview_images?.length) > 1) && (
                                     <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-black/50 backdrop-blur-sm text-white text-sm rounded-full">
-                                        {Math.max(1, selectedImageIndex + 1)} / {component.previewImages.length}
+                                        {Math.max(1, selectedImageIndex + 1)} / {(component?.previewImages || component?.preview_images)?.length}
                                     </div>
                                 )}
                             </div>
 
                             {/* Thumbnail Strip */}
-                            {component?.previewImages?.length > 1 && (
+                            {((component?.previewImages?.length || component?.preview_images?.length) > 1) && (
                                 <div className="p-4 bg-white/5">
                                     <div className="flex gap-2 overflow-x-auto">
-                                        {component.previewImages.map((image, index) => (
+                                        {(component?.previewImages || component?.preview_images)?.map((image, index) => (
                                             <button
                                                 key={`thumb-${index}`}
                                                 onClick={() => {
                                                     try {
-                                                        if (component?.previewImages && index >= 0 && index < component.previewImages.length) {
+                                                        const images = component?.previewImages || component?.preview_images;
+                                                        if (images && index >= 0 && index < images.length) {
                                                             setSelectedImageIndex(index);
                                                         }
                                                     } catch (error) {
@@ -300,7 +364,7 @@ const ComponentDetailPage = ({ componentId }) => {
                                 {/* Description */}
                                 <div>
                                     <p className="text-gray-300 leading-relaxed">
-                                        {component.fullDescription || component.shortDescription}
+                                        {component.fullDescription || component.full_description || component.shortDescription || component.short_description || 'No description available.'}
                                     </p>
                                 </div>
 
@@ -312,7 +376,7 @@ const ComponentDetailPage = ({ componentId }) => {
                                             {component.dependencies.map((dep, index) => (
                                                 <span
                                                     key={index}
-                                                    className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-lg text-sm border border-blue-500/30"
+                                                    className="px-3 py-1 bg-gray-700 text-gray-300 rounded-lg text-sm"
                                                 >
                                                     {dep}
                                                 </span>
@@ -331,7 +395,7 @@ const ComponentDetailPage = ({ componentId }) => {
                                                     key={index}
                                                     className="px-3 py-1 bg-green-500/20 text-green-300 rounded-lg text-sm border border-green-500/30"
                                                 >
-                                                    {tag}
+                                                    #{tag}
                                                 </span>
                                             ))}
                                         </div>
@@ -339,24 +403,24 @@ const ComponentDetailPage = ({ componentId }) => {
                                 )}
 
                                 {/* Links */}
-                                <div className="flex flex-wrap gap-4 pt-4">
-                                    {component.gitRepoUrl && (
+                                <div className="flex flex-wrap gap-3">
+                                    {(component.gitRepoUrl || component.git_repo_url) && (
                                         <a
-                                            href={component.gitRepoUrl}
+                                            href={component.gitRepoUrl || component.git_repo_url}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                                            className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
                                         >
                                             <Github className="w-5 h-5" />
                                             View Code
                                         </a>
                                     )}
-                                    {component.liveDemoUrl && (
+                                    {(component.liveDemoUrl || component.live_demo_url) && (
                                         <a
-                                            href={component.liveDemoUrl}
+                                            href={component.liveDemoUrl || component.live_demo_url}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors"
                                         >
                                             <ExternalLink className="w-5 h-5" />
                                             Live Demo
@@ -428,8 +492,8 @@ const ComponentDetailPage = ({ componentId }) => {
                                     <Layers className="w-5 h-5 text-gray-400" />
                                     <div>
                                         <span className="text-gray-400">Difficulty: </span>
-                                        <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getDifficultyColor(component.difficultyLevel)}`}>
-                                            {component.difficultyLevel}
+                                        <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getDifficultyColor(component.difficultyLevel || component.difficulty_level)}`}>
+                                            {component.difficultyLevel || component.difficulty_level}
                                         </span>
                                     </div>
                                 </div>
@@ -444,21 +508,21 @@ const ComponentDetailPage = ({ componentId }) => {
                                     <User className="w-5 h-5 text-gray-400" />
                                     <div>
                                         <span className="text-gray-400">Developer: </span>
-                                        <span className="text-white">{component.developerName}</span>
+                                        <span className="text-white">{component.developerName || component.developer_name || 'Unknown Developer'}</span>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <Clock className="w-5 h-5 text-gray-400" />
                                     <div>
                                         <span className="text-gray-400">Experience: </span>
-                                        <span className="text-white">{component.developerExperience}+ years</span>
+                                        <span className="text-white">{component.developerExperience || component.developer_experience || '0'} years</span>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Pricing */}
                             <div className="border-t border-white/10 pt-6">
-                                {component.planType === 'Free' ? (
+                                {(component.planType === 'Free' || component.plan_type === 'Free') ? (
                                     <div className="text-center mb-6">
                                         <div className="text-3xl font-bold text-green-400 mb-2">Free</div>
                                         <p className="text-gray-400">No cost to download</p>
@@ -490,7 +554,9 @@ const ComponentDetailPage = ({ componentId }) => {
                                             </button>
                                         </div>
                                         <div className="text-3xl font-bold text-white mb-2">
-                                            {selectedCurrency === 'inr' ? `₹${component.pricingINR}` : `$${component.pricingUSD}`}
+                                            {selectedCurrency === 'inr' 
+                                                ? `₹${component.pricingINR || component.pricing_inr || 0}` 
+                                                : `$${component.pricingUSD || component.pricing_usd || 0}`}
                                         </div>
                                         <p className="text-gray-400">One-time purchase</p>
                                     </div>
@@ -506,7 +572,7 @@ const ComponentDetailPage = ({ componentId }) => {
                                     }`}
                                 >
                                     <Download className="w-5 h-5" />
-                                    {component.planType === 'Free' ? 'Download Free' : 'Purchase Component'}
+                                    {(component.planType === 'Free' || component.plan_type === 'Free') ? 'Download Free' : 'Purchase Component'}
                                 </button>
                             </div>
                         </motion.div>

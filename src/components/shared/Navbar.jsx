@@ -396,9 +396,16 @@ const Navbar = () => {
                     Profile
                   </Link>
                   <button
-                    onClick={() => {
-                      logout();
-                      setUserMenuOpen(false);
+                    onClick={async () => {
+                      try {
+                        await logout();
+                        setUserMenuOpen(false);
+                        router.push('/');
+                      } catch (error) {
+                        console.error('Logout error:', error);
+                        setUserMenuOpen(false);
+                        router.push('/');
+                      }
                     }}
                     className="block w-full text-left px-4 py-2 text-red-400 hover:text-red-300 hover:bg-gray-800 transition-colors text-sm"
                   >
@@ -505,9 +512,16 @@ const Navbar = () => {
                     Profile
                   </Link>
                   <button
-                    onClick={() => {
-                      logout();
-                      setMobileMenuOpen(false);
+                    onClick={async () => {
+                      try {
+                        await logout();
+                        setMobileMenuOpen(false);
+                        router.push('/');
+                      } catch (error) {
+                        console.error('Logout error:', error);
+                        setMobileMenuOpen(false);
+                        router.push('/');
+                      }
                     }}
                     className="block text-red-400 hover:text-red-300 transition-colors text-sm"
                   >
