@@ -257,6 +257,7 @@ export default function Hero() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: isLoaded ? 1 : 0, x: isLoaded ? 0 : -20 }}
               transition={{ duration: 0.6, delay: 1.2 }}
+              onClick={() => window.open('https://marketplace.visualstudio.com/items?itemName=AutoGenCodeBuilder.auto-gen-code-builder', '_blank')}
             >
               Download in Visual Studio
             </motion.button>
@@ -267,7 +268,7 @@ export default function Hero() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: isLoaded ? 1 : 0, x: isLoaded ? 0 : 20 }}
               transition={{ duration: 0.6, delay: 1.4 }}
-              onClick={() => window.location.href = '/docs'}
+              onClick={() => window.open('https://marketplace.visualstudio.com/items?itemName=AutoGenCodeBuilder.auto-gen-code-builder', '_blank')}
             >
               Get Started
             </motion.button>

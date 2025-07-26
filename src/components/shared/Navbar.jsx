@@ -50,7 +50,7 @@ const Navbar = () => {
   const handleMouseLeave = () => {
     timeoutRef.current = setTimeout(() => {
       setHoveredItem(null);
-    }, 150);
+    }, 300);
   };
 
   // Smooth scroll to section function
@@ -79,6 +79,43 @@ const Navbar = () => {
     scrollToSection(sectionId);
   };
 
+  // Enhanced authentication check for ALL navbar links
+  const handleLinkClick = (e, href, name) => {
+    e.preventDefault(); // Prevent default navigation
+    
+    console.log(`🔍 Navbar Debug: Clicking on ${name}, href: ${href}`);
+    console.log(`🔍 Current pathname: ${pathname}`);
+    console.log(`🔍 Router available: ${!!router}`);
+    console.log(`🔍 User authenticated: ${isAuthenticated}`);
+    
+    // Public routes that don't require authentication
+    const publicRoutes = [
+      '/',
+      '/auth',
+      '/blogs'
+    ];
+
+    // Check if the route is public (allowed without authentication)
+    const isPublicRoute = publicRoutes.some(route => href === route || href.startsWith(route));
+    
+    // If it's NOT a public route and user is NOT authenticated, redirect to login
+    if (!isPublicRoute && !isAuthenticated) {
+      console.log(`🔒 Navbar: Redirecting to /auth - route ${href} requires authentication`);
+      // Store the intended URL so user can be redirected back after login
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('intendedUrl', href);
+      }
+      router.push('/auth');
+      return;
+    }
+    
+    // If authenticated or accessing public route, allow navigation
+    if (href.startsWith('/')) {
+      console.log(`✅ Navigating to: ${href}`);
+      router.push(href);
+    }
+  };
+
   const dropdownContent = {
     Company: {
       sections: [
@@ -89,8 +126,7 @@ const Navbar = () => {
               name: "About Us",
               description: "Learn about our investors and what makes us us",
               icon: "🎯",
-              sectionId: "aboutus",
-              isSection: true  // Added this
+              href: "/about"
             },
             {
               name: "Careers",
@@ -124,9 +160,8 @@ const Navbar = () => {
             {
               name: "Contact",
               description: "For the best way to get in touch with us",
-              icon: "🤝",
-              sectionId: "contact",
-              isSection: true
+              icon: "📞",
+              href: "/contact"
             }
           ]
         }
@@ -277,13 +312,13 @@ const Navbar = () => {
                   <span className="text-sm font-medium">{item.name}</span>
                 </button>
               ) : (
-                // Regular page link
-                <Link
-                  href={item.href}
+                // Regular page link with authentication protection
+                <button
+                  onClick={(e) => handleLinkClick(e, item.href, item.name)}
                   className="flex items-center space-x-1 text-gray-300 hover:text-white transition-colors py-2"
                 >
                   <span className="text-sm font-medium">{item.name}</span>
-                </Link>
+                </button>
               )}
 
               {/* Dropdown Menu */}
@@ -318,11 +353,14 @@ const Navbar = () => {
                                   </div>
                                 </button>
                               ) : (
-                                <Link
+                                <button
                                   key={itemIndex}
-                                  href={dropdownItem.href}
-                                  className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-800/50 transition-colors group"
-                                  onClick={() => setHoveredItem(null)} // Close dropdown
+                                  onClick={(e) => {
+                                    console.log(`🔍 Dropdown Link clicked: ${dropdownItem.name}, href: ${dropdownItem.href}`);
+                                    handleLinkClick(e, dropdownItem.href, dropdownItem.name);
+                                    setHoveredItem(null); // Close dropdown
+                                  }}
+                                  className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-800/50 transition-colors group w-full text-left"
                                 >
                                   <span className="text-lg flex-shrink-0 mt-0.5">{dropdownItem.icon}</span>
                                   <div>
@@ -333,7 +371,7 @@ const Navbar = () => {
                                       {dropdownItem.description}
                                     </div>
                                   </div>
-                                </Link>
+                                </button>
                               )
                             ))}
                           </div>
@@ -458,14 +496,17 @@ const Navbar = () => {
                               {dropdownItem.icon} {dropdownItem.name}
                             </button>
                           ) : (
-                            <Link
+                            <button
                               key={itemIndex}
-                              href={dropdownItem.href}
-                              className="block text-gray-300 hover:text-white transition-colors text-sm"
-                              onClick={() => setMobileMenuOpen(false)}
+                              onClick={(e) => {
+                                console.log(`🔍 Mobile Link clicked: ${dropdownItem.name}, href: ${dropdownItem.href}`);
+                                handleLinkClick(e, dropdownItem.href, dropdownItem.name);
+                                setMobileMenuOpen(false);
+                              }}
+                              className="block text-gray-300 hover:text-white transition-colors text-sm w-full text-left"
                             >
                               {dropdownItem.icon} {dropdownItem.name}
-                            </Link>
+                            </button>
                           )
                         ))}
                       </div>
@@ -482,13 +523,16 @@ const Navbar = () => {
                     {item.name}
                   </button>
                 ) : (
-                  <Link
-                    href={item.href}
-                    className="block text-gray-300 hover:text-white transition-colors text-sm font-medium"
-                    onClick={() => setMobileMenuOpen(false)}
+                  <button
+                    onClick={(e) => {
+                      console.log(`🔍 Mobile Nav Link clicked: ${item.name}, href: ${item.href}`);
+                      handleLinkClick(e, item.href, item.name);
+                      setMobileMenuOpen(false);
+                    }}
+                    className="block text-gray-300 hover:text-white transition-colors text-sm font-medium w-full text-left"
                   >
                     {item.name}
-                  </Link>
+                  </button>
                 )}
               </div>
             ))}
@@ -497,20 +541,24 @@ const Navbar = () => {
             <div className="border-t border-gray-800 pt-4 mt-4">
               {isAuthenticated ? (
                 <div className="space-y-2">
-                  <Link
-                    href="/dashboard"
-                    className="block text-gray-300 hover:text-white transition-colors text-sm"
-                    onClick={() => setMobileMenuOpen(false)}
+                  <button
+                    onClick={(e) => {
+                      handleLinkClick(e, '/dashboard', 'Dashboard');
+                      setMobileMenuOpen(false);
+                    }}
+                    className="block text-gray-300 hover:text-white transition-colors text-sm w-full text-left"
                   >
                     Dashboard
-                  </Link>
-                  <Link
-                    href="/profile"
-                    className="block text-gray-300 hover:text-white transition-colors text-sm"
-                    onClick={() => setMobileMenuOpen(false)}
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      handleLinkClick(e, '/profile', 'Profile');
+                      setMobileMenuOpen(false);
+                    }}
+                    className="block text-gray-300 hover:text-white transition-colors text-sm w-full text-left"
                   >
                     Profile
-                  </Link>
+                  </button>
                   <button
                     onClick={async () => {
                       try {

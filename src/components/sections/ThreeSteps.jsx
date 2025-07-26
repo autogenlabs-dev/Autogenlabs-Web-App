@@ -127,6 +127,15 @@ export default function ThreeSteps() {
                       }`}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
+                      onClick={() => {
+                        if (step.id === 1 || step.id === 2) {
+                          // Download and Get Started buttons open VS Code extension
+                          window.open('https://marketplace.visualstudio.com/items?itemName=AutoGenCodeBuilder.auto-gen-code-builder', '_blank');
+                        } else if (step.id === 3) {
+                          // Learn more button opens docs
+                          window.open('/docs', '_blank');
+                        }
+                      }}
                     >
                       {step.buttonText}
                       {step.hasDropdown && (

@@ -20,6 +20,7 @@ export const AuthProvider = ({ children }) => {
     // Load user from stored tokens on app initialization
     useEffect(() => {
         const initializeAuth = async () => {
+            console.log('🔄 InitializeAuth - Starting authentication check');
             try {
                 const accessToken = tokenUtils.getAccessToken();
                 console.log('🔍 InitializeAuth - Access token exists:', !!accessToken);
@@ -64,20 +65,25 @@ export const AuthProvider = ({ children }) => {
                             } catch (refreshError) {
                                 console.error('❌ InitializeAuth - Refresh failed:', refreshError);
                                 tokenUtils.clearTokens();
+                                setUser(null);
                             }
                         } else {
                             console.log('❌ InitializeAuth - No refresh token available');
                             tokenUtils.clearTokens();
+                            setUser(null);
                         }
                     }
                 } else {
                     console.log('❌ InitializeAuth - Token expired or missing');
                     tokenUtils.clearTokens();
+                    setUser(null);
                 }
             } catch (error) {
                 console.error('❌ Failed to initialize auth:', error);
                 tokenUtils.clearTokens();
+                setUser(null);
             } finally {
+                console.log('✅ InitializeAuth completed, setting loading to false');
                 setLoading(false);
             }
         };
@@ -245,7 +251,7 @@ export const AuthProvider = ({ children }) => {
         updateUser,
         updateProfile,
         clearError,
-        isAuthenticated: !!user,
+        isAuthenticated: !loading && !!user && !!tokenUtils.getAccessToken(),
         isAdmin: user?.role === 'admin',
         isDeveloper: user?.role === 'developer',
         isUser: user?.role === 'user'

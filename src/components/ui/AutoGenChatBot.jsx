@@ -192,10 +192,10 @@ const AutoGenChatbot = () => {
                   </div>
                   <div>
                     <h3 className="text-white font-semibold">AutoGen Assistant</h3>
-                    <p className="text-green-400 text-xs flex items-center">
+                    <div className="text-green-400 text-xs flex items-center">
                       <div className="w-2 h-2 bg-green-400 rounded-full mr-1"></div>
                       Online
-                    </p>
+                    </div>
                   </div>
                 </div>
                 <button

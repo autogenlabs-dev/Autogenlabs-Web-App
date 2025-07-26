@@ -4,6 +4,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import AuthBackground from './AuthBackground';
 import AuthLoadingState from './AuthLoadingState';
+import AuthLoadingOverlay from './AuthLoadingOverlay';
 import AuthHeader from './AuthHeader';
 import AuthForm from './AuthForm';
 import AuthStyles from './AuthStyles';
@@ -23,12 +24,8 @@ const AuthPage = () => {
     const { login, signup, isAuthenticated, error: authError, clearError } = useAuth();
     const router = useRouter();
 
-    // Redirect if already authenticated
-    useEffect(() => {
-        if (isAuthenticated) {
-            router.push('/');
-        }
-    }, [isAuthenticated, router]);
+    // Note: Redirect logic is handled by AuthGuard component
+    // No need for redirect logic here to avoid race conditions
 
     // Optimized input change handler with useCallback to prevent unnecessary re-renders
     const handleInputChange = useCallback((e) => {
@@ -46,6 +43,31 @@ const AuthPage = () => {
     useEffect(() => {
         setIsMounted(true);
     }, []);
+
+    // Handle redirect for already authenticated users
+    useEffect(() => {
+        if (!isMounted) return;
+        
+        if (isAuthenticated) {
+            console.log('✅ AuthPage: User already authenticated, checking for redirect');
+            
+            let intendedUrl = null;
+            if (typeof window !== 'undefined') {
+                intendedUrl = localStorage.getItem('intendedUrl');
+            }
+            
+            if (intendedUrl && intendedUrl !== '/auth') {
+                console.log(`✅ AuthPage: Redirecting authenticated user to intended URL: ${intendedUrl}`);
+                if (typeof window !== 'undefined') {
+                    localStorage.removeItem('intendedUrl');
+                }
+                router.push(intendedUrl);
+            } else {
+                console.log(`✅ AuthPage: Redirecting authenticated user to home page`);
+                router.push('/');
+            }
+        }
+    }, [isAuthenticated, isMounted, router]);
 
     const validateForm = () => {
         if (!formData.email || !formData.password) {
@@ -96,6 +118,26 @@ const AuthPage = () => {
                     password: formData.password
                 });
                 console.log('✅ Login completed:', result);
+                
+                // Show success state briefly before redirect
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // Handle redirect after successful login
+                let intendedUrl = null;
+                if (typeof window !== 'undefined') {
+                    intendedUrl = localStorage.getItem('intendedUrl');
+                }
+                
+                if (intendedUrl && intendedUrl !== '/auth') {
+                    console.log(`✅ AuthPage: Redirecting to intended URL: ${intendedUrl}`);
+                    if (typeof window !== 'undefined') {
+                        localStorage.removeItem('intendedUrl');
+                    }
+                    router.push(intendedUrl);
+                } else {
+                    console.log(`✅ AuthPage: Redirecting to home page`);
+                    router.push('/');
+                }
             } else {
                 const result = await signup({
                     email: formData.email,
@@ -103,23 +145,48 @@ const AuthPage = () => {
                     name: formData.name
                 });
                 console.log('✅ Signup completed:', result);
+                
+                // Show success state briefly before redirect
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // Keep loading state during redirect
+                // The finally block will not run as we're redirecting
+                
+                // Handle redirect after successful signup
+                console.log(`✅ AuthPage: Signup successful, redirecting to home page`);
+                router.push('/');
             }
-            // Success - redirect will happen via useEffect
+            // Success - redirect handled above
         } catch (error) {
             console.error('❌ Form submission error:', error);
             setError(error.message || (isSignIn ? 'Login failed' : 'Signup failed'));
         } finally {
+            // Only set loading to false if we're not redirecting (i.e., there was an error)
+            if (!isLoading) return; // Already set to false in catch block
             setIsLoading(false);
+            console.log('🎯 Form submission completed');
         }
-    }, [formData, isSignIn, login, signup, isLoading, validateForm]);
+    }, [formData, isSignIn, login, signup, isLoading, validateForm, router]);
 
     // Don't render animations until component is mounted on client
     if (!isMounted) {
         return <AuthLoadingState />;
     }
 
+    // If user is already authenticated, show loading while redirecting
+    if (isAuthenticated) {
+        return <AuthLoadingState />;
+    }
+
     return (
         <div className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 overflow-hidden">
+            {/* Full-screen loading overlay */}
+            {isLoading && (
+                <AuthLoadingOverlay 
+                    message={isSignIn ? "Signing you in..." : "Creating your account..."}
+                />
+            )}
+            
             <AuthBackground isMounted={isMounted} />
 
             {/* Auth Card with Enhanced Animations */}
