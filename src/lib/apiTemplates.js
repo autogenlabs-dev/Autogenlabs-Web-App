@@ -168,16 +168,25 @@ export const templateApi = {
      * Get a specific template by ID
      */
     async getTemplate(templateId) {
-        const response = await fetch(`${API_BASE_URL}/templates/${templateId}`, {
+        console.log('🌐 API: getTemplate called with ID:', templateId);
+        const url = `${API_BASE_URL}/templates/${templateId}`;
+        console.log('🌐 API: Making request to:', url);
+        
+        const response = await fetch(url, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
         });
 
+        console.log('📡 API: Response status:', response.status, response.statusText);
         const result = await handleApiResponse(response);
+        console.log('📦 API: Raw result from backend:', result);
+        
         // Transform the response to ensure consistent format
-        return this.transformTemplateData(result);
+        const transformed = this.transformTemplateData(result);
+        console.log('🔄 API: Transformed result:', transformed);
+        return transformed;
     },
 
     /**
@@ -363,13 +372,19 @@ export const templateApi = {
                         template._id ? String(template._id) : 
                         '';
         
-        // Handle preview images - prioritize string URLs over File objects
+        // Handle preview images - simplified approach like componentApi
         let previewImages = [];
+        console.log('🔍 Transform: Raw template data:', template.title, 'preview_images:', template.preview_images);
+        
         if (template.preview_images && Array.isArray(template.preview_images)) {
-            previewImages = template.preview_images.filter(img => typeof img === 'string');
+            console.log('🔍 Transform: Found preview_images array:', template.preview_images);
+            previewImages = template.preview_images; // Don't filter - accept all images like componentApi
         } else if (template.previewImages && Array.isArray(template.previewImages)) {
-            previewImages = template.previewImages.filter(img => typeof img === 'string');
+            console.log('🔍 Transform: Found previewImages array:', template.previewImages);
+            previewImages = template.previewImages; // Don't filter - accept all images like componentApi
         }
+        
+        console.log('🔍 Transform: Final previewImages (no filtering):', previewImages);
         
         // If no images, add default based on category
         if (previewImages.length === 0) {

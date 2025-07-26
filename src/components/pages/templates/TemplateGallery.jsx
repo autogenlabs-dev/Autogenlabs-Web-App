@@ -34,9 +34,12 @@ const TemplateGallery = () => {
         limit: 100
       });
       
-      const transformedTemplates = response.templates.map(template => 
-        templateApi.transformTemplateData(template)
-      );
+      const transformedTemplates = response.templates.map(template => {
+        const transformed = templateApi.transformTemplateData(template);
+        // Debug: Log the template data to see what images we're getting
+        console.log('🔍 Template:', transformed.title, 'Images:', transformed.previewImages);
+        return transformed;
+      });
       
       setTemplates(transformedTemplates);
       setFilteredTemplates(transformedTemplates);
@@ -370,6 +373,7 @@ const TemplateGallery = () => {
                             fill
                             className="object-cover transition-all duration-700 group-hover:scale-110"
                             sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                            unoptimized={true}
                             onError={(e) => {
                               // Fallback to default image if original fails to load
                               e.target.src = '/components/navbar-preview.svg';
@@ -406,7 +410,10 @@ const TemplateGallery = () => {
                     {/* View Details Button - Centered */}
                     <div className="absolute inset-0 flex items-center justify-center z-10">
                       <Link href={`/templates/${template.id}`}>
-                        <button className="px-6 py-3 bg-white/20 backdrop-blur-md border border-white/30 text-white font-semibold rounded-full transition-all duration-300 hover:bg-white/30 hover:scale-105 transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100">
+                        <button 
+                          onClick={() => console.log('🔗 Navigating to template:', template.id, 'Template data:', template)}
+                          className="px-6 py-3 bg-white/20 backdrop-blur-md border border-white/30 text-white font-semibold rounded-full transition-all duration-300 hover:bg-white/30 hover:scale-105 transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100"
+                        >
                           <Eye className="w-5 h-5 inline-block mr-2" />
                           View Details
                         </button>
@@ -469,6 +476,7 @@ const TemplateGallery = () => {
                             alt={template.title}
                             fill
                             className="object-cover transition-transform duration-300 group-hover:scale-110"
+                            unoptimized={true}
                             onError={(e) => {
                               // Fallback to default image if original fails to load
                               e.target.src = '/components/navbar-preview.svg';
@@ -496,7 +504,10 @@ const TemplateGallery = () => {
                       
                       {/* View Details Button */}
                       <div className="ml-6">
-                        <button className="px-6 py-3 bg-white/20 backdrop-blur-md border border-white/30 text-white font-semibold rounded-full transition-all duration-300 hover:bg-white/30 hover:scale-105 flex items-center gap-2">
+                        <button 
+                          onClick={() => console.log('🔗 Navigating to template (list view):', template.id, 'Template data:', template)}
+                          className="px-6 py-3 bg-white/20 backdrop-blur-md border border-white/30 text-white font-semibold rounded-full transition-all duration-300 hover:bg-white/30 hover:scale-105 flex items-center gap-2"
+                        >
                           <Eye className="w-5 h-5" />
                           View Details
                         </button>

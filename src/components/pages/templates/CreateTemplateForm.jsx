@@ -60,6 +60,16 @@ const CreateTemplateForm = () => {
     const [submitError, setSubmitError] = useState(null);
     const [submitSuccess, setSubmitSuccess] = useState(false);
 
+    // Helper function to convert file to base64
+    const convertFileToBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = (error) => reject(error);
+        });
+    };
+
     const handleInputChange = (field, value) => {
         setFormData(prev => ({
             ...prev,
@@ -115,7 +125,7 @@ const CreateTemplateForm = () => {
             console.log('✅ Form validation passed');
             
             // Prepare template data for API
-            const templateData = {
+            let templateData = {
                 title: formData.title,
                 category: formData.category,
                 type: formData.type,
@@ -126,7 +136,7 @@ const CreateTemplateForm = () => {
                 pricing_usd: parseInt(formData.pricingUSD) || 0,
                 short_description: formData.shortDescription,
                 full_description: formData.fullDescription,
-                preview_images: formData.previewImage ? [URL.createObjectURL(formData.previewImage)] : [], // Only add image if uploaded
+                preview_images: [], // We'll handle image separately
                 git_repo_url: formData.gitRepoUrl,
                 live_demo_url: formData.liveDemoUrl,
                 dependencies: formData.dependencies,
@@ -139,6 +149,19 @@ const CreateTemplateForm = () => {
                 featured: false,
                 popular: false
             };
+
+            // Handle image upload - convert to base64 if uploaded
+            if (formData.previewImage) {
+                try {
+                    const base64Image = await convertFileToBase64(formData.previewImage);
+                    templateData.preview_images = [base64Image];
+                    console.log('✅ Image converted to base64 successfully');
+                } catch (error) {
+                    console.error('❌ Failed to convert image to base64:', error);
+                    // Continue without image
+                    templateData.preview_images = [];
+                }
+            }
 
             console.log('📦 Template data to submit:', templateData);
             console.log('🔄 About to call createTemplate function...');
