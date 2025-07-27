@@ -30,9 +30,7 @@ const ComponentGallery = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await componentApi.getComponents({
-        limit: 100
-      });
+      const response = await componentApi.getComponents();
       
       const transformedComponents = response.components.map(component => 
         componentApi.transformComponentData(component)

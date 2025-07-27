@@ -188,8 +188,8 @@ export const componentApi = {
      * Get all components with optional filtering
      */
     async getComponents({
-        skip = 0,
-        limit = 100,
+        skip = null,
+        limit = null,
         category = null,
         type = null,
         plan_type = null,
@@ -199,8 +199,10 @@ export const componentApi = {
     } = {}) {
         try {
             const params = new URLSearchParams();
-            params.append('skip', skip.toString());
-            params.append('limit', limit.toString());
+            
+            // Only add skip and limit if they are explicitly provided
+            if (skip !== null && skip !== undefined) params.append('skip', skip.toString());
+            if (limit !== null && limit !== undefined) params.append('limit', limit.toString());
             
             if (category) params.append('category', category);
             if (type) params.append('type', type);
@@ -209,7 +211,11 @@ export const componentApi = {
             if (popular !== null) params.append('popular', popular.toString());
             if (search) params.append('search', search);
 
-            const response = await fetch(`${API_BASE_URL}/components?${params.toString()}`, {
+            // Create URL - only add query string if there are parameters
+            const queryString = params.toString();
+            const url = queryString ? `${API_BASE_URL}/components?${queryString}` : `${API_BASE_URL}/components`;
+
+            const response = await fetch(url, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }, // No auth required for listing
             });
