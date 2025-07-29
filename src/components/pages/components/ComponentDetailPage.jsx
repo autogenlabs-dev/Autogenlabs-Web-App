@@ -8,6 +8,7 @@ import { mockUser } from '@/lib/componentData';
 import { componentApi } from '@/lib/componentApi';
 import PaymentModal from '@/components/ui/PaymentModal';
 import SafeRatingSection from '@/components/ui/SafeRatingSection';
+import CodeViewerModal from '@/components/ui/CodeViewerModal';
 
 const ComponentDetailPage = ({ componentId }) => {
     const [component, setComponent] = useState(null);
@@ -19,6 +20,7 @@ const ComponentDetailPage = ({ componentId }) => {
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [selectedCurrency, setSelectedCurrency] = useState('inr');
     const [mounted, setMounted] = useState(false);
+    const [showCodeModal, setShowCodeModal] = useState(false);
 
     useEffect(() => {
         setMounted(true);
@@ -236,7 +238,7 @@ const ComponentDetailPage = ({ componentId }) => {
                             transition={{ duration: 0.6 }}
                         >
                             {/* Main Image */}
-                            <div className="relative h-96 bg-gray-900">
+                            <div className="relative h-96 bg-gray-900 group">
                                 {(() => {
                                     try {
                                         const images = component?.previewImages || component?.preview_images;
@@ -264,13 +266,25 @@ const ComponentDetailPage = ({ componentId }) => {
                                         }
 
                                         return (
-                                            <Image
-                                                src={imageSrc}
-                                                alt={component?.title || 'Component preview'}
-                                                fill
-                                                className="object-cover"
-                                                onError={() => console.warn('Image failed to load:', imageSrc)}
-                                            />
+                                            <>
+                                                <Image
+                                                    src={imageSrc}
+                                                    alt={component?.title || 'Component preview'}
+                                                    fill
+                                                    className="object-cover"
+                                                    onError={() => console.warn('Image failed to load:', imageSrc)}
+                                                />
+                                                {/* Code Button Overlay */}
+                                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center">
+                                                    <button
+                                                        onClick={() => setShowCodeModal(true)}
+                                                        className="opacity-0 group-hover:opacity-100 transform scale-90 group-hover:scale-100 transition-all duration-300 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg font-semibold flex items-center gap-2 shadow-2xl"
+                                                    >
+                                                        <Code className="w-5 h-5" />
+                                                        View Code
+                                                    </button>
+                                                </div>
+                                            </>
                                         );
                                     } catch (error) {
                                         console.error('Error rendering image:', error);
@@ -402,30 +416,15 @@ const ComponentDetailPage = ({ componentId }) => {
                                     </div>
                                 )}
 
-                                {/* Links */}
+                                {/* Code Button */}
                                 <div className="flex flex-wrap gap-3">
-                                    {(component.gitRepoUrl || component.git_repo_url) && (
-                                        <a
-                                            href={component.gitRepoUrl || component.git_repo_url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
-                                        >
-                                            <Github className="w-5 h-5" />
-                                            View Code
-                                        </a>
-                                    )}
-                                    {(component.liveDemoUrl || component.live_demo_url) && (
-                                        <a
-                                            href={component.liveDemoUrl || component.live_demo_url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors"
-                                        >
-                                            <ExternalLink className="w-5 h-5" />
-                                            Live Demo
-                                        </a>
-                                    )}
+                                    <button
+                                        onClick={() => setShowCodeModal(true)}
+                                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-purple-500/25"
+                                    >
+                                        <Code className="w-5 h-5" />
+                                        View Code
+                                    </button>
                                 </div>
                             </div>
                         </motion.div>
@@ -590,6 +589,13 @@ const ComponentDetailPage = ({ componentId }) => {
                     currency={selectedCurrency}
                 />
             )}
+
+            {/* Code Viewer Modal */}
+            <CodeViewerModal
+                isOpen={showCodeModal}
+                onClose={() => setShowCodeModal(false)}
+                component={component}
+            />
         </div>
     );
 };

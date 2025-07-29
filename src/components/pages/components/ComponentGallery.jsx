@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { componentApi } from '@/lib/componentApi';
 import { componentCategories } from '@/lib/componentData';
+import { generateDynamicPreview, generateComponentTypePreview } from '@/utils/dynamicPreviewGenerator';
 
 const ComponentGallery = () => {
   const [mounted, setMounted] = useState(false);
@@ -20,10 +21,124 @@ const ComponentGallery = () => {
   const [sortBy, setSortBy] = useState('popular');
   const [viewMode, setViewMode] = useState('grid');
   const [filteredComponents, setFilteredComponents] = useState([]);
+  const [previewCache, setPreviewCache] = useState({});
+
+  // Enhanced Component Image Component with Dynamic Preview
+  const EnhancedComponentImage = ({ component, className = "" }) => {
+    const [previewUrl, setPreviewUrl] = useState(null);
+    const [isGenerating, setIsGenerating] = useState(false);
+
+    useEffect(() => {
+      generatePreview();
+    }, [component.id]);
+
+    const generatePreview = async () => {
+      try {
+        // Check cache first
+        if (previewCache[component.id]) {
+          setPreviewUrl(previewCache[component.id]);
+          return;
+        }
+
+        setIsGenerating(true);
+        
+        // Try to use existing preview images first
+        if (component.previewImages && component.previewImages.length > 0 && 
+            component.previewImages[0] && component.previewImages[0].startsWith('data:image/')) {
+          setPreviewUrl(component.previewImages[0]);
+          setPreviewCache(prev => ({ ...prev, [component.id]: component.previewImages[0] }));
+          return;
+        }
+
+        // Generate dynamic preview
+        const preview = await generateComponentTypePreview(component);
+        if (preview) {
+          setPreviewUrl(preview);
+          setPreviewCache(prev => ({ ...prev, [component.id]: preview }));
+        }
+      } catch (error) {
+        console.error('Failed to generate preview:', error);
+      } finally {
+        setIsGenerating(false);
+      }
+    };
+
+    const getCategoryFallback = (category) => {
+      const fallbackMap = {
+        'Navigation': '/components/navbar-preview.svg',
+        'Layout': '/components/sidebar-preview.svg',
+        'Forms': '/components/contact-form-preview.svg',
+        'Data Display': '/components/data-table-preview.svg',
+        'User Interface': '/components/modal-dialog-preview.svg',
+        'Content': '/components/pricing-cards-preview.svg',
+        'Media': '/components/image-gallery-preview.svg',
+        'Interactive': '/components/hero-section-preview.svg',
+        'Widgets': '/components/sidebar-preview.svg',
+        'Sections': '/components/hero-section-preview.svg'
+      };
+      return fallbackMap[category] || '/components/navbar-preview.svg';
+    };
+
+    if (isGenerating) {
+      return (
+        <div className={`${className} relative bg-gradient-to-br from-blue-600/20 to-purple-600/20 flex items-center justify-center`}>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-white/20 border-t-white/60"></div>
+        </div>
+      );
+    }
+
+    if (previewUrl) {
+      return (
+        <img
+          src={previewUrl}
+          alt={component.title}
+          className={`${className} object-cover transition-all duration-700 group-hover:scale-110`}
+          onError={() => setPreviewUrl(null)}
+        />
+      );
+    }
+
+    // Fallback to regular Image component
+    return (
+      <Image
+        src={getCategoryFallback(component.category)}
+        alt={component.title}
+        fill
+        className={`${className} object-cover transition-all duration-700 group-hover:scale-110`}
+        sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
+        onError={(e) => {
+          e.target.src = '/components/navbar-preview.svg';
+        }}
+      />
+    );
+  };
 
   useEffect(() => {
     setMounted(true);
     fetchComponents();
+    
+    // Add window focus listener to refresh components when user returns to page
+    const handleFocus = () => {
+      console.log('🔄 Page focused, refreshing components...');
+      fetchComponents();
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    
+    // Also listen for visibility change
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        console.log('🔄 Page visible, refreshing components...');
+        fetchComponents();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, []);
 
   const fetchComponents = async () => {
@@ -323,42 +438,10 @@ const ComponentGallery = () => {
                     
                     {/* Full Card Background Image */}
                     <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 overflow-hidden">
-                      {(() => {
-                        // Get fallback image based on category
-                        const getCategoryImage = (category) => {
-                          const categoryImageMap = {
-                            'Navigation': '/components/navbar-preview.svg',
-                            'Layout': '/components/sidebar-preview.svg',
-                            'Forms': '/components/contact-form-preview.svg',
-                            'Data Display': '/components/data-table-preview.svg',
-                            'User Interface': '/components/modal-dialog-preview.svg',
-                            'Content': '/components/pricing-cards-preview.svg',
-                            'Media': '/components/image-gallery-preview.svg',
-                            'Interactive': '/components/hero-section-preview.svg',
-                            'Widgets': '/components/sidebar-preview.svg',
-                            'Sections': '/components/hero-section-preview.svg'
-                          };
-                          return categoryImageMap[category] || '/components/navbar-preview.svg';
-                        };
-
-                        const imageSource = (component.previewImages && component.previewImages.length > 0) 
-                          ? component.previewImages[0] 
-                          : getCategoryImage(component.category);
-
-                        return (
-                          <Image
-                            src={imageSource}
-                            alt={component.title}
-                            fill
-                            className="object-cover transition-all duration-700 group-hover:scale-110"
-                            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
-                            onError={(e) => {
-                              // Fallback to default image if original fails to load
-                              e.target.src = '/components/navbar-preview.svg';
-                            }}
-                          />
-                        );
-                      })()}
+                      <EnhancedComponentImage 
+                        component={component}
+                        className="absolute inset-0 w-full h-full"
+                      />
                     </div>
 
                     {/* Dark Overlay for Better Text Visibility */}
