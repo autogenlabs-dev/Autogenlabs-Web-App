@@ -372,38 +372,19 @@ export const templateApi = {
                         template._id ? String(template._id) : 
                         '';
         
-        // Handle preview images - simplified approach like componentApi
+        // Handle preview images - now mostly empty as we use live URL
         let previewImages = [];
-        console.log('🔍 Transform: Raw template data:', template.title, 'preview_images:', template.preview_images);
+        console.log('🔍 Transform: Raw template data:', template.title, 'live_demo_url:', template.live_demo_url);
         
         if (template.preview_images && Array.isArray(template.preview_images)) {
             console.log('🔍 Transform: Found preview_images array:', template.preview_images);
-            previewImages = template.preview_images; // Don't filter - accept all images like componentApi
+            previewImages = template.preview_images; // Keep existing if any
         } else if (template.previewImages && Array.isArray(template.previewImages)) {
             console.log('🔍 Transform: Found previewImages array:', template.previewImages);
-            previewImages = template.previewImages; // Don't filter - accept all images like componentApi
+            previewImages = template.previewImages; // Keep existing if any
         }
         
-        console.log('🔍 Transform: Final previewImages (no filtering):', previewImages);
-        
-        // If no images, add default based on category
-        if (previewImages.length === 0) {
-            const categoryImageMap = {
-                'Navigation': '/components/navbar-preview.svg',
-                'Layout': '/components/sidebar-preview.svg',
-                'Forms': '/components/contact-form-preview.svg',
-                'Data Display': '/components/data-table-preview.svg',
-                'User Interface': '/components/modal-dialog-preview.svg',
-                'Content': '/components/pricing-cards-preview.svg',
-                'Media': '/components/image-gallery-preview.svg',
-                'Interactive': '/components/hero-section-preview.svg',
-                'Widgets': '/components/sidebar-preview.svg',
-                'Sections': '/components/hero-section-preview.svg'
-            };
-            
-            const defaultImage = categoryImageMap[template.category] || '/components/navbar-preview.svg';
-            previewImages = [defaultImage];
-        }
+        console.log('🔍 Transform: Final previewImages (using live URL for display):', previewImages);
         
         const transformed = {
             id: idString,
@@ -417,9 +398,9 @@ export const templateApi = {
             pricingUSD: template.pricing_usd || 0,
             shortDescription: template.short_description,
             fullDescription: template.full_description,
-            previewImages: previewImages,
+            previewImages: previewImages, // Keep but UI will prefer live URL
             gitRepoUrl: template.git_repo_url,
-            liveDemoUrl: template.live_demo_url,
+            liveDemoUrl: template.live_demo_url, // Main focus for preview
             dependencies: template.dependencies || [],
             tags: template.tags || [],
             developerName: template.developer_name,
@@ -451,53 +432,9 @@ export const templateApi = {
             console.log('🔄 Transform: Starting template form data transformation');
             console.log('📋 Transform: Input form data:', formData);
             
-            // Handle preview images - convert File objects to base64 or data URLs
+            // No preview images processing - using live URL for preview
             let previewImages = [];
-            
-            if (Array.isArray(formData.previewImages)) {
-                console.log(`🖼️ Transform: Processing ${formData.previewImages.length} images`);
-                
-                // Process each image
-                for (let i = 0; i < formData.previewImages.length; i++) {
-                    const img = formData.previewImages[i];
-                    console.log(`🖼️ Transform: Processing image ${i + 1}:`, typeof img, img instanceof File ? img.name : img);
-                    
-                    if (typeof img === 'string') {
-                        // Already a URL, keep it
-                        previewImages.push(img);
-                        console.log(`✅ Transform: Added string URL: ${img.substring(0, 50)}...`);
-                    } else if (img instanceof File) {
-                        // Convert File to data URL (if needed in future)
-                        try {
-                            console.log(`🔄 Transform: Converting file "${img.name}" to data URL...`);
-                            // For now, just skip File objects for templates
-                            console.log(`⚠️ Transform: Skipping file object for template`);
-                        } catch (error) {
-                            console.warn(`⚠️ Transform: Failed to convert file "${img.name}":`, error);
-                        }
-                    }
-                }
-                previewImages = previewImages.slice(0, 5); // Limit to 5 images
-            }
-        
-            // If no images provided, add a default placeholder based on category
-            if (previewImages.length === 0) {
-                const categoryImageMap = {
-                    'Navigation': '/components/navbar-preview.svg',
-                    'Layout': '/components/sidebar-preview.svg',
-                    'Forms': '/components/contact-form-preview.svg',
-                    'Data Display': '/components/data-table-preview.svg',
-                    'User Interface': '/components/modal-dialog-preview.svg',
-                    'Content': '/components/pricing-cards-preview.svg',
-                    'Media': '/components/image-gallery-preview.svg',
-                    'Interactive': '/components/hero-section-preview.svg',
-                    'Widgets': '/components/sidebar-preview.svg',
-                    'Sections': '/components/hero-section-preview.svg'
-                };
-                
-                const defaultImage = categoryImageMap[formData.category] || '/components/navbar-preview.svg';
-                previewImages = [defaultImage];
-            }
+            console.log('🖼️ Transform: Using live URL for preview, no image processing needed');
 
             return {
                 title: formData.title,
@@ -510,7 +447,7 @@ export const templateApi = {
                 pricing_usd: parseInt(formData.pricingUSD) || 0,
                 short_description: formData.shortDescription,
                 full_description: formData.fullDescription,
-                preview_images: previewImages,
+                preview_images: previewImages, // Empty - using live URL for preview
                 git_repo_url: formData.gitRepoUrl || null,
                 live_demo_url: formData.liveDemoUrl || null,
                 dependencies: formData.dependencies || [],

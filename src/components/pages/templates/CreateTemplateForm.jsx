@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Upload, X, Plus, Github, Globe, IndianRupee, DollarSign, Save, Eye } from 'lucide-react';
+import { ArrowLeft, X, Plus, Github, Globe, IndianRupee, DollarSign, Save, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { templateCategories, difficultyLevels, templateTypes, planTypes } from '@/lib/templateData';
 import { useTemplate } from '@/contexts/TemplateContext';
@@ -49,9 +49,7 @@ const CreateTemplateForm = () => {
         pricingUSD: '',
         shortDescription: '',
         fullDescription: '',
-        dependencies: [],
-        previewImage: null,
-        gifVideo: null
+        dependencies: []
     });
 
     const [newDependency, setNewDependency] = useState('');
@@ -59,16 +57,6 @@ const CreateTemplateForm = () => {
     const [showPreview, setShowPreview] = useState(false);
     const [submitError, setSubmitError] = useState(null);
     const [submitSuccess, setSubmitSuccess] = useState(false);
-
-    // Helper function to convert file to base64
-    const convertFileToBase64 = (file) => {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = (error) => reject(error);
-        });
-    };
 
     const handleInputChange = (field, value) => {
         setFormData(prev => ({
@@ -91,13 +79,6 @@ const CreateTemplateForm = () => {
         setFormData(prev => ({
             ...prev,
             dependencies: prev.dependencies.filter((_, i) => i !== index)
-        }));
-    };
-
-    const handleFileUpload = (field, file) => {
-        setFormData(prev => ({
-            ...prev,
-            [field]: file
         }));
     };
 
@@ -136,7 +117,7 @@ const CreateTemplateForm = () => {
                 pricing_usd: parseInt(formData.pricingUSD) || 0,
                 short_description: formData.shortDescription,
                 full_description: formData.fullDescription,
-                preview_images: [], // We'll handle image separately
+                preview_images: [], // No images - will use live URL for preview
                 git_repo_url: formData.gitRepoUrl,
                 live_demo_url: formData.liveDemoUrl,
                 dependencies: formData.dependencies,
@@ -149,19 +130,6 @@ const CreateTemplateForm = () => {
                 featured: false,
                 popular: false
             };
-
-            // Handle image upload - convert to base64 if uploaded
-            if (formData.previewImage) {
-                try {
-                    const base64Image = await convertFileToBase64(formData.previewImage);
-                    templateData.preview_images = [base64Image];
-                    console.log('✅ Image converted to base64 successfully');
-                } catch (error) {
-                    console.error('❌ Failed to convert image to base64:', error);
-                    // Continue without image
-                    templateData.preview_images = [];
-                }
-            }
 
             console.log('📦 Template data to submit:', templateData);
             console.log('🔄 About to call createTemplate function...');
@@ -610,71 +578,6 @@ const CreateTemplateForm = () => {
                                     rows="6"
                                     className="w-full p-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500/50 resize-vertical"
                                 />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Media Upload */}
-                    <div className="bg-white/5 rounded-2xl p-8 border border-white/10">
-                        <h2 className="text-2xl font-bold mb-6">Media</h2>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Preview Image */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-3">
-                                    Preview Image
-                                </label>
-                                <div className="border-2 border-dashed border-white/20 rounded-xl p-6 text-center hover:border-purple-500/30 transition-colors duration-300">
-                                    <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                                    <p className="text-gray-400 mb-4">Click to upload or drag and drop</p>
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={(e) => handleFileUpload('previewImage', e.target.files[0])}
-                                        className="hidden"
-                                        id="preview-image"
-                                    />
-                                    <label
-                                        htmlFor="preview-image"
-                                        className="px-4 py-2 bg-purple-500/20 border border-purple-500/30 rounded-lg text-purple-400 hover:bg-purple-500/30 transition-all duration-300 cursor-pointer"
-                                    >
-                                        Choose Image
-                                    </label>
-                                    {formData.previewImage && (
-                                        <p className="text-green-400 text-sm mt-2">
-                                            ✓ {formData.previewImage.name}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* GIF Video */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-3">
-                                    Short GIF/Video Preview (Optional)
-                                </label>
-                                <div className="border-2 border-dashed border-white/20 rounded-xl p-6 text-center hover:border-purple-500/30 transition-colors duration-300">
-                                    <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                                    <p className="text-gray-400 mb-4">GIF or short video (max 10MB)</p>
-                                    <input
-                                        type="file"
-                                        accept="image/gif,video/*"
-                                        onChange={(e) => handleFileUpload('gifVideo', e.target.files[0])}
-                                        className="hidden"
-                                        id="gif-video"
-                                    />
-                                    <label
-                                        htmlFor="gif-video"
-                                        className="px-4 py-2 bg-purple-500/20 border border-purple-500/30 rounded-lg text-purple-400 hover:bg-purple-500/30 transition-all duration-300 cursor-pointer"
-                                    >
-                                        Choose File
-                                    </label>
-                                    {formData.gifVideo && (
-                                        <p className="text-green-400 text-sm mt-2">
-                                            ✓ {formData.gifVideo.name}
-                                        </p>
-                                    )}
-                                </div>
                             </div>
                         </div>
                     </div>

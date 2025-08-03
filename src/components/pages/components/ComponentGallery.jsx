@@ -7,6 +7,8 @@ import Link from 'next/link';
 import { componentApi } from '@/lib/componentApi';
 import { componentCategories } from '@/lib/componentData';
 import { generateDynamicPreview, generateComponentTypePreview } from '@/utils/dynamicPreviewGenerator';
+import LiveComponentPreview from '@/components/ui/LiveComponentPreview';
+import LivePreviewModal from '@/components/ui/LivePreviewModal';
 
 const ComponentGallery = () => {
   const [mounted, setMounted] = useState(false);
@@ -22,47 +24,30 @@ const ComponentGallery = () => {
   const [viewMode, setViewMode] = useState('grid');
   const [filteredComponents, setFilteredComponents] = useState([]);
   const [previewCache, setPreviewCache] = useState({});
+  const [expandedPreview, setExpandedPreview] = useState(null);
 
-  // Enhanced Component Image Component with Dynamic Preview
-  const EnhancedComponentImage = ({ component, className = "" }) => {
-    const [previewUrl, setPreviewUrl] = useState(null);
-    const [isGenerating, setIsGenerating] = useState(false);
+  // Live Component Preview Component - replaces static image previews
+  const LiveComponentCard = ({ component, className = "" }) => {
+    // Check for different possible code field names
+    const hasCode = component.code || component.html || component.content || component.htmlCode;
+    
+    // If component has code, use live preview
+    if (hasCode) {
+      return (
+        <LiveComponentPreview
+          component={component}
+          width="100%"
+          height="100%"
+          className={className}
+          theme="dark"
+          showFallback={true}
+          showExpandButton={true}
+          onExpand={() => setExpandedPreview(component)}
+        />
+      );
+    }
 
-    useEffect(() => {
-      generatePreview();
-    }, [component.id]);
-
-    const generatePreview = async () => {
-      try {
-        // Check cache first
-        if (previewCache[component.id]) {
-          setPreviewUrl(previewCache[component.id]);
-          return;
-        }
-
-        setIsGenerating(true);
-        
-        // Try to use existing preview images first
-        if (component.previewImages && component.previewImages.length > 0 && 
-            component.previewImages[0] && component.previewImages[0].startsWith('data:image/')) {
-          setPreviewUrl(component.previewImages[0]);
-          setPreviewCache(prev => ({ ...prev, [component.id]: component.previewImages[0] }));
-          return;
-        }
-
-        // Generate dynamic preview
-        const preview = await generateComponentTypePreview(component);
-        if (preview) {
-          setPreviewUrl(preview);
-          setPreviewCache(prev => ({ ...prev, [component.id]: preview }));
-        }
-      } catch (error) {
-        console.error('Failed to generate preview:', error);
-      } finally {
-        setIsGenerating(false);
-      }
-    };
-
+    // Fallback to static preview image if no code
     const getCategoryFallback = (category) => {
       const fallbackMap = {
         'Navigation': '/components/navbar-preview.svg',
@@ -79,26 +64,23 @@ const ComponentGallery = () => {
       return fallbackMap[category] || '/components/navbar-preview.svg';
     };
 
-    if (isGenerating) {
+    // Check for existing preview images
+    if (component.previewImages && component.previewImages.length > 0) {
       return (
-        <div className={`${className} relative bg-gradient-to-br from-blue-600/20 to-purple-600/20 flex items-center justify-center`}>
-          <div className="animate-spin rounded-full h-8 w-8 border-2 border-white/20 border-t-white/60"></div>
-        </div>
-      );
-    }
-
-    if (previewUrl) {
-      return (
-        <img
-          src={previewUrl}
+        <Image
+          src={component.previewImages[0]}
           alt={component.title}
+          fill
           className={`${className} object-cover transition-all duration-700 group-hover:scale-110`}
-          onError={() => setPreviewUrl(null)}
+          sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
+          onError={(e) => {
+            e.target.src = getCategoryFallback(component.category);
+          }}
         />
       );
     }
 
-    // Fallback to regular Image component
+    // Final fallback to category image
     return (
       <Image
         src={getCategoryFallback(component.category)}
@@ -432,13 +414,13 @@ const ComponentGallery = () => {
                   className="group break-inside-avoid mb-6 inline-block w-full"
                 >
                   <div 
-                    className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl overflow-hidden cursor-pointer transition-all duration-500 hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:shadow-blue-500/10 group"
+                    className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl overflow-hidden transition-all duration-500 hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:shadow-blue-500/10 group"
                     style={{ height: `${cardHeight}px` }}
                   >
                     
-                    {/* Full Card Background Image */}
+                    {/* Full Card Background Preview */}
                     <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 overflow-hidden">
-                      <EnhancedComponentImage 
+                      <LiveComponentCard 
                         component={component}
                         className="absolute inset-0 w-full h-full"
                       />
@@ -461,19 +443,18 @@ const ComponentGallery = () => {
                       )}
                     </div>
 
-                    {/* Plan Type Badge */}
-                    <div className="absolute top-4 right-4 z-10">
+                    {/* Plan Type Badge - Left Side */}
+                    <div className="absolute top-4 left-4 z-10">
                       <span className={`px-3 py-1.5 text-xs font-bold rounded-full backdrop-blur-sm shadow-lg ${getPlanColor(component.planType)}`}>
                         {component.planType}
                       </span>
                     </div>
 
-                    {/* View Details Button - Centered */}
-                    <div className="absolute inset-0 flex items-center justify-center z-10">
+                    {/* Clickable View Icon - Top Right */}
+                    <div className="absolute top-4 right-4 z-20">
                       <Link href={`/components/${component.id}`}>
-                        <button className="px-6 py-3 bg-white/20 backdrop-blur-md border border-white/30 text-white font-semibold rounded-full transition-all duration-300 hover:bg-white/30 hover:scale-105 transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100">
-                          <Eye className="w-5 h-5 inline-block mr-2" />
-                          View Details
+                        <button className="p-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-full transition-all duration-300 hover:scale-110 cursor-pointer">
+                          <Eye className="w-4 h-4 text-white" />
                         </button>
                       </Link>
                     </div>
@@ -501,74 +482,42 @@ const ComponentGallery = () => {
                 whileHover={{ scale: 1.01 }}
                 className="group"
               >
-                <Link href={`/components/${component.id}`} className="block">
-                  <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:bg-white/10 flex gap-6 p-6">
-                    
-                    {/* Component Preview */}
-                    <div className="relative bg-gradient-to-br from-gray-800 to-gray-900 overflow-hidden w-48 h-32 flex-shrink-0 rounded-xl">
-                      {(() => {
-                        // Get fallback image based on category
-                        const getCategoryImage = (category) => {
-                          const categoryImageMap = {
-                            'Navigation': '/components/navbar-preview.svg',
-                            'Layout': '/components/sidebar-preview.svg',
-                            'Forms': '/components/contact-form-preview.svg',
-                            'Data Display': '/components/data-table-preview.svg',
-                            'User Interface': '/components/modal-dialog-preview.svg',
-                            'Content': '/components/pricing-cards-preview.svg',
-                            'Media': '/components/image-gallery-preview.svg',
-                            'Interactive': '/components/hero-section-preview.svg',
-                            'Widgets': '/components/sidebar-preview.svg',
-                            'Sections': '/components/hero-section-preview.svg'
-                          };
-                          return categoryImageMap[category] || '/components/navbar-preview.svg';
-                        };
+                <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden transition-all duration-300 hover:bg-white/10 flex gap-6 p-6">
+                  
+                  {/* Component Preview */}
+                  <div className="relative bg-gradient-to-br from-gray-800 to-gray-900 overflow-hidden w-48 h-32 flex-shrink-0 rounded-xl">
+                    <LiveComponentCard 
+                      component={component}
+                      className="w-full h-full"
+                    />
+                  </div>
 
-                        const imageSource = (component.previewImages && component.previewImages.length > 0) 
-                          ? component.previewImages[0] 
-                          : getCategoryImage(component.category);
-
-                        return (
-                          <Image
-                            src={imageSource}
-                            alt={component.title}
-                            fill
-                            className="object-cover transition-transform duration-300 group-hover:scale-110"
-                            onError={(e) => {
-                              // Fallback to default image if original fails to load
-                              e.target.src = '/components/navbar-preview.svg';
-                            }}
-                          />
-                        );
-                      })()}
+                  {/* Simplified Component Info - Only Basic Info */}
+                  <div className="flex-1 flex items-center justify-between">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-xl text-white mb-2 group-hover:text-blue-400 transition-colors">
+                        {component.title}
+                      </h3>
+                      <div className="flex items-center gap-3">
+                        <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-lg text-sm border border-blue-500/30">
+                          {component.category}
+                        </span>
+                        <span className={`px-3 py-1 text-sm font-medium rounded-full border ${getPlanColor(component.planType)}`}>
+                          {component.planType}
+                        </span>
+                      </div>
                     </div>
-
-                    {/* Simplified Component Info - Only Basic Info */}
-                    <div className="flex-1 flex items-center justify-between">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-xl text-white mb-2 group-hover:text-blue-400 transition-colors">
-                          {component.title}
-                        </h3>
-                        <div className="flex items-center gap-3">
-                          <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-lg text-sm border border-blue-500/30">
-                            {component.category}
-                          </span>
-                          <span className={`px-3 py-1 text-sm font-medium rounded-full border ${getPlanColor(component.planType)}`}>
-                            {component.planType}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      {/* View Details Button */}
-                      <div className="ml-6">
-                        <button className="px-6 py-3 bg-white/20 backdrop-blur-md border border-white/30 text-white font-semibold rounded-full transition-all duration-300 hover:bg-white/30 hover:scale-105 flex items-center gap-2">
-                          <Eye className="w-5 h-5" />
-                          View Details
+                    
+                    {/* Clickable View Icon */}
+                    <div className="ml-6">
+                      <Link href={`/components/${component.id}`}>
+                        <button className="p-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-full transition-all duration-300 hover:scale-110 cursor-pointer">
+                          <Eye className="w-5 h-5 text-white" />
                         </button>
-                      </div>
+                      </Link>
                     </div>
                   </div>
-                </Link>
+                </div>
               </motion.div>
             ))}
           </motion.div>
@@ -603,6 +552,13 @@ const ComponentGallery = () => {
           </motion.div>
         )}
       </div>
+
+      {/* Live Preview Modal */}
+      <LivePreviewModal
+        isOpen={!!expandedPreview}
+        onClose={() => setExpandedPreview(null)}
+        component={expandedPreview}
+      />
     </section>
   );
 };

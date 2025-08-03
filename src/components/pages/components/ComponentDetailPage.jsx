@@ -9,6 +9,7 @@ import { componentApi } from '@/lib/componentApi';
 import PaymentModal from '@/components/ui/PaymentModal';
 import SafeRatingSection from '@/components/ui/SafeRatingSection';
 import CodeViewerModal from '@/components/ui/CodeViewerModal';
+import LiveComponentPreview from '@/components/ui/LiveComponentPreview';
 
 const ComponentDetailPage = ({ componentId }) => {
     const [component, setComponent] = useState(null);
@@ -237,10 +238,46 @@ const ComponentDetailPage = ({ componentId }) => {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6 }}
                         >
-                            {/* Main Image */}
-                            <div className="relative h-96 bg-gray-900 group">
+                            {/* Main Preview */}
+                            <div className="relative h-[500px] bg-gray-900 rounded-xl overflow-hidden group">
                                 {(() => {
                                     try {
+                                        console.log('🔍 ComponentDetail: Component data:', component);
+                                        console.log('💾 ComponentDetail: Component code:', component?.code);
+                                        console.log('🏷️ ComponentDetail: Component language:', component?.language);
+                                        console.log('📋 ComponentDetail: Available fields:', Object.keys(component || {}));
+                                        
+                                        // Check for different possible code field names
+                                        const hasCode = component?.code || component?.html || component?.content || component?.htmlCode;
+                                        
+                                        // Use live component preview if code is available
+                                        if (hasCode) {
+                                            console.log('✅ ComponentDetail: Using live preview with code:', hasCode);
+                                            return (
+                                                <>
+                                                    <LiveComponentPreview 
+                                                        component={component}
+                                                        width="100%"
+                                                        height="100%"
+                                                        className="w-full h-full"
+                                                        theme="dark"
+                                                        showFallback={true}
+                                                    />
+                                                    {/* Code Button Overlay */}
+                                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center">
+                                                        <button
+                                                            onClick={() => setShowCodeModal(true)}
+                                                            className="opacity-0 group-hover:opacity-100 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2"
+                                                        >
+                                                            <Code className="w-4 h-4" />
+                                                            View Code
+                                                        </button>
+                                                    </div>
+                                                </>
+                                            );
+                                        }
+
+                                        // Fallback to static images
                                         const images = component?.previewImages || component?.preview_images;
                                         console.log('🖼️ ComponentDetail: Preview images:', images);
                                         if (!images || !Array.isArray(images) || images.length === 0) {

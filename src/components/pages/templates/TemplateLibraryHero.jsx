@@ -110,20 +110,7 @@ const TemplateLibraryHero = () => {
                 production-ready templates and focus on what matters most.
               </motion.p>
             </div>            {/* CTA Buttons */}
-            <motion.div className="flex flex-col sm:flex-row gap-4" variants={itemVariants}>
-              {/* Create Template Button - Only for authenticated users */}
-              {isAuthenticated && (
-                <Link href="/templates/create">
-                  <motion.button
-                    className="inline-flex items-center justify-center gap-3 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl font-medium text-base transition-all duration-300 shadow-lg hover:shadow-green-500/25"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <Plus size={18} />
-                    Create Template
-                  </motion.button>
-                </Link>
-              )}            </motion.div>
+          
 
             {/* Stats */}
             <motion.div

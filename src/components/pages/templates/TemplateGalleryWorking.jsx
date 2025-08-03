@@ -327,7 +327,7 @@ const TemplateGallery = () => {
           </div>
         </motion.div>
 
-        {/* Templates Layout - 2 CARDS PER ROW WITH LIVE WEBSITE PREVIEW */}
+        {/* Templates Layout - 2 CARDS PER ROW WITH LIVE PREVIEW */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {filteredTemplates.map((template, index) => (
             <motion.div
@@ -338,32 +338,60 @@ const TemplateGallery = () => {
               transition={{ duration: 0.6, delay: (index % 8) * 0.1 }}
               whileHover={{ scale: 1.02, y: -5 }}
               className="group w-full cursor-pointer"
+              onClick={() => window.open(template.liveDemoUrl, '_blank')}
             >
               <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl overflow-hidden transition-all duration-500 hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:shadow-blue-500/10 h-80">
-                {/* Live Website Preview Image Only */}
-                <div className="relative w-full h-full overflow-hidden">
-                  <img 
-                    src={`https://shot.screenshotapi.net/screenshot?token=DEMO_TOKEN&url=${encodeURIComponent(template.liveDemoUrl)}&width=800&height=600&output=image&file_type=png&wait_for_event=load`} 
-                    alt={`${template.title} live preview`}
-                    className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
-                    onError={(e) => {
-                      // Fallback: show gradient if screenshot fails
-                      e.target.style.display = 'none';
-                      e.target.nextElementSibling.style.display = 'flex';
-                    }}
-                  />
-                  {/* Fallback Gradient Background */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 hidden items-center justify-center text-white p-6">
-                    <Globe className="w-12 h-12 opacity-80 mx-auto mb-4" />
+                
+                {/* Live Website Preview Card */}
+                <div className="relative w-full h-full bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 overflow-hidden">
+                  <div className="absolute inset-0 flex items-center justify-center text-white p-6">
+                    <div className="text-center">
+                      {/* Website Favicon */}
+                      <div className="flex items-center justify-center mb-4">
+                        <img 
+                          src={getFaviconUrl(template.liveDemoUrl)} 
+                          alt="Site icon" 
+                          className="w-12 h-12 rounded-lg bg-white/20 p-2 mr-3"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                        <Globe className="w-12 h-12 opacity-80" />
+                      </div>
+                      
+                      {/* Template Info */}
+                      <h3 className="text-lg font-bold mb-2">{template.title}</h3>
+                      <p className="text-sm opacity-90 mb-3">Live Website</p>
+                      
+                      {/* Domain Display */}
+                      <div className="bg-white/20 backdrop-blur-sm rounded-lg p-3 mb-4">
+                        <p className="text-xs font-mono">{getDomainName(template.liveDemoUrl)}</p>
+                      </div>
+                      
+                      {/* Click Indicator */}
+                      <div className="flex items-center justify-center gap-2 text-sm">
+                        <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                        <span>Click to visit live site</span>
+                      </div>
+                    </div>
                   </div>
-                  {/* View Details Icon - Top Right Only Clickable */}
-                  <div className="absolute top-3 right-3 z-10">
-                    <Link href={`/templates/${template.id}`}>
-                      <button className="w-8 h-8 bg-white/20 backdrop-blur-md border border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-110 transition-all duration-300 group/btn">
-                        <Eye className="w-4 h-4 group-hover/btn:scale-110 transition-transform duration-200" />
-                      </button>
-                    </Link>
+                  
+                  {/* Subtle overlay for better visibility */}
+                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-all duration-300"></div>
+                  
+                  {/* Free/Paid Badge - Top Left Corner */}
+                  <div className="absolute top-3 left-3 z-10">
+                    <span className={`px-2 py-1 text-xs font-bold rounded-full shadow-lg ${getPlanColor(template.planType)}`}>
+                      {template.planType}
+                    </span>
                   </div>
+                  
+                  {/* View Details Icon - Top Right Corner */}
+                  <Link href={`/templates/${template.id}`} onClick={(e) => e.stopPropagation()}>
+                    <button className="absolute top-3 right-3 w-8 h-8 bg-white/20 backdrop-blur-md border border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-110 transition-all duration-300 z-10 group/btn">
+                      <Eye className="w-4 h-4 group-hover/btn:scale-110 transition-transform duration-200" />
+                    </button>
+                  </Link>
                 </div>
               </div>
             </motion.div>

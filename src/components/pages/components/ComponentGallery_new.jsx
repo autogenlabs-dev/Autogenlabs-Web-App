@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Masonry from 'react-masonry-css';
 import { sampleComponents, componentCategories } from '@/lib/componentData';
+import LiveComponentPreview from '@/components/ui/LiveComponentPreview';
 
 const ComponentGallery = () => {
   const [mounted, setMounted] = useState(false);
@@ -272,16 +273,20 @@ const ComponentGallery = () => {
                   whileHover={{ scale: 1.02 }}
                   className="mb-6"
                 >
-                  <Link href={`/components/${component.id}`} className="block">
-                    {/* Modern Masonry Card - Supahero.io Style */}
-                    <div className={`relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl overflow-hidden cursor-pointer transition-all duration-500 hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:shadow-blue-500/10 flex flex-col group ${cardConfig.minHeight}`}>
-                      
-                      {/* Preview Image with Dynamic Aspect Ratio */}
-                      <div className={`relative ${cardConfig.image} bg-gradient-to-br from-gray-800 to-gray-900 overflow-hidden flex-shrink-0`}>
-                        {component.previewImages && component.previewImages.length > 0 ? (
-                          <Image
-                            src={component.previewImages[0]}
-                            alt={component.title}
+                  {/* Modern Masonry Card - Supahero.io Style */}
+                  <div className={`relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl overflow-hidden transition-all duration-500 hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:shadow-blue-500/10 flex flex-col group ${cardConfig.minHeight}`}>
+                    
+                    {/* Preview with Dynamic Aspect Ratio */}
+                    <div className={`relative ${cardConfig.image} bg-gradient-to-br from-gray-800 to-gray-900 overflow-hidden flex-shrink-0`}>
+                      {component.code || component.html || component.content || component.htmlCode ? (
+                        <LiveComponentPreview 
+                          component={component}
+                          className="w-full h-full transition-all duration-700 group-hover:scale-110"
+                        />
+                      ) : component.previewImages && component.previewImages.length > 0 ? (
+                        <Image
+                          src={component.previewImages[0]}
+                          alt={component.title}
                             fill
                             className="object-cover transition-all duration-700 group-hover:scale-110"
                           />
@@ -293,6 +298,9 @@ const ComponentGallery = () => {
                         
                         {/* Status Badges */}
                         <div className="absolute top-4 left-4 flex gap-2">
+                          <span className={`px-3 py-1.5 text-xs font-bold rounded-full backdrop-blur-sm shadow-lg ${getPlanColor(component.planType)}`}>
+                            {component.planType}
+                          </span>
                           {component.featured && (
                             <span className="px-3 py-1.5 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold rounded-full shadow-lg backdrop-blur-sm">
                               Featured
@@ -305,21 +313,13 @@ const ComponentGallery = () => {
                           )}
                         </div>
 
-                        {/* Plan Type Badge */}
-                        <div className="absolute top-4 right-4">
-                          <span className={`px-3 py-1.5 text-xs font-bold rounded-full backdrop-blur-sm shadow-lg ${getPlanColor(component.planType)}`}>
-                            {component.planType}
-                          </span>
-                        </div>
-
-                        {/* Hover Overlay */}
-                        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <div className="flex items-center justify-center h-full">
-                            <div className="flex items-center gap-3 text-white">
-                              <Eye className="w-5 h-5" />
-                              <span className="text-sm font-medium">View Details</span>
-                            </div>
-                          </div>
+                        {/* Clickable View Icon - Top Right */}
+                        <div className="absolute top-4 right-4 z-20">
+                          <Link href={`/components/${component.id}`}>
+                            <button className="p-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-full transition-all duration-300 hover:scale-110 cursor-pointer">
+                              <Eye className="w-4 h-4 text-white" />
+                            </button>
+                          </Link>
                         </div>
                       </div>
 
@@ -379,7 +379,6 @@ const ComponentGallery = () => {
                         )}
                       </div>
                     </div>
-                  </Link>
                 </motion.div>
               );
             })}
@@ -401,27 +400,32 @@ const ComponentGallery = () => {
                 transition={{ duration: 0.6, delay: index * 0.05 }}
                 className="group"
               >
-                <Link href={`/components/${component.id}`} className="block">
-                  {/* List View */}
-                  <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:bg-white/10 flex gap-6 p-6">
-                    
-                    {/* Component Preview */}
-                    <div className="relative bg-gradient-to-br from-gray-800 to-gray-900 overflow-hidden w-48 h-32 flex-shrink-0 rounded-xl">
-                      {component.previewImages && component.previewImages.length > 0 ? (
-                        <Image
-                          src={component.previewImages[0]}
-                          alt={component.title}
-                          fill
-                          className="object-cover transition-transform duration-300 group-hover:scale-110"
-                        />
-                      ) : (
-                        <div className="flex items-center justify-center h-full text-gray-500">
-                          No Preview
-                        </div>
-                      )}
-                    </div>
+                {/* List View */}
+                <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden transition-all duration-300 hover:bg-white/10 flex gap-6 p-6">
+                  
+                  {/* Component Preview */}
+                  <div className="relative bg-gradient-to-br from-gray-800 to-gray-900 overflow-hidden w-48 h-32 flex-shrink-0 rounded-xl">
+                    {component.code || component.html || component.content || component.htmlCode ? (
+                      <LiveComponentPreview 
+                        component={component}
+                        className="w-full h-full transition-transform duration-300 group-hover:scale-110"
+                      />
+                    ) : component.previewImages && component.previewImages.length > 0 ? (
+                      <Image
+                        src={component.previewImages[0]}
+                        alt={component.title}
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-110"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-gray-500">
+                        No Preview
+                      </div>
+                    )}
+                  </div>
 
-                    {/* Component Info */}
+                  {/* Component Info */}
+                  <div className="flex-1 flex items-center justify-between">
                     <div className="flex-1">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
@@ -473,8 +477,17 @@ const ComponentGallery = () => {
                         </span>
                       </div>
                     </div>
+                    
+                    {/* Clickable View Icon */}
+                    <div className="ml-6">
+                      <Link href={`/components/${component.id}`}>
+                        <button className="p-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-full transition-all duration-300 hover:scale-110 cursor-pointer">
+                          <Eye className="w-5 h-5 text-white" />
+                        </button>
+                      </Link>
+                    </div>
                   </div>
-                </Link>
+                </div>
               </motion.div>
             ))}
           </motion.div>
