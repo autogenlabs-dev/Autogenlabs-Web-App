@@ -32,11 +32,6 @@ const SafeImage = ({
         const position = computedStyle.position;
         
         if (position === 'static') {
-          console.warn(
-            `SafeImage with fill prop has parent with static positioning. ` +
-            `Adding relative positioning automatically.`,
-            { src, alt }
-          );
           parent.style.position = 'relative';
         }
       }
@@ -52,7 +47,6 @@ const SafeImage = ({
   const handleError = (e) => {
     setIsLoading(false);
     setHasError(true);
-    console.warn(`Image failed to load: ${src}`, e);
     onError?.(e);
   };
 

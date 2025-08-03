@@ -22,13 +22,10 @@ const LiveComponentPreview = ({
   }, [component]);
 
   const generatePreviewContent = () => {
-    console.log('🔍 LiveComponentPreview: Component data:', component);
-    
     // Check for different possible code field names
     const codeContent = component?.code || component?.html || component?.content || component?.htmlCode;
     
     if (!component || !codeContent) {
-      console.log('❌ LiveComponentPreview: No code found. Available fields:', Object.keys(component || {}));
       setHasError(true);
       setIsLoading(false);
       return;
@@ -40,8 +37,6 @@ const LiveComponentPreview = ({
 
       let htmlContent = '';
       let cssContent = '';
-
-      console.log('💾 LiveComponentPreview: Using code content:', codeContent);
 
       // Check if code is JSON format (HTML + CSS)
       if (component.language?.toLowerCase() === 'css' || 
@@ -174,7 +169,6 @@ const LiveComponentPreview = ({
       setPreviewContent(fullHTML);
       setIsLoading(false);
     } catch (error) {
-      console.error('Error generating preview content:', error);
       setHasError(true);
       setIsLoading(false);
     }

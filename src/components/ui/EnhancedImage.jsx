@@ -12,8 +12,6 @@ const EnhancedImage = ({ src, alt, onError, ...props }) => {
   const [retryCount, setRetryCount] = useState(0);
   
   const handleError = (e) => {
-    console.warn(`Image failed to load: ${src}`, e);
-    
     // Try once more with enhanced props
     if (retryCount === 0) {
       setRetryCount(1);

@@ -34,27 +34,9 @@ const ComponentDetailPage = ({ componentId }) => {
         try {
             setLoading(true);
             setError(null);
-            console.log('🔍 Fetching component with ID:', componentId);
             const component = await componentApi.getComponent(componentId);
-            console.log('📦 Raw component data received:', component);
-            console.log('💰 Pricing data:', {
-                pricingINR: component.pricingINR,
-                pricingUSD: component.pricingUSD,
-                pricing_inr: component.pricing_inr,
-                pricing_usd: component.pricing_usd,
-                planType: component.planType,
-                plan_type: component.plan_type
-            });
-            console.log('🖼️ Image data:', {
-                previewImages: component.previewImages,
-                preview_images: component.preview_images
-            });
-            console.log('👨‍💻 Developer data:', {
-                developerName: component.developerName,
-                developer_name: component.developer_name,
-                developerExperience: component.developerExperience,
-                developer_experience: component.developer_experience
-            });
+           
+           
             setComponent(component);
         } catch (err) {
             console.error('Failed to fetch component:', err);
@@ -242,17 +224,12 @@ const ComponentDetailPage = ({ componentId }) => {
                             <div className="relative h-[500px] bg-gray-900 rounded-xl overflow-hidden group">
                                 {(() => {
                                     try {
-                                        console.log('🔍 ComponentDetail: Component data:', component);
-                                        console.log('💾 ComponentDetail: Component code:', component?.code);
-                                        console.log('🏷️ ComponentDetail: Component language:', component?.language);
-                                        console.log('📋 ComponentDetail: Available fields:', Object.keys(component || {}));
                                         
                                         // Check for different possible code field names
                                         const hasCode = component?.code || component?.html || component?.content || component?.htmlCode;
                                         
                                         // Use live component preview if code is available
                                         if (hasCode) {
-                                            console.log('✅ ComponentDetail: Using live preview with code:', hasCode);
                                             return (
                                                 <>
                                                     <LiveComponentPreview 
@@ -279,7 +256,6 @@ const ComponentDetailPage = ({ componentId }) => {
 
                                         // Fallback to static images
                                         const images = component?.previewImages || component?.preview_images;
-                                        console.log('🖼️ ComponentDetail: Preview images:', images);
                                         if (!images || !Array.isArray(images) || images.length === 0) {
                                             return (
                                                 <div className="flex items-center justify-center h-full text-gray-400">

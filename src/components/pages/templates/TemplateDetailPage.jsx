@@ -56,10 +56,8 @@ const TemplateDetailPage = ({ templateId }) => {
                 images.push(...validImages);
             }
             
-            console.log('Gallery images created (live URL first):', images);
             return images; // Return live URL + any existing images
         } catch (error) {
-            console.error('Error creating gallery images:', error);
             return [];
         }
     }, [template]);
@@ -71,7 +69,6 @@ const TemplateDetailPage = ({ templateId }) => {
                 setSelectedImageIndex(index);
             }
         } catch (error) {
-            console.error('Error navigating images:', error);
             setSelectedImageIndex(0);
         }
     }, [galleryImages.length]);
@@ -82,7 +79,6 @@ const TemplateDetailPage = ({ templateId }) => {
         
         const loadTemplate = async () => {
             if (!templateId) {
-                console.log('❌ No templateId provided');
                 if (!isCancelled) {
                     setLoading(false);
                     setError('No template ID provided');
@@ -92,17 +88,12 @@ const TemplateDetailPage = ({ templateId }) => {
             
             // Validate templateId format (should be 24 characters for MongoDB ObjectId)
             if (typeof templateId !== 'string' || templateId.length !== 24) {
-                console.log('❌ Invalid templateId format:', templateId, 'length:', templateId?.length);
                 if (!isCancelled) {
                     setLoading(false);
                     setError('Invalid template ID format');
                 }
                 return;
             }
-            
-            console.log('🔄 Starting to load template:', templateId);
-            console.log('🔄 Template ID type:', typeof templateId);
-            console.log('🔄 Template ID length:', templateId.length);
             
             // Set loading to true and reset error state
             if (!isCancelled) {
@@ -112,20 +103,13 @@ const TemplateDetailPage = ({ templateId }) => {
             }
             
             try {
-                console.log('🌐 Calling getTemplateById with ID:', templateId);
                 const templateData = await getTemplateById(templateId);
-                console.log('📦 Template data received:', templateData);
-                console.log('📦 Template data type:', typeof templateData);
-                console.log('📦 Template has ID?', templateData && templateData.id);
                 
                 if (!isCancelled) {
                     if (templateData && templateData.id) {
                         setTemplate(templateData);
                         setError(null);
-                        console.log('✅ Template set successfully:', templateData.title);
                     } else {
-                        console.warn('❌ Invalid template data received:', templateData);
-                        console.warn('❌ Data exists but no ID:', !!templateData);
                         setTemplate(null);
                         setError('Template not found');
                     }
@@ -158,7 +142,6 @@ const TemplateDetailPage = ({ templateId }) => {
     }, [selectedImageIndex, galleryImages.length]);
 
     // Early returns after all hooks are called
-    console.log('TemplateDetailPage render - loading:', loading, 'template:', !!template, 'templateId:', templateId, 'error:', error);
     
     if (loading) {
         return (

@@ -283,7 +283,6 @@ const CreateComponentForm = () => {
     // Ensure title is set when selectedType is available
     useEffect(() => {
         if (selectedType) {
-            console.log('🔄 Auto-setting title from selectedType:', selectedType.name);
             setFormData(prev => ({
                 ...prev,
                 title: selectedType.name
@@ -292,7 +291,6 @@ const CreateComponentForm = () => {
     }, [selectedType]);
 
     const handleTypeSelect = (type) => {
-        console.log('🎯 Selected type:', type);
         setSelectedType(type);
         
         // Immediately update formData with the new title
@@ -303,7 +301,6 @@ const CreateComponentForm = () => {
             title: type.name // Always set the title to the type name
         }));
         
-        console.log('📝 Updated title to:', type.name);
     };
 
     const handleTechSelect = (tech) => {
@@ -426,7 +423,6 @@ const CreateComponentForm = () => {
 
     const generatePreviewImage = async () => {
         try {
-            console.log('🖼️ Generating modern preview image like uiverse.io...');
             
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
@@ -683,8 +679,6 @@ const CreateComponentForm = () => {
             ctx.shadowBlur = 0;
             
             const dataURL = canvas.toDataURL('image/png', 0.95);
-            console.log('✅ Modern preview image generated successfully');
-            console.log('🖼️ Preview image data URL length:', dataURL.length);
             
             return dataURL;
             
@@ -754,14 +748,11 @@ const CreateComponentForm = () => {
                 previewImages: previewImage ? [previewImage] : []
             };
             
-            console.log('🚀 Creating component with data:', completeData);
             
             // Actually create the component using the backend API
             const backendData = await componentApi.transformFormDataToBackend(completeData);
-            console.log('📤 Transformed data:', backendData);
             
             const response = await componentApi.createComponent(backendData);
-            console.log('✅ Component created successfully:', response);
             
             setSubmitStatus('success');
             setSubmitMessage('Component created successfully! Redirecting...');

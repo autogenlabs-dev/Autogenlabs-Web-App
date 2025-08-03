@@ -1,12 +1,11 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Grid3X3, List, Star, Download, Eye, Heart, Code, Globe } from 'lucide-react';
+import { Search, Grid3X3, List, Star, Download, Eye, Heart, Code } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { templateApi } from '@/lib/apiTemplates';
 import { templateCategories } from '@/lib/templateData';
-import { getFaviconUrl, getDomainName } from '@/utils/simpleScreenshot';
 
 const TemplateGallery = () => {
   const [mounted, setMounted] = useState(false);
@@ -37,19 +36,12 @@ const TemplateGallery = () => {
       
       const transformedTemplates = response.templates.map(template => {
         const transformed = templateApi.transformTemplateData(template);
-        // Debug: Log the template data to see what images we're getting
-        console.log('🔍 Template:', transformed.title);
-        console.log('   - Live URL:', transformed.liveDemoUrl);
-        console.log('   - Preview Images:', transformed.previewImages);
-        console.log('   - Category:', transformed.category);
-        console.log('   - Plan Type:', transformed.planType);
         return transformed;
       });
       
       setTemplates(transformedTemplates);
       setFilteredTemplates(transformedTemplates);
     } catch (err) {
-      console.error('Failed to fetch templates:', err);
       setError(err.message);
       // Fallback to empty array
       setTemplates([]);
@@ -62,13 +54,6 @@ const TemplateGallery = () => {
   // Filter and sort templates
   useEffect(() => {
     let filtered = templates.filter(template => {
-      // FIRST: Only show templates with live demo URLs (no static templates)
-      const hasLiveUrl = template.liveDemoUrl && template.liveDemoUrl.trim() !== '';
-      if (!hasLiveUrl) {
-        console.log('🚫 Filtering out template without live URL:', template.title);
-        return false;
-      }
-
       const matchesSearch = template.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            template.shortDescription.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = selectedCategory === 'All' || template.category === selectedCategory;
@@ -327,7 +312,7 @@ const TemplateGallery = () => {
           </div>
         </motion.div>
 
-        {/* Templates Layout - 2 CARDS PER ROW WITH LIVE WEBSITE PREVIEW */}
+        {/* Templates Layout - 2 CARDS PER ROW WITH LIVE PREVIEW */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {filteredTemplates.map((template, index) => (
             <motion.div
@@ -340,30 +325,51 @@ const TemplateGallery = () => {
               className="group w-full cursor-pointer"
             >
               <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl overflow-hidden transition-all duration-500 hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:shadow-blue-500/10 h-80">
-                {/* Live Website Preview Image Only */}
-                <div className="relative w-full h-full overflow-hidden">
-                  <img 
-                    src={`https://shot.screenshotapi.net/screenshot?token=DEMO_TOKEN&url=${encodeURIComponent(template.liveDemoUrl)}&width=800&height=600&output=image&file_type=png&wait_for_event=load`} 
-                    alt={`${template.title} live preview`}
-                    className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
-                    onError={(e) => {
-                      // Fallback: show gradient if screenshot fails
-                      e.target.style.display = 'none';
-                      e.target.nextElementSibling.style.display = 'flex';
-                    }}
-                  />
-                  {/* Fallback Gradient Background */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 hidden items-center justify-center text-white p-6">
-                    <Globe className="w-12 h-12 opacity-80 mx-auto mb-4" />
+                
+                {/* Template Image Preview */}
+                <div className="relative w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 overflow-hidden">
+                  {template.previewImages && template.previewImages.length > 0 ? (
+                    <Image
+                      src={template.previewImages[0]}
+                      alt={template.title}
+                      fill
+                      className="object-cover transition-all duration-700 group-hover:scale-110"
+                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    />
+                  ) : (
+                    // Fallback display when no image
+                    <div className="absolute inset-0 flex items-center justify-center text-white p-6">
+                      <div className="text-center">
+                        <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                          <span className="text-2xl font-bold">
+                            {template.title.charAt(0)}
+                          </span>
+                        </div>
+                        <h3 className="text-lg font-semibold mb-2">{template.title}</h3>
+                        <p className="text-sm text-gray-300 mb-3">{template.category}</p>
+                        <div className="text-xs text-gray-400 bg-black/20 rounded-lg px-3 py-1">
+                          No Preview Image
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Dark overlay for better text visibility */}
+                  <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition-all duration-300"></div>
+                  
+                  {/* Free/Paid Badge - Top Left Corner */}
+                  <div className="absolute top-3 left-3 z-10">
+                    <span className={`px-2 py-1 text-xs font-bold rounded-full shadow-lg ${getPlanColor(template.planType)}`}>
+                      {template.planType}
+                    </span>
                   </div>
-                  {/* View Details Icon - Top Right Only Clickable */}
-                  <div className="absolute top-3 right-3 z-10">
-                    <Link href={`/templates/${template.id}`}>
-                      <button className="w-8 h-8 bg-white/20 backdrop-blur-md border border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-110 transition-all duration-300 group/btn">
-                        <Eye className="w-4 h-4 group-hover/btn:scale-110 transition-transform duration-200" />
-                      </button>
-                    </Link>
-                  </div>
+                  
+                  {/* View Details Icon - Top Right Corner */}
+                  <Link href={`/templates/${template.id}`} onClick={(e) => e.stopPropagation()}>
+                    <button className="absolute top-3 right-3 w-8 h-8 bg-white/20 backdrop-blur-md border border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 hover:scale-110 transition-all duration-300 z-10 group/btn">
+                      <Eye className="w-4 h-4 group-hover/btn:scale-110 transition-transform duration-200" />
+                    </button>
+                  </Link>
                 </div>
               </div>
             </motion.div>

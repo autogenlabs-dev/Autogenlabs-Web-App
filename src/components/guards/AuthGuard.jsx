@@ -42,22 +42,18 @@ const AuthGuard = ({ children }) => {
   useEffect(() => {
     // Don't redirect while loading
     if (loading) {
-      console.log('🔄 AuthGuard: Still loading authentication state...');
       return;
     }
 
-    console.log(`🔍 AuthGuard: Checking path ${pathname} - authenticated: ${isAuthenticated}, loading: ${loading}`);
 
     // Check if current route is protected
     const isProtectedRoute = protectedRoutes.some(route => 
       pathname.startsWith(route)
     );
 
-    console.log(`🔍 AuthGuard: Is protected route: ${isProtectedRoute}`);
 
     // If user is not authenticated and trying to access protected route
     if (!isAuthenticated && isProtectedRoute) {
-      console.log(`🔒 AuthGuard: Redirecting from ${pathname} to /auth (not authenticated)`);
       // Store the intended URL in localStorage so we can redirect back after login
       if (typeof window !== 'undefined') {
         localStorage.setItem('intendedUrl', pathname);
@@ -93,10 +89,8 @@ const AuthGuard = ({ children }) => {
     pathname.startsWith(route)
   );
 
-  console.log(`🛡️ AuthGuard: Route ${pathname} - Protected: ${isProtectedRoute}, Authenticated: ${isAuthenticated}, Loading: ${loading}`);
 
   if (isProtectedRoute && !isAuthenticated) {
-    console.log(`🚫 AuthGuard: BLOCKING access to ${pathname} - user not authenticated`);
     // Return loading state while redirecting to login
     return (
       <div className="min-h-screen bg-[linear-gradient(180deg,#0D0B12_0%,#040406_100%)] text-white flex items-center justify-center">
@@ -114,7 +108,6 @@ const AuthGuard = ({ children }) => {
     );
   }
 
-  console.log(`✅ AuthGuard: ALLOWING access to ${pathname}`);
   return children;
 };
 

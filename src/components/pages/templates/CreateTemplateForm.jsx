@@ -14,9 +14,6 @@ const CreateTemplateForm = () => {
     const router = useRouter();
     
     // Debug authentication state
-    console.log('CreateTemplateForm: User:', user);
-    console.log('CreateTemplateForm: Is Authenticated:', isAuthenticated);
-    console.log('CreateTemplateForm: Access Token:', localStorage.getItem('access_token') ? 'Present' : 'Missing');
     
     // Check if user is authenticated
     if (!isAuthenticated) {
@@ -49,7 +46,8 @@ const CreateTemplateForm = () => {
         pricingUSD: '',
         shortDescription: '',
         fullDescription: '',
-        dependencies: []
+        dependencies: [],
+        templateImage: null // File object for uploaded image
     });
 
     const [newDependency, setNewDependency] = useState('');
@@ -57,12 +55,42 @@ const CreateTemplateForm = () => {
     const [showPreview, setShowPreview] = useState(false);
     const [submitError, setSubmitError] = useState(null);
     const [submitSuccess, setSubmitSuccess] = useState(false);
+    const [imagePreview, setImagePreview] = useState(null); // For showing image preview
 
     const handleInputChange = (field, value) => {
         setFormData(prev => ({
             ...prev,
             [field]: value
         }));
+    };
+
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please select an image file');
+                return;
+            }
+            
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Image size should be less than 5MB');
+                return;
+            }
+
+            setFormData(prev => ({
+                ...prev,
+                templateImage: file
+            }));
+
+            // Create preview URL
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setImagePreview(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     const handleAddDependency = () => {
@@ -84,26 +112,24 @@ const CreateTemplateForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('🚀 Form submission started!');
-        console.log('🔍 User:', user);
-        console.log('🔍 Is Authenticated:', isAuthenticated);
-        console.log('🔍 Form Data:', formData);
-        console.log('🔍 Form Valid:', isFormValid());
+        
+        // Prevent multiple submissions
+        if (isSubmitting || submitSuccess) {
+            return;
+        }
+        
         
         setIsSubmitting(true);
         setSubmitError(null);
         setSubmitSuccess(false);
 
         try {
-            console.log('🔍 About to validate form...');
             
             if (!isFormValid()) {
-                console.log('❌ Form is not valid, stopping submission');
-                alert('Please fill in all required fields');
+                setSubmitError('Please fill in all required fields');
                 return;
             }
             
-            console.log('✅ Form validation passed');
             
             // Prepare template data for API
             let templateData = {
@@ -117,7 +143,7 @@ const CreateTemplateForm = () => {
                 pricing_usd: parseInt(formData.pricingUSD) || 0,
                 short_description: formData.shortDescription,
                 full_description: formData.fullDescription,
-                preview_images: [], // No images - will use live URL for preview
+                preview_images: [], // Will be set after image upload if any
                 git_repo_url: formData.gitRepoUrl,
                 live_demo_url: formData.liveDemoUrl,
                 dependencies: formData.dependencies,
@@ -131,37 +157,49 @@ const CreateTemplateForm = () => {
                 popular: false
             };
 
-            console.log('📦 Template data to submit:', templateData);
-            console.log('🔄 About to call createTemplate function...');
+            // Handle image upload if file is selected
+            if (formData.templateImage) {
+                // Convert image to base64 for now (you can implement proper file upload later)
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    templateData.preview_images = [e.target.result];
+                    await submitTemplate(templateData);
+                };
+                reader.readAsDataURL(formData.templateImage);
+                return; // Exit here as submission will continue in reader.onload
+            } else {
+                await submitTemplate(templateData);
+            }
+        } catch (error) {
+            console.error('❌ Template submission error:', error);
+            setSubmitError(error.message || 'Failed to create template');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const submitTemplate = async (templateData) => {
+        try {
             
             if (!createTemplate) {
-                console.error('❌ createTemplate function is not available!');
                 throw new Error('Template creation function not available');
             }
             
-            console.log('✅ createTemplate function is available, calling it now...');
 
             // Use the createTemplate function from context
             const result = await createTemplate(templateData);
 
-            console.log('Template created successfully:', result);
             setSubmitSuccess(true);
             
-            // Show success message
-            alert('Template created successfully!');
-            
-            // Redirect to templates page after a short delay
+            // Redirect to templates page after showing success
             setTimeout(() => {
                 router.push('/templates');
-            }, 1500);
+            }, 2000);
 
         } catch (error) {
             console.error('Error creating template:', error);
             const errorMessage = error.message || 'Failed to create template. Please try again.';
             setSubmitError(errorMessage);
-            alert(`Error creating template: ${errorMessage}`);
-        } finally {
-            setIsSubmitting(false);
         }
     };
 
@@ -173,9 +211,10 @@ const CreateTemplateForm = () => {
         ];
 
         const hasRequiredFields = requiredFields.every(field => formData[field]);
+        const hasImage = formData.templateImage !== null; // Check if file is uploaded
         const hasPricing = formData.planType === 'Free' || (formData.pricingINR && formData.pricingUSD);
 
-        if (hasRequiredFields && hasPricing) {
+        if (hasRequiredFields && hasImage && hasPricing) {
             return true;
         }
         return false;
@@ -423,6 +462,49 @@ const CreateTemplateForm = () => {
                                     />
                                 </div>
                             </div>
+
+                            {/* Template Image Upload */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-2">
+                                    Template Image *
+                                </label>
+                                <div className="space-y-4">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleImageUpload}
+                                        className="w-full p-3 bg-white/10 border border-white/20 rounded-xl text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700 focus:outline-none focus:border-purple-500/50"
+                                        required
+                                    />
+                                    <p className="text-sm text-gray-400">
+                                        Upload an image for your template preview. Accepted formats: JPG, PNG, WebP (Max 5MB)
+                                    </p>
+                                    
+                                    {/* Image Preview */}
+                                    {imagePreview && (
+                                        <div className="mt-4">
+                                            <p className="text-sm text-gray-300 mb-2">Preview:</p>
+                                            <div className="relative inline-block">
+                                                <img 
+                                                    src={imagePreview} 
+                                                    alt="Template preview" 
+                                                    className="w-48 h-32 object-cover rounded-lg border border-white/20"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setFormData(prev => ({ ...prev, templateImage: null }));
+                                                        setImagePreview(null);
+                                                    }}
+                                                    className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -582,27 +664,90 @@ const CreateTemplateForm = () => {
                         </div>
                     </div>
 
-                    {/* Submit Button */}
+                                            {/* Submit Success/Error Messages */}
+                        {submitSuccess && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="flex items-center justify-center p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl mb-6"
+                            >
+                                <div className="flex items-center space-x-3">
+                                    <div className="flex-shrink-0">
+                                        <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p className="text-green-800 font-medium">Template Created Successfully!</p>
+                                        <p className="text-green-600 text-sm">Redirecting to templates page...</p>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {submitError && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="flex items-center justify-between p-4 bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-xl mb-6"
+                            >
+                                <div className="flex items-center space-x-3">
+                                    <div className="flex-shrink-0">
+                                        <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p className="text-red-800 font-medium">Error Creating Template</p>
+                                        <p className="text-red-600 text-sm">{submitError}</p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => setSubmitError('')}
+                                    className="text-red-400 hover:text-red-600 transition-colors duration-200"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </motion.div>
+                        )}
+
+                        {/* Submit Button */}
                     <div className="flex justify-center pt-8">
                         <button
                             type="submit"
-                            disabled={!isFormValid() || isSubmitting}
+                            disabled={!isFormValid() || isSubmitting || submitSuccess}
                             className={`px-12 py-4 rounded-xl font-bold text-lg transition-all duration-300 flex items-center gap-3 ${
-                                isFormValid() && !isSubmitting
-                                    ? 'bg-gradient-to-r from-purple-600 to-cyan-600 text-white hover:from-purple-700 hover:to-cyan-700 hover:scale-105 shadow-lg hover:shadow-purple-500/25'
-                                    : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                                isFormValid() && !isSubmitting && !submitSuccess
+                                    ? 'bg-gradient-to-r from-purple-600 to-cyan-600 text-white hover:from-purple-700 hover:to-cyan-700 hover:scale-105 shadow-lg hover:shadow-purple-500/25 active:scale-95'
+                                    : submitSuccess 
+                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white cursor-default shadow-lg'
+                                        : isSubmitting
+                                            ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white cursor-wait animate-pulse'
+                                            : 'bg-gray-600 text-gray-400 cursor-not-allowed'
                             }`}
                         >
                             {isSubmitting ? (
-                                <>
-                                    <div className="w-5 h-5 border-2 border-gray-400 border-t-white rounded-full animate-spin"></div>
-                                    Submitting...
-                                </>
+                                <div className="flex items-center justify-center space-x-3">
+                                    <svg className="animate-spin w-6 h-6 text-white" fill="none" viewBox="0 0 24 24">
+                                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" className="opacity-25" />
+                                        <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" className="opacity-75" />
+                                    </svg>
+                                    <span className="animate-pulse">Creating Template...</span>
+                                </div>
+                            ) : submitSuccess ? (
+                                <div className="flex items-center justify-center space-x-3">
+                                    <svg className="w-6 h-6 text-white animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span>Template Created Successfully!</span>
+                                </div>
                             ) : (
-                                <>
-                                    <Save className="w-5 h-5" />
-                                    Submit Template
-                                </>
+                                <div className="flex items-center justify-center space-x-3">
+                                    <Save className="w-6 h-6" />
+                                    <span>Submit Template</span>
+                                </div>
                             )}
                         </button>
                     </div>

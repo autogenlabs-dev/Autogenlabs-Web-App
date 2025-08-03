@@ -7,7 +7,6 @@ import { tokenUtils, ApiError } from './api';
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 const handleApiResponse = async (response) => {
-    console.log('🔍 API Response:', response.status, response.statusText);
     
     if (!response.ok) {
         let errorMessage = `HTTP error! status: ${response.status}`;
@@ -27,7 +26,6 @@ const handleApiResponse = async (response) => {
     }
     
     const data = await response.json();
-    console.log('✅ Success Response Data:', data);
     return data;
 };
 
@@ -62,28 +60,19 @@ const refreshAccessToken = async () => {
 const getAuthHeadersWithRefresh = async () => {
     if (typeof window === 'undefined') return { 'Content-Type': 'application/json' };
     
-    console.log('🔐 Getting auth headers...');
     
     let token = tokenUtils.getAccessToken();
-    console.log('🎫 Initial token from storage:', token ? 'Token exists' : 'No token found');
     
     // Check if token is expired and refresh if needed
     if (!token || tokenUtils.isTokenExpired(token)) {
-        console.log('🔄 Token expired or missing, attempting refresh...');
         const refreshToken = tokenUtils.getRefreshToken();
-        console.log('🎫 Refresh token available:', refreshToken ? 'Yes' : 'No');
         
         try {
             token = await refreshAccessToken();
-            console.log('✅ Token refreshed successfully');
         } catch (error) {
-            console.error('❌ Token refresh failed:', error);
-            console.log('🚪 Clearing tokens and requiring re-login');
             tokenUtils.clearTokens();
             throw new ApiError('Authentication required - please login again', 401);
         }
-    } else {
-        console.log('✅ Token is valid, using existing token');
     }
 
     return {
@@ -105,13 +94,8 @@ export const templateApi = {
      * Create a new template
      */
     async createTemplate(templateData) {
-        console.log('🌐 API: createTemplate called with data:', templateData);
-        
         try {
             const headers = await getAuthHeadersWithRefresh();
-            console.log('🔑 API: Auth headers obtained successfully');
-
-            console.log('🚀 API: Making POST request to:', `${API_BASE_URL}/templates`);
 
             const response = await fetch(`${API_BASE_URL}/templates`, {
                 method: 'POST',
@@ -119,11 +103,8 @@ export const templateApi = {
                 body: JSON.stringify(templateData),
             });
 
-            console.log('📡 API: Response received:', response.status, response.statusText);
-
             return handleApiResponse(response);
         } catch (error) {
-            console.error('❌ API: createTemplate failed:', error);
             throw error;
         }
     },
@@ -132,8 +113,6 @@ export const templateApi = {
      * Get all templates with optional filtering
      */
     async getTemplates(params = {}) {
-        console.log('🔍 API: getTemplates called with params:', params);
-        
         const queryParams = new URLSearchParams();
         
         // Add query parameters (only add non-null, non-undefined, non-empty values)
@@ -152,7 +131,6 @@ export const templateApi = {
         if (params.search && params.search.trim()) queryParams.append('search', params.search.trim());
 
         const finalUrl = `${API_BASE_URL}/templates?${queryParams}`;
-        console.log('🌐 API: Final URL:', finalUrl);
 
         const response = await fetch(finalUrl, {
             method: 'GET',
@@ -168,9 +146,7 @@ export const templateApi = {
      * Get a specific template by ID
      */
     async getTemplate(templateId) {
-        console.log('🌐 API: getTemplate called with ID:', templateId);
         const url = `${API_BASE_URL}/templates/${templateId}`;
-        console.log('🌐 API: Making request to:', url);
         
         const response = await fetch(url, {
             method: 'GET',
@@ -179,13 +155,10 @@ export const templateApi = {
             },
         });
 
-        console.log('📡 API: Response status:', response.status, response.statusText);
         const result = await handleApiResponse(response);
-        console.log('📦 API: Raw result from backend:', result);
         
         // Transform the response to ensure consistent format
         const transformed = this.transformTemplateData(result);
-        console.log('🔄 API: Transformed result:', transformed);
         return transformed;
     },
 
@@ -204,7 +177,6 @@ export const templateApi = {
 
             return handleApiResponse(response);
         } catch (error) {
-            console.error('❌ API: updateTemplate failed:', error);
             throw error;
         }
     },
@@ -223,7 +195,6 @@ export const templateApi = {
 
             return handleApiResponse(response);
         } catch (error) {
-            console.error('❌ API: deleteTemplate failed:', error);
             throw error;
         }
     },
@@ -246,7 +217,6 @@ export const templateApi = {
 
             return handleApiResponse(response);
         } catch (error) {
-            console.error('❌ API: getMyTemplates failed:', error);
             throw error;
         }
     },
@@ -265,7 +235,6 @@ export const templateApi = {
 
             return handleApiResponse(response);
         } catch (error) {
-            console.error('❌ API: toggleLike failed:', error);
             throw error;
         }
     },
@@ -284,7 +253,6 @@ export const templateApi = {
 
             return handleApiResponse(response);
         } catch (error) {
-            console.error('❌ API: downloadTemplate failed:', error);
             throw error;
         }
     },
@@ -374,17 +342,12 @@ export const templateApi = {
         
         // Handle preview images - now mostly empty as we use live URL
         let previewImages = [];
-        console.log('🔍 Transform: Raw template data:', template.title, 'live_demo_url:', template.live_demo_url);
         
         if (template.preview_images && Array.isArray(template.preview_images)) {
-            console.log('🔍 Transform: Found preview_images array:', template.preview_images);
             previewImages = template.preview_images; // Keep existing if any
         } else if (template.previewImages && Array.isArray(template.previewImages)) {
-            console.log('🔍 Transform: Found previewImages array:', template.previewImages);
             previewImages = template.previewImages; // Keep existing if any
         }
-        
-        console.log('🔍 Transform: Final previewImages (using live URL for display):', previewImages);
         
         const transformed = {
             id: idString,
@@ -420,7 +383,6 @@ export const templateApi = {
             likes: template.likes || 0,
         };
         
-        console.log('✅ Transformed template data:', transformed);
         return transformed;
     },
 
@@ -429,12 +391,8 @@ export const templateApi = {
      */
     async transformFormDataToBackend(formData) {
         try {
-            console.log('🔄 Transform: Starting template form data transformation');
-            console.log('📋 Transform: Input form data:', formData);
-            
             // No preview images processing - using live URL for preview
             let previewImages = [];
-            console.log('🖼️ Transform: Using live URL for preview, no image processing needed');
 
             return {
                 title: formData.title,
@@ -461,7 +419,6 @@ export const templateApi = {
                 readme_content: formData.readmeContent || null,
             };
         } catch (error) {
-            console.error('❌ Transform: Error transforming template form data:', error);
             throw error;
         }
     },

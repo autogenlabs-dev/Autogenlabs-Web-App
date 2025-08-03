@@ -43,7 +43,6 @@ export const generateScreenshotUrl = (liveUrl, options = {}) => {
         // Try multiple services in sequence for better reliability
         const screenshotUrl = services[0]; // Start with the most reliable one
         
-        console.log('📸 Generated screenshot URL:', screenshotUrl, 'for:', liveUrl);
         return screenshotUrl;
     } catch (error) {
         console.error('❌ Error generating screenshot URL for:', liveUrl, error);
@@ -139,11 +138,8 @@ export const getScreenshotServices = (url, options = {}) => {
  */
 export const getBestPreviewImage = (template, options = {}) => {
     if (!template) {
-        console.log('🖼️ No template provided');
         return null;
     }
-    
-    console.log('🖼️ Getting best preview for:', template.title, 'LiveURL:', template.liveDemoUrl);
     
     // If we have a live URL, use screenshot service
     if (template.liveDemoUrl) {
@@ -154,18 +150,14 @@ export const getBestPreviewImage = (template, options = {}) => {
             // Use a working screenshot service - this one works reliably
             const screenshotUrl = `https://image.thum.io/get/width/800/crop/600/noanimate/${template.liveDemoUrl}`;
             
-            console.log('✅ Using thum.io screenshot service:', screenshotUrl);
             return screenshotUrl;
             
         } catch (urlError) {
-            console.error('❌ Invalid live URL format:', template.liveDemoUrl);
+            // Invalid URL format
         }
-    } else {
-        console.log('📭 No live demo URL available');
     }
     
     // If no live URL, return null to hide the template
-    console.log('🚫 No live URL available, returning null to hide static template');
     return null;
 };
 

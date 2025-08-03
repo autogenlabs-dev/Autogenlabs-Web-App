@@ -20,16 +20,12 @@ export const AuthProvider = ({ children }) => {
     // Load user from stored tokens on app initialization
     useEffect(() => {
         const initializeAuth = async () => {
-            console.log('🔄 InitializeAuth - Starting authentication check');
             try {
                 const accessToken = tokenUtils.getAccessToken();
-                console.log('🔍 InitializeAuth - Access token exists:', !!accessToken);
                 
                 if (accessToken && !tokenUtils.isTokenExpired(accessToken)) {
-                    console.log('🔍 InitializeAuth - Token is valid, fetching user data');
                     try {
                         const userData = await authApi.getCurrentUser(accessToken);
-                        console.log('✅ InitializeAuth - User data received:', userData);
                         setUser({
                             id: userData.id,
                             name: userData.full_name || userData.name || userData.email.split('@')[0],
@@ -40,18 +36,15 @@ export const AuthProvider = ({ children }) => {
                             avatar: '/public/logoAuto.webp',
                             ...userData
                         });
-                        console.log('✅ InitializeAuth - User state set successfully');
                     } catch (userError) {
                         console.error('❌ InitializeAuth - Failed to fetch user data:', userError);
                         // Token might be invalid, try refresh
                         const refreshToken = tokenUtils.getRefreshToken();
                         if (refreshToken) {
                             try {
-                                console.log('🔄 InitializeAuth - Refreshing token');
                                 const refreshResponse = await authApi.refreshToken(refreshToken);
                                 tokenUtils.setTokens(refreshResponse.access_token, refreshResponse.refresh_token || refreshToken);
                                 const userData = await authApi.getCurrentUser(refreshResponse.access_token);
-                                console.log('✅ InitializeAuth - User data after refresh:', userData);
                                 setUser({
                                     id: userData.id,
                                     name: userData.full_name || userData.name || userData.email.split('@')[0],
@@ -68,13 +61,11 @@ export const AuthProvider = ({ children }) => {
                                 setUser(null);
                             }
                         } else {
-                            console.log('❌ InitializeAuth - No refresh token available');
                             tokenUtils.clearTokens();
                             setUser(null);
                         }
                     }
                 } else {
-                    console.log('❌ InitializeAuth - Token expired or missing');
                     tokenUtils.clearTokens();
                     setUser(null);
                 }
@@ -83,7 +74,6 @@ export const AuthProvider = ({ children }) => {
                 tokenUtils.clearTokens();
                 setUser(null);
             } finally {
-                console.log('✅ InitializeAuth completed, setting loading to false');
                 setLoading(false);
             }
         };
@@ -96,9 +86,7 @@ export const AuthProvider = ({ children }) => {
         setError(null);
         
         try {
-            console.log('🔄 Login attempt for:', credentials.email);
             const response = await authApi.login(credentials.email, credentials.password);
-            console.log('✅ Login response received:', response);
             
             // Store tokens
             tokenUtils.setTokens(response.access_token, response.refresh_token);
@@ -117,7 +105,6 @@ export const AuthProvider = ({ children }) => {
             };
             
             setUser(userState);
-            console.log('✅ Login successful, user state set:', userState);
             
             return { success: true, user: userData };
         } catch (error) {
@@ -136,11 +123,9 @@ export const AuthProvider = ({ children }) => {
         try {
             // First register the user
             const registerResponse = await authApi.signup(userData);
-            console.log('Signup response:', registerResponse);
             
             // Then automatically login to get tokens
             const loginResponse = await authApi.login(userData.email, userData.password);
-            console.log('Auto-login response:', loginResponse);
             
             // Store tokens
             tokenUtils.setTokens(loginResponse.access_token, loginResponse.refresh_token);
@@ -179,7 +164,6 @@ export const AuthProvider = ({ children }) => {
             if (accessToken) {
                 try {
                     await authApi.logout(accessToken);
-                    console.log('✅ Backend logout successful');
                 } catch (error) {
                     console.warn('⚠️ Backend logout failed, continuing with local cleanup:', error);
                 }
@@ -188,7 +172,6 @@ export const AuthProvider = ({ children }) => {
             // Clear tokens and user state
             tokenUtils.clearTokens();
             setUser(null);
-            console.log('✅ Local logout completed');
             
         } catch (error) {
             console.error('❌ Logout error:', error);

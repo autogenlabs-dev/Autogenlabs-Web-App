@@ -101,7 +101,6 @@ const ComponentGallery = () => {
     
     // Add window focus listener to refresh components when user returns to page
     const handleFocus = () => {
-      console.log('🔄 Page focused, refreshing components...');
       fetchComponents();
     };
     
@@ -110,7 +109,6 @@ const ComponentGallery = () => {
     // Also listen for visibility change
     const handleVisibilityChange = () => {
       if (!document.hidden) {
-        console.log('🔄 Page visible, refreshing components...');
         fetchComponents();
       }
     };
@@ -136,7 +134,6 @@ const ComponentGallery = () => {
       setComponents(transformedComponents);
       setFilteredComponents(transformedComponents);
     } catch (err) {
-      console.error('Failed to fetch components:', err);
       setError(err.message);
       // Fallback to empty array
       setComponents([]);

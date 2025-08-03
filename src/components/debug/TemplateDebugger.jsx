@@ -8,12 +8,6 @@ const TemplateDebugger = () => {
   const { user, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    console.log('🔍 Template Debugger - Current State:');
-    console.log('  📊 Templates:', templates);
-    console.log('  👤 My Templates:', myTemplates);
-    console.log('  ⏳ Loading:', loading);
-    console.log('  ❌ Error:', error);
-    console.log('  🔐 User:', user);
     console.log('  ✅ Authenticated:', isAuthenticated);
   }, [templates, myTemplates, loading, error, user, isAuthenticated]);
 

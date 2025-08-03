@@ -57,28 +57,18 @@ const refreshAccessToken = async () => {
 const getAuthHeadersWithRefresh = async () => {
     if (typeof window === 'undefined') return { 'Content-Type': 'application/json' };
     
-    console.log('🔐 Getting auth headers...');
-    
     let token = tokenUtils.getAccessToken();
-    console.log('🎫 Initial token from storage:', token ? 'Token exists' : 'No token found');
     
     // Check if token is expired and refresh if needed
     if (!token || tokenUtils.isTokenExpired(token)) {
-        console.log('🔄 Token expired or missing, attempting refresh...');
         const refreshToken = tokenUtils.getRefreshToken();
-        console.log('🎫 Refresh token available:', refreshToken ? 'Yes' : 'No');
         
         try {
             token = await refreshAccessToken();
-            console.log('✅ Token refreshed successfully');
         } catch (error) {
-            console.error('❌ Token refresh failed:', error);
-            console.log('🚪 Clearing tokens and requiring re-login');
             tokenUtils.clearTokens();
             throw new ApiError('Authentication required - please login again', 401);
         }
-    } else {
-        console.log('✅ Using existing valid token');
     }
     
     return {
@@ -154,8 +144,6 @@ export const componentApi = {
      */
     async createComponent(componentData) {
         try {
-            console.log('� Creating component without authentication check...');
-            
             // Use basic headers - NO AUTHENTICATION REQUIRED AT ALL
             const headers = {
                 'Content-Type': 'application/json'
@@ -167,18 +155,11 @@ export const componentApi = {
                 body: JSON.stringify(componentData),
             });
 
-            console.log('📡 API Response status:', response.status);
             const result = await handleApiResponse(response);
-            console.log('✅ Component created successfully:', result);
             
             // Transform the response to ensure ID is a string
             return this.transformComponentData(result);
         } catch (error) {
-            console.error('❌ Create component error:', error);
-            console.error('❌ Error message:', error.message);
-            console.error('❌ Error status:', error.status);
-            console.error('❌ Full error object:', error);
-            
             // Pass through the exact error without any transformation
             throw error;
         }
@@ -222,7 +203,6 @@ export const componentApi = {
 
             return await handleApiResponse(response);
         } catch (error) {
-            console.error('Get components error:', error);
             throw error;
         }
     },
@@ -241,7 +221,6 @@ export const componentApi = {
             // Transform the response to ensure ID is a string
             return this.transformComponentData(result);
         } catch (error) {
-            console.error('Get component error:', error);
             throw error;
         }
     },
@@ -262,7 +241,6 @@ export const componentApi = {
             // Transform the response to ensure ID is a string
             return this.transformComponentData(result);
         } catch (error) {
-            console.error('Update component error:', error);
             throw error;
         }
     },
@@ -280,7 +258,6 @@ export const componentApi = {
 
             return await handleApiResponse(response);
         } catch (error) {
-            console.error('Delete component error:', error);
             throw error;
         }
     },
@@ -332,7 +309,6 @@ export const componentApi = {
      * Transform backend component data to frontend format
      */
     transformComponentData(component) {
-        console.log('🔄 Transforming component data:', component);
         
         // Ensure ID is always a string
         const componentId = component.id || component._id;
@@ -393,7 +369,6 @@ export const componentApi = {
             likes: 0, // You might want to add this to backend later
         };
         
-        console.log('✅ Transformed component data:', transformed);
         return transformed;
     },
 
@@ -402,31 +377,24 @@ export const componentApi = {
      */
     async transformFormDataToBackend(formData) {
         try {
-            console.log('🔄 Transform: Starting form data transformation');
-            console.log('📋 Transform: Input form data:', formData);
             
             // Handle preview images - convert File objects to base64 or data URLs
             let previewImages = [];
             
             if (Array.isArray(formData.previewImages)) {
-                console.log(`🖼️ Transform: Processing ${formData.previewImages.length} images`);
                 
                 // Process each image
                 for (let i = 0; i < formData.previewImages.length; i++) {
                     const img = formData.previewImages[i];
-                    console.log(`🖼️ Transform: Processing image ${i + 1}:`, typeof img, img instanceof File ? img.name : img);
                     
                     if (typeof img === 'string') {
                         // Already a URL, keep it
                         previewImages.push(img);
-                        console.log(`✅ Transform: Added string URL: ${img.substring(0, 50)}...`);
                     } else if (img instanceof File) {
                         // Convert File to data URL
                         try {
-                            console.log(`🔄 Transform: Converting file "${img.name}" to data URL...`);
                             const dataUrl = await this.fileToDataURL(img);
                             previewImages.push(dataUrl);
-                            console.log(`✅ Transform: File converted successfully: ${dataUrl.substring(0, 50)}...`);
                         } catch (error) {
                             console.warn(`⚠️ Transform: Failed to convert file "${img.name}":`, error);
                         }

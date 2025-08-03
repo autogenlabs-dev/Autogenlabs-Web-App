@@ -43,8 +43,6 @@ export const TemplateProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       
-      console.log('TemplateContext: Loading templates with params:', params);
-      
       // Use current filters from ref to avoid stale closure
       const currentFilters = filtersRef.current;
       const mergedParams = { ...currentFilters, ...params };
@@ -57,15 +55,11 @@ export const TemplateProvider = ({ children }) => {
         return acc;
       }, {});
       
-      console.log('TemplateContext: Cleaned params:', cleanedParams);
-      
       const response = await templateApi.getAllTemplates(cleanedParams);
       
       setTemplates(response.templates || []);
-      console.log('TemplateContext: Templates loaded successfully:', response.templates?.length || 0);
       return response;
     } catch (err) {
-      console.error('TemplateContext: Error loading templates:', err);
       const errorMessage = err.message || 'Failed to load templates';
       setError(errorMessage);
       setTemplates([]); // Clear templates on error
@@ -97,10 +91,8 @@ export const TemplateProvider = ({ children }) => {
 
   // Create a new template
   const createTemplate = async (templateData) => {
-    console.log('TemplateContext: createTemplate called with:', templateData);
     
     if (!isAuthenticated) {
-      console.error('TemplateContext: User not authenticated');
       throw new Error('Authentication required');
     }
 
@@ -108,21 +100,17 @@ export const TemplateProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       
-      console.log('TemplateContext: Calling templateApi.createTemplate...');
       const response = await templateApi.createTemplate(templateData);  // Fixed: removed accessToken parameter
-      console.log('TemplateContext: API response:', response);
       
       // Add to myTemplates if successful
       if (response) {
         setMyTemplates(prev => [response, ...prev]);
         // Also refresh all templates
         await loadTemplates();
-        console.log('TemplateContext: Template created and lists updated');
       }
       
       return response;
     } catch (err) {
-      console.error('TemplateContext: Error creating template:', err);
       setError(err.message || 'Failed to create template');
       throw err;
     } finally {
@@ -310,13 +298,10 @@ export const TemplateProvider = ({ children }) => {
       // Don't set global loading state for individual template fetches
       setError(null);
       
-      console.log('TemplateContext: Getting template by ID:', templateId);
       const response = await templateApi.getTemplate(templateId);
-      console.log('TemplateContext: Template data received:', response);
       
       return response;
     } catch (err) {
-      console.error('TemplateContext: Error getting template by ID:', err);
       setError(err.message || 'Failed to load template');
       throw err;
     }

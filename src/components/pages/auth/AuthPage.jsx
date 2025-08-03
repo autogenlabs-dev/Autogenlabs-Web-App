@@ -49,7 +49,6 @@ const AuthPage = () => {
         if (!isMounted) return;
         
         if (isAuthenticated) {
-            console.log('✅ AuthPage: User already authenticated, checking for redirect');
             
             let intendedUrl = null;
             if (typeof window !== 'undefined') {
@@ -57,13 +56,11 @@ const AuthPage = () => {
             }
             
             if (intendedUrl && intendedUrl !== '/auth') {
-                console.log(`✅ AuthPage: Redirecting authenticated user to intended URL: ${intendedUrl}`);
                 if (typeof window !== 'undefined') {
                     localStorage.removeItem('intendedUrl');
                 }
                 router.push(intendedUrl);
             } else {
-                console.log(`✅ AuthPage: Redirecting authenticated user to home page`);
                 router.push('/');
             }
         }
@@ -98,7 +95,6 @@ const AuthPage = () => {
         
         // Prevent multiple submissions
         if (isLoading) {
-            console.log('⚠️ Form submission already in progress, ignoring');
             return;
         }
         
@@ -110,14 +106,12 @@ const AuthPage = () => {
         setError('');
 
         try {
-            console.log('🔄 Form submission started:', isSignIn ? 'login' : 'signup');
             
             if (isSignIn) {
                 const result = await login({
                     email: formData.email,
                     password: formData.password
                 });
-                console.log('✅ Login completed:', result);
                 
                 // Show success state briefly before redirect
                 await new Promise(resolve => setTimeout(resolve, 1500));
@@ -129,13 +123,11 @@ const AuthPage = () => {
                 }
                 
                 if (intendedUrl && intendedUrl !== '/auth') {
-                    console.log(`✅ AuthPage: Redirecting to intended URL: ${intendedUrl}`);
                     if (typeof window !== 'undefined') {
                         localStorage.removeItem('intendedUrl');
                     }
                     router.push(intendedUrl);
                 } else {
-                    console.log(`✅ AuthPage: Redirecting to home page`);
                     router.push('/');
                 }
             } else {
@@ -144,7 +136,6 @@ const AuthPage = () => {
                     password: formData.password,
                     name: formData.name
                 });
-                console.log('✅ Signup completed:', result);
                 
                 // Show success state briefly before redirect
                 await new Promise(resolve => setTimeout(resolve, 1500));
@@ -153,7 +144,6 @@ const AuthPage = () => {
                 // The finally block will not run as we're redirecting
                 
                 // Handle redirect after successful signup
-                console.log(`✅ AuthPage: Signup successful, redirecting to home page`);
                 router.push('/');
             }
             // Success - redirect handled above
@@ -164,7 +154,6 @@ const AuthPage = () => {
             // Only set loading to false if we're not redirecting (i.e., there was an error)
             if (!isLoading) return; // Already set to false in catch block
             setIsLoading(false);
-            console.log('🎯 Form submission completed');
         }
     }, [formData, isSignIn, login, signup, isLoading, validateForm, router]);
 
