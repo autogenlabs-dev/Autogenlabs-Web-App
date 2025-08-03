@@ -157,7 +157,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🔗 Links
 
-- [Website Demo](https://autogen-labs.vercel.app)
+- [Website Demo](https://autogenlabs.com)
 - [Extension Marketplace](https://marketplace.visualstudio.com/items?itemName=autogen-labs.extension)
 - [Documentation](./docs/README.md)
 
