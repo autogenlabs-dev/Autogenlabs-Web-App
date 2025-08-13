@@ -285,6 +285,14 @@ export default function Hero() {
           0%, 100% { opacity: 0.2; transform: scale(1); }
           50% { opacity: 0.8; transform: scale(1.5); }
         }
+        /* Static brand highlight for 'AutoGen' */
+        .brand-highlight {
+          background: linear-gradient(90deg,#34d399,#06b6d4,#3b82f6);
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+          filter: drop-shadow(0 0 6px rgba(56,189,248,0.35));
+        }
       `}</style>
 
       <motion.section
@@ -301,13 +309,13 @@ export default function Hero() {
             animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 30 }}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
           >
-            {/* Line 1 */}
-            <span className="block text-[36px] sm:text-[44px] md:text-[52px] xl:text-[56px] font-semibold bg-gradient-to-r from-cyan-300 via-teal-300 to-emerald-300 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(45,255,196,0.18)] whitespace-nowrap max-w-full tracking-tight">
+            {/* Line 1 (single light color) */}
+            <span className="block text-[36px] sm:text-[44px] md:text-[52px] xl:text-[56px] font-semibold text-neutral-100 drop-shadow-[0_0_8px_rgba(255,255,255,0.18)] whitespace-nowrap max-w-full tracking-tight">
               From concept to completion in a click.
             </span>
-            {/* Line 2 */}
-            <span className="block mt-2 text-[36px] sm:text-[44px] md:text-[52px] xl:text-[56px] font-semibold text-neutral-100 whitespace-nowrap max-w-full">
-              Let <span className="relative font-semibold bg-gradient-to-r from-cyan-300 via-teal-300 to-emerald-300 bg-clip-text text-transparent">AutoGen</span> do the coding magic.
+            {/* Line 2 (same color) */}
+            <span className="block mt-2 text-[36px] sm:text-[44px] md:text-[52px] xl:text-[56px] font-semibold text-neutral-100 drop-shadow-[0_0_8px_rgba(255,255,255,0.18)] whitespace-nowrap max-w-full">
+              Let <span className="brand-highlight font-semibold">AutoGen</span> do the coding magic.
             </span>
           </motion.h1>
 
