@@ -264,8 +264,6 @@ const CreateComponentForm = () => {
         developerExperience: '',
         isAvailableForDev: true,
         planType: '',
-        pricingINR: '',
-        pricingUSD: '',
         shortDescription: '',
         fullDescription: '',
         dependencies: [],
@@ -1085,36 +1083,6 @@ const CreateComponentForm = () => {
                                         <option value="Premium">Premium</option>
                                     </select>
                                 </div>
-
-                                {/* Pricing */}
-                                {formData.planType === 'Premium' && (
-                                    <>
-                                        <div>
-                                            <label className="block text-sm font-medium mb-2 text-gray-300">
-                                                Price (INR)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                value={formData.pricingINR}
-                                                onChange={(e) => handleInputChange('pricingINR', e.target.value)}
-                                                className="w-full px-4 py-3 border border-gray-600 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                placeholder="Price in INR"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium mb-2 text-gray-300">
-                                                Price (USD)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                value={formData.pricingUSD}
-                                                onChange={(e) => handleInputChange('pricingUSD', e.target.value)}
-                                                className="w-full px-4 py-3 border border-gray-600 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                placeholder="Price in USD"
-                                            />
-                                        </div>
-                                    </>
-                                )}
 
                                 {/* Developer Name */}
                                 <div>

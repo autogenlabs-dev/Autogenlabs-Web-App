@@ -13,8 +13,6 @@ const TemplateForm = ({ template = null, onSubmit, onCancel, isEditing = false }
         language: 'JavaScript',
         difficulty_level: 'Easy',
         plan_type: 'Free',
-        pricing_inr: 0,
-        pricing_usd: 0,
         short_description: '',
         full_description: '',
         preview_images: [],
@@ -41,7 +39,7 @@ const TemplateForm = ({ template = null, onSubmit, onCancel, isEditing = false }
     const componentTypes = ['React', 'Vue', 'Angular', 'HTML/CSS', 'Svelte', 'Flutter'];
     const languages = ['JavaScript', 'TypeScript', 'Python', 'Java', 'C++', 'Go', 'Rust'];
     const difficultyLevels = ['Easy', 'Medium', 'Tough'];
-    const planTypes = ['Free', 'Paid'];
+    const planTypes = ['Free'];
     const experienceLevels = ['1+ years', '2+ years', '3+ years', '4+ years', '5+ years', '6+ years', '7+ years', '8+ years', '9+ years', '10+ years'];
 
     // Initialize form with template data if editing
@@ -54,8 +52,6 @@ const TemplateForm = ({ template = null, onSubmit, onCancel, isEditing = false }
                 language: template.language || 'JavaScript',
                 difficulty_level: template.difficultyLevel || 'Easy',
                 plan_type: template.planType || 'Free',
-                pricing_inr: template.pricingINR || 0,
-                pricing_usd: template.pricingUSD || 0,
                 short_description: template.shortDescription || '',
                 full_description: template.fullDescription || '',
                 preview_images: template.previewImages || [],
@@ -114,11 +110,6 @@ const TemplateForm = ({ template = null, onSubmit, onCancel, isEditing = false }
         if (!formData.full_description.trim()) newErrors.full_description = 'Full description is required';
         if (!formData.developer_name.trim()) newErrors.developer_name = 'Developer name is required';
         if (!formData.developer_experience) newErrors.developer_experience = 'Developer experience is required';
-        
-        if (formData.plan_type === 'Paid') {
-            if (formData.pricing_inr <= 0) newErrors.pricing_inr = 'INR price must be greater than 0 for paid templates';
-            if (formData.pricing_usd <= 0) newErrors.pricing_usd = 'USD price must be greater than 0 for paid templates';
-        }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -258,47 +249,6 @@ const TemplateForm = ({ template = null, onSubmit, onCancel, isEditing = false }
                         </select>
                     </div>
                 </div>
-
-                {/* Pricing (only show if paid) */}
-                {formData.plan_type === 'Paid' && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Price (INR) *
-                            </label>
-                            <input
-                                type="number"
-                                name="pricing_inr"
-                                value={formData.pricing_inr}
-                                onChange={handleInputChange}
-                                min="0"
-                                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white ${
-                                    errors.pricing_inr ? 'border-red-500' : 'border-gray-300'
-                                }`}
-                                placeholder="0"
-                            />
-                            {errors.pricing_inr && <p className="text-red-500 text-sm mt-1">{errors.pricing_inr}</p>}
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Price (USD) *
-                            </label>
-                            <input
-                                type="number"
-                                name="pricing_usd"
-                                value={formData.pricing_usd}
-                                onChange={handleInputChange}
-                                min="0"
-                                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white ${
-                                    errors.pricing_usd ? 'border-red-500' : 'border-gray-300'
-                                }`}
-                                placeholder="0"
-                            />
-                            {errors.pricing_usd && <p className="text-red-500 text-sm mt-1">{errors.pricing_usd}</p>}
-                        </div>
-                    </div>
-                )}
 
                 {/* Descriptions */}
                 <div>

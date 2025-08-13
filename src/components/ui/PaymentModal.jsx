@@ -2,8 +2,10 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { CreditCard, Shield, Lock, IndianRupee, DollarSign, X } from 'lucide-react';
+import { useNotification } from '@/contexts/NotificationContext';
 
 const PaymentModal = ({ isOpen, onClose, template, selectedCurrency = 'inr' }) => {
+    const { showSuccess, showError } = useNotification();
     const [paymentMethod, setPaymentMethod] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);
     const [cardDetails, setCardDetails] = useState({
@@ -43,12 +45,12 @@ const PaymentModal = ({ isOpen, onClose, template, selectedCurrency = 'inr' }) =
                 });
             }
 
-            alert(`Payment successful! You can now download the template.`);
+            showSuccess(`Payment successful! You can now download the template.`);
             onClose();
 
         } catch (error) {
             console.error('Payment error:', error);
-            alert('Payment failed. Please try again.');
+            showError('Payment failed. Please try again.');
         } finally {
             setIsProcessing(false);
         }

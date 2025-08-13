@@ -66,9 +66,7 @@ export const templateTypes = [
 ];
 
 export const planTypes = [
-  'All',
   'Free',
-  'Paid',
   'Premium'
 ];
 

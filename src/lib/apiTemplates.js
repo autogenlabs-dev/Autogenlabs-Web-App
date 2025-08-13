@@ -207,8 +207,13 @@ export const templateApi = {
             const headers = await getAuthHeadersWithRefresh();
 
             const queryParams = new URLSearchParams();
-            if (params.skip !== undefined) queryParams.append('skip', params.skip);
+            if (params.page !== undefined) queryParams.append('page', params.page);
             if (params.limit !== undefined) queryParams.append('limit', params.limit);
+            // Support both skip and page for backward compatibility
+            if (params.skip !== undefined && params.page === undefined) {
+                const page = Math.floor(params.skip / (params.limit || 20)) + 1;
+                queryParams.append('page', page);
+            }
 
             const response = await fetch(`${API_BASE_URL}/templates/user/my-templates?${queryParams}`, {
                 method: 'GET',
@@ -357,8 +362,6 @@ export const templateApi = {
             language: template.language,
             difficultyLevel: template.difficulty_level,
             planType: template.plan_type,
-            pricingINR: template.pricing_inr || 0,
-            pricingUSD: template.pricing_usd || 0,
             shortDescription: template.short_description,
             fullDescription: template.full_description,
             previewImages: previewImages, // Keep but UI will prefer live URL
@@ -401,8 +404,6 @@ export const templateApi = {
                 language: formData.language,
                 difficulty_level: formData.difficultyLevel,
                 plan_type: formData.planType,
-                pricing_inr: parseInt(formData.pricingINR) || 0,
-                pricing_usd: parseInt(formData.pricingUSD) || 0,
                 short_description: formData.shortDescription,
                 full_description: formData.fullDescription,
                 preview_images: previewImages, // Empty - using live URL for preview

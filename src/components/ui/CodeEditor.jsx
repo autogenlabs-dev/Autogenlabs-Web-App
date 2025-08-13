@@ -187,12 +187,70 @@ const CodeEditor = ({
                           min-height: 100vh;
                           padding: 20px;
                         }
+                        
+                        /* Enhanced CSS Animation Support */
+                        @keyframes spin {
+                          from { transform: rotate(0deg); }
+                          to { transform: rotate(360deg); }
+                        }
+                        
+                        @keyframes pulse {
+                          0%, 100% { opacity: 1; }
+                          50% { opacity: 0.5; }
+                        }
+                        
+                        @keyframes bounce {
+                          0%, 20%, 53%, 80%, 100% { transform: translateY(0); }
+                          40%, 43% { transform: translateY(-30px); }
+                          70% { transform: translateY(-15px); }
+                          90% { transform: translateY(-4px); }
+                        }
+                        
+                        @keyframes fadeIn {
+                          from { opacity: 0; }
+                          to { opacity: 1; }
+                        }
+                        
+                        @keyframes slideIn {
+                          from { transform: translateX(-100%); }
+                          to { transform: translateX(0); }
+                        }
+                        
+                        /* Common Animation Classes */
+                        .animate-spin { animation: spin 1s linear infinite; }
+                        .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+                        .animate-bounce { animation: bounce 1s infinite; }
+                        .animate-fade-in { animation: fadeIn 0.5s ease-in; }
+                        .animate-slide-in { animation: slideIn 0.5s ease-out; }
+                        
+                        /* Ensure all animations work */
+                        * {
+                          animation-play-state: running !important;
+                        }
                       </style>
                     </head>
                     <body>
                       <div class="preview-wrapper">
                         ${code}
                       </div>
+                      
+                      <script>
+                        // Ensure animations start immediately
+                        document.addEventListener('DOMContentLoaded', function() {
+                          // Force repaint to ensure animations work
+                          document.body.style.display = 'none';
+                          document.body.offsetHeight; // Trigger reflow
+                          document.body.style.display = 'flex';
+                          
+                          // Start any paused animations
+                          const animatedElements = document.querySelectorAll('*');
+                          animatedElements.forEach(el => {
+                            if (getComputedStyle(el).animationName !== 'none') {
+                              el.style.animationPlayState = 'running';
+                            }
+                          });
+                        });
+                      </script>
                     </body>
                     </html>
                   `}

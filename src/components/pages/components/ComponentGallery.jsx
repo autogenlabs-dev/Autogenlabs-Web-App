@@ -1,16 +1,17 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Grid3X3, List, Star, Download, Eye, Heart, Code } from 'lucide-react';
+import { Search, Grid3X3, List, Star, Download, Eye, Heart, Code, Filter, Trash2, Edit } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { componentApi } from '@/lib/componentApi';
-import { componentCategories } from '@/lib/componentData';
-import { generateDynamicPreview, generateComponentTypePreview } from '@/utils/dynamicPreviewGenerator';
+import { marketplaceApi } from '@/lib/marketplaceApi';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNotification } from '@/contexts/NotificationContext';
 import LiveComponentPreview from '@/components/ui/LiveComponentPreview';
-import LivePreviewModal from '@/components/ui/LivePreviewModal';
 
 const ComponentGallery = () => {
+  const { user } = useAuth();
+  const { showSuccess, showError } = useNotification();
   const [mounted, setMounted] = useState(false);
   const [components, setComponents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,31 +24,103 @@ const ComponentGallery = () => {
   const [sortBy, setSortBy] = useState('popular');
   const [viewMode, setViewMode] = useState('grid');
   const [filteredComponents, setFilteredComponents] = useState([]);
-  const [previewCache, setPreviewCache] = useState({});
+  const [showFilters, setShowFilters] = useState(false);
   const [expandedPreview, setExpandedPreview] = useState(null);
+  const [showMyContent, setShowMyContent] = useState(false);
 
-  // Live Component Preview Component - replaces static image previews
-  const LiveComponentCard = ({ component, className = "" }) => {
-    // Check for different possible code field names
-    const hasCode = component.code || component.html || component.content || component.htmlCode;
+  // Check if user can create components (developer or admin)
+  const canCreateComponents = user?.role === 'developer' || user?.role === 'admin';
+  
+  // Check if user can see My Components section (developer or admin)
+  const canSeeMyComponents = user?.role === 'developer' || user?.role === 'admin';
+  
+  // Helper function to check if edit/delete icons should be shown
+  const shouldShowEditDelete = (component) => {
+    const isAdmin = user?.role === 'admin';
+    const isDeveloper = user?.role === 'developer';
+    const isUser = user?.role === 'user' || !user?.role;
     
-    // If component has code, use live preview
-    if (hasCode) {
-      return (
-        <LiveComponentPreview
-          component={component}
-          width="100%"
-          height="100%"
-          className={className}
-          theme="dark"
-          showFallback={true}
-          showExpandButton={true}
-          onExpand={() => setExpandedPreview(component)}
-        />
-      );
+    // Users can never edit/delete
+    if (isUser) return false;
+    
+    // Admin can edit/delete any component
+    if (isAdmin) return true;
+    
+    // Developer can only edit/delete their own components if not approved
+    if (isDeveloper) {
+      const componentUserId = component.user_id || component.userId || component.creator_id;
+      const currentUserId = user?.id || user?._id;
+      const isOwnComponent = String(componentUserId) === String(currentUserId);
+      const isApproved = component.status === 'approved' || component.approval_status === 'approved';
+      
+      // Developer can edit/delete own components only if not approved
+      return isOwnComponent && !isApproved;
     }
+    
+    return false;
+  };
+  
+  // Debug logging
+  console.log('🔍 ComponentGallery Debug:', {
+    user,
+    userRole: user?.role,
+    canCreateComponents,
+    canSeeMyComponents,
+    showMyContent,
+    isAdmin: user?.role === 'admin',
+    isDeveloper: user?.role === 'developer'
+  });
 
-    // Fallback to static preview image if no code
+  // Component categories
+  const componentCategories = [
+    'Navigation',
+    'Layout',
+    'Forms',
+    'Buttons',
+    'Cards',
+    'Data Display',
+    'User Interface',
+    'Content',
+    'Media',
+    'Interactive',
+    'Widgets',
+    'Sections',
+    'Animations',
+    'Charts',
+    'Tables',
+    'Modals',
+    'Headers',
+    'Footers',
+    'Other'
+  ];
+
+  // Simple fallback component for LivePreviewModal
+  const LivePreviewModal = ({ isOpen, onClose, component }) => {
+    if (!isOpen) return null;
+    
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
+        <div className="bg-gray-800 p-6 rounded-lg max-w-2xl w-full mx-4" onClick={e => e.stopPropagation()}>
+          <h3 className="text-xl font-bold text-white mb-4">{component?.title}</h3>
+          <div className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 h-64 flex items-center justify-center rounded-lg">
+            <div className="text-center text-white/60">
+              <Code className="w-12 h-12 mx-auto mb-2" />
+              <p>Component Preview</p>
+            </div>
+          </div>
+          <button 
+            onClick={onClose}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // Live Component Preview Component - matches detail page logic
+  const LiveComponentCard = ({ component, className = "" }) => {
     const getCategoryFallback = (category) => {
       const fallbackMap = {
         'Navigation': '/components/navbar-preview.svg',
@@ -64,27 +137,57 @@ const ComponentGallery = () => {
       return fallbackMap[category] || '/components/navbar-preview.svg';
     };
 
-    // Check for existing preview images
-    if (component.previewImages && component.previewImages.length > 0) {
-      return (
-        <Image
-          src={component.previewImages[0]}
-          alt={component.title}
-          fill
-          className={`${className} object-cover transition-all duration-700 group-hover:scale-110`}
-          sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
-          onError={(e) => {
-            e.target.src = getCategoryFallback(component.category);
-          }}
-        />
-      );
+    // Check for different possible code field names (like detail page)
+    const hasCode = component?.code || component?.html || component?.content || component?.htmlCode;
+    
+    // Use live component preview if code is available (like detail page)
+    if (hasCode) {
+      try {
+        return (
+          <LiveComponentPreview
+            component={component}
+            width="100%"
+            height="100%"
+            className={className}
+            theme="dark"
+            showFallback={true}
+            showExpandButton={false}
+            onExpand={() => setExpandedPreview(component)}
+          />
+        );
+      } catch (error) {
+        console.error('Error rendering live preview:', error);
+        // Fall through to static image logic
+      }
     }
 
-    // Final fallback to category image
+    // Check for preview images in different field name variations (like detail page)
+    const previewImages = component?.previewImages || component?.preview_images;
+    
+    // Use first preview image if available
+    if (previewImages && Array.isArray(previewImages) && previewImages.length > 0) {
+      const imageSrc = previewImages[0];
+      if (imageSrc) {
+        return (
+          <Image
+            src={imageSrc}
+            alt={component?.title || component?.name || 'Component Preview'}
+            fill
+            className={`${className} object-cover transition-all duration-700 group-hover:scale-110`}
+            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
+            onError={(e) => {
+              e.target.src = getCategoryFallback(component.category);
+            }}
+          />
+        );
+      }
+    }
+
+    // Fallback to category image
     return (
       <Image
         src={getCategoryFallback(component.category)}
-        alt={component.title}
+        alt={component?.title || component?.name || 'Component Preview'}
         fill
         className={`${className} object-cover transition-all duration-700 group-hover:scale-110`}
         sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
@@ -125,17 +228,36 @@ const ComponentGallery = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await componentApi.getComponents();
+      console.log('🔍 Fetching components from API...');
+      console.log('🔍 showMyContent:', showMyContent);
+      console.log('🔍 canSeeMyComponents:', canSeeMyComponents);
+      console.log('🔍 user:', user);
       
-      const transformedComponents = response.components.map(component => 
-        componentApi.transformComponentData(component)
-      );
+      let response;
+      if (showMyContent && canSeeMyComponents) {
+        console.log('🔍 Using getUserComponents endpoint');
+        // Use dedicated endpoint for user's own components
+        response = await marketplaceApi.getUserComponents({
+          limit: 100,
+          skip: 0
+        });
+      } else {
+        console.log('🔍 Using getComponents endpoint');
+        // Use main endpoint for all approved components
+        response = await marketplaceApi.getComponents({
+          limit: 100,
+          sort_by: 'popular'
+        });
+      }
       
-      setComponents(transformedComponents);
-      setFilteredComponents(transformedComponents);
+      console.log('✅ API Response:', response);
+      console.log('📦 Components count:', response.components?.length || 0);
+      
+      setComponents(response.components || []);
+      setFilteredComponents(response.components || []);
     } catch (err) {
-      setError(err.message);
-      // Fallback to empty array
+      console.error('❌ Failed to fetch components:', err);
+      setError('Failed to load components. Please try again.');
       setComponents([]);
       setFilteredComponents([]);
     } finally {
@@ -143,15 +265,30 @@ const ComponentGallery = () => {
     }
   };
 
+  // Refetch when showMyContent changes
+  useEffect(() => {
+    if (mounted) {
+      fetchComponents();
+    }
+  }, [showMyContent]);
+
   // Filter and sort components
   useEffect(() => {
     let filtered = components.filter(component => {
-      const matchesSearch = component.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           component.shortDescription.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = selectedCategory === 'All' || component.category === selectedCategory;
-      const matchesDifficulty = selectedDifficulty === 'All' || component.difficultyLevel === selectedDifficulty;
-      const matchesType = selectedType === 'All' || component.type === selectedType;
-      const matchesPlan = selectedPlan === 'All' || component.planType === selectedPlan;
+      // Handle different field name variations from backend
+      const title = component.title || component.name || '';
+      const description = component.shortDescription || component.short_description || component.description || '';
+      const category = component.category || '';
+      const difficulty = component.difficultyLevel || component.difficulty_level || '';
+      const type = component.type || '';
+      const planType = component.planType || component.plan_type || '';
+      
+      const matchesSearch = title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = selectedCategory === 'All' || category === selectedCategory;
+      const matchesDifficulty = selectedDifficulty === 'All' || difficulty === selectedDifficulty;
+      const matchesType = selectedType === 'All' || type === selectedType;
+      const matchesPlan = selectedPlan === 'All' || planType === selectedPlan;
 
       return matchesSearch && matchesCategory && matchesDifficulty && matchesType && matchesPlan;
     });
@@ -159,16 +296,13 @@ const ComponentGallery = () => {
     // Sort components
     switch (sortBy) {
       case 'popular':
-        filtered.sort((a, b) => b.downloads - a.downloads);
+        filtered.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
         break;
       case 'rating':
-        filtered.sort((a, b) => b.rating - a.rating);
+        filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
         break;
       case 'newest':
-        filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        break;
-      case 'price':
-        filtered.sort((a, b) => a.pricingUSD - b.pricingUSD);
+        filtered.sort((a, b) => new Date(b.createdAt || b.created_at || 0) - new Date(a.createdAt || a.created_at || 0));
         break;
       default:
         break;
@@ -190,6 +324,22 @@ const ComponentGallery = () => {
     return planType === 'Free' 
       ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
       : 'bg-purple-500/20 text-purple-400 border-purple-500/30';
+  };
+
+  const handleDelete = async (componentId) => {
+    if (!window.confirm('Are you sure you want to delete this component?')) {
+      return;
+    }
+
+    try {
+      await marketplaceApi.deleteComponent(componentId);
+      // Refresh the components list
+      fetchComponents();
+      showSuccess('Component deleted successfully!');
+    } catch (error) {
+      console.error('Failed to delete component:', error);
+      showError('Failed to delete component. Please try again.');
+    }
   };
 
   // Generate varied heights like supahero.io - true masonry effect
@@ -270,15 +420,62 @@ const ComponentGallery = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Component{' '}
-            <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-              Library
-            </span>
-          </h2>
-          <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-            Discover our curated collection of beautiful, modern UI components with advanced filtering
-          </p>
+          <div className="flex flex-col items-center justify-between mb-6 md:flex-row">
+            <div className="text-center md:text-left mb-4 md:mb-0">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                {showMyContent ? 'My ' : ''}Component{' '}
+                <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+                  Library
+                </span>
+              </h2>
+              <p className="text-lg text-gray-400 max-w-2xl">
+                {showMyContent 
+                  ? 'Manage your submitted components and track their approval status'
+                  : 'Discover our curated collection of beautiful, modern UI components with advanced filtering'
+                }
+              </p>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-3">
+              {/* Components/My Components Toggle for Developers and Admins */}
+              {canSeeMyComponents && (
+                <div className="flex rounded-lg bg-white/10 p-1">
+                  <button
+                    onClick={() => setShowMyContent(false)}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                      !showMyContent 
+                        ? 'bg-emerald-600 text-white' 
+                        : 'text-gray-300 hover:text-white'
+                    }`}
+                  >
+                    Components
+                  </button>
+                  <button
+                    onClick={() => setShowMyContent(true)}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                      showMyContent 
+                        ? 'bg-emerald-600 text-white' 
+                        : 'text-gray-300 hover:text-white'
+                    }`}
+                  >
+                    My Components
+                  </button>
+                </div>
+              )}
+              
+              {/* Create Component Button - Only for Developers and Admins */}
+              {canCreateComponents && (
+                <Link href="/components/create">
+                  <button className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-emerald-500/25 flex items-center gap-2">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    Create Component
+                  </button>
+                </Link>
+              )}
+            </div>
+          </div>
         </motion.div>
 
         {/* Search and Filters */}
@@ -350,7 +547,7 @@ const ComponentGallery = () => {
             >
               <option value="All" className="bg-gray-800">All Plans</option>
               <option value="Free" className="bg-gray-800">Free</option>
-              <option value="Paid" className="bg-gray-800">Paid</option>
+              <option value="Premium" className="bg-gray-800">Premium</option>
             </select>
 
             {/* Sort Filter */}
@@ -362,7 +559,6 @@ const ComponentGallery = () => {
               <option value="popular" className="bg-gray-800">Most Popular</option>
               <option value="rating" className="bg-gray-800">Highest Rated</option>
               <option value="newest" className="bg-gray-800">Newest</option>
-              <option value="price" className="bg-gray-800">Price: Low to High</option>
             </select>
 
             {/* View Mode Toggle */}
@@ -402,7 +598,7 @@ const ComponentGallery = () => {
               
               return (
                 <motion.div
-                  key={component.id}
+                  key={String(component.id || component._id)}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-100px" }}
@@ -426,34 +622,42 @@ const ComponentGallery = () => {
                     {/* Dark Overlay for Better Text Visibility */}
                     <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition-all duration-300"></div>
                     
-                    {/* Status Badges */}
-                    <div className="absolute top-4 left-4 flex gap-2 z-10">
-                      {component.featured && (
-                        <span className="px-3 py-1.5 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold rounded-full shadow-lg backdrop-blur-sm">
-                          Featured
-                        </span>
+                    {/* Component Info Overlay - Bottom - ONLY ICONS */}
+                    <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
+                      {shouldShowEditDelete(component) ? (
+                        /* Show Edit/Delete icons for authorized users */
+                        <div className="flex items-center justify-end gap-2">
+                          {/* View Icon */}
+                          <Link href={`/components/${String(component.id || component._id)}`}>
+                            <button className="p-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-full transition-all duration-300 hover:scale-110 cursor-pointer">
+                              <Eye className="w-5 h-5 text-white" />
+                            </button>
+                          </Link>
+                          {/* Edit Icon */}
+                          <Link href={`/components/${String(component.id || component._id)}/edit`}>
+                            <button className="p-3 bg-blue-500/20 hover:bg-blue-500/30 backdrop-blur-sm border border-blue-500/30 rounded-full transition-all duration-300 hover:scale-110 cursor-pointer">
+                              <Edit className="w-5 h-5 text-blue-300" />
+                            </button>
+                          </Link>
+                          {/* Delete Icon */}
+                          <button 
+                            onClick={() => handleDelete(component.id || component._id)}
+                            className="p-3 bg-red-500/20 hover:bg-red-500/30 backdrop-blur-sm border border-red-500/30 rounded-full transition-all duration-300 hover:scale-110 cursor-pointer"
+                          >
+                            <Trash2 className="w-5 h-5 text-red-300" />
+                          </button>
+                        </div>
+                      ) : (
+                        /* Show only View icon */
+                        <div className="flex items-center justify-end">
+                          {/* View Icon Only */}
+                          <Link href={`/components/${String(component.id || component._id)}`}>
+                            <button className="p-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-full transition-all duration-300 hover:scale-110 cursor-pointer">
+                              <Eye className="w-5 h-5 text-white" />
+                            </button>
+                          </Link>
+                        </div>
                       )}
-                      {component.popular && (
-                        <span className="px-3 py-1.5 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-xs font-bold rounded-full shadow-lg backdrop-blur-sm">
-                          Popular
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Plan Type Badge - Left Side */}
-                    <div className="absolute top-4 left-4 z-10">
-                      <span className={`px-3 py-1.5 text-xs font-bold rounded-full backdrop-blur-sm shadow-lg ${getPlanColor(component.planType)}`}>
-                        {component.planType}
-                      </span>
-                    </div>
-
-                    {/* Clickable View Icon - Top Right */}
-                    <div className="absolute top-4 right-4 z-20">
-                      <Link href={`/components/${component.id}`}>
-                        <button className="p-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-full transition-all duration-300 hover:scale-110 cursor-pointer">
-                          <Eye className="w-4 h-4 text-white" />
-                        </button>
-                      </Link>
                     </div>
                   </div>
                 </motion.div>
@@ -471,7 +675,7 @@ const ComponentGallery = () => {
           >
             {filteredComponents.map((component, index) => (
               <motion.div
-                key={component.id}
+                key={String(component.id || component._id)}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
@@ -489,29 +693,41 @@ const ComponentGallery = () => {
                     />
                   </div>
 
-                  {/* Simplified Component Info - Only Basic Info */}
-                  <div className="flex-1 flex items-center justify-between">
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-xl text-white mb-2 group-hover:text-blue-400 transition-colors">
-                        {component.title}
-                      </h3>
-                      <div className="flex items-center gap-3">
-                        <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-lg text-sm border border-blue-500/30">
-                          {component.category}
-                        </span>
-                        <span className={`px-3 py-1 text-sm font-medium rounded-full border ${getPlanColor(component.planType)}`}>
-                          {component.planType}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    {/* Clickable View Icon */}
-                    <div className="ml-6">
-                      <Link href={`/components/${component.id}`}>
-                        <button className="p-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-full transition-all duration-300 hover:scale-110 cursor-pointer">
-                          <Eye className="w-5 h-5 text-white" />
-                        </button>
-                      </Link>
+                  {/* ONLY Preview and Icons - No Text */}
+                  <div className="flex-1 flex items-center justify-end">
+                    {/* Action Icons for List View */}
+                    <div className="flex items-center gap-2">
+                      {shouldShowEditDelete(component) ? (
+                        /* Show Edit/Delete icons for authorized users */
+                        <>
+                          {/* View Icon */}
+                          <Link href={`/components/${String(component.id || component._id)}`}>
+                            <button className="p-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-full transition-all duration-300 hover:scale-110 cursor-pointer">
+                              <Eye className="w-5 h-5 text-white" />
+                            </button>
+                          </Link>
+                          {/* Edit Icon */}
+                          <Link href={`/components/${String(component.id || component._id)}/edit`}>
+                            <button className="p-3 bg-blue-500/20 hover:bg-blue-500/30 backdrop-blur-sm border border-blue-500/30 rounded-full transition-all duration-300 hover:scale-110 cursor-pointer">
+                              <Edit className="w-5 h-5 text-blue-300" />
+                            </button>
+                          </Link>
+                          {/* Delete Icon */}
+                          <button 
+                            onClick={() => handleDelete(component.id || component._id)}
+                            className="p-3 bg-red-500/20 hover:bg-red-500/30 backdrop-blur-sm border border-red-500/30 rounded-full transition-all duration-300 hover:scale-110 cursor-pointer"
+                          >
+                            <Trash2 className="w-5 h-5 text-red-300" />
+                          </button>
+                        </>
+                      ) : (
+                        /* Show only View icon */
+                        <Link href={`/components/${String(component.id || component._id)}`}>
+                          <button className="p-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-full transition-all duration-300 hover:scale-110 cursor-pointer">
+                            <Eye className="w-5 h-5 text-white" />
+                          </button>
+                        </Link>
+                      )}
                     </div>
                   </div>
                 </div>

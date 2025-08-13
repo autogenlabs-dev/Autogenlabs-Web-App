@@ -3,7 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
-const ProtectedRoute = ({ children, allowedRoles = [] }) => {
+const ProtectedRoute = ({ children, allowedRoles = [], requiredRole = null }) => {
     const { isAuthenticated, user, loading } = useAuth();
     const router = useRouter();
 
@@ -14,13 +14,20 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
     }, [isAuthenticated, loading, router]);
 
     useEffect(() => {
-        if (!loading && isAuthenticated && allowedRoles.length > 0 && user) {
-            const hasAllowedRole = allowedRoles.includes(user.role);
-            if (!hasAllowedRole) {
+        if (!loading && isAuthenticated && user) {
+            // Check single required role
+            if (requiredRole && user.role !== requiredRole) {
                 router.push('/unauthorized');
+                return;
+            }
+            
+            // Check multiple allowed roles
+            if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
+                router.push('/unauthorized');
+                return;
             }
         }
-    }, [isAuthenticated, loading, user, allowedRoles, router]);
+    }, [isAuthenticated, loading, user, allowedRoles, requiredRole, router]);
 
     if (loading) {
         return (
@@ -37,8 +44,15 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
         return null; // Redirect will happen in useEffect
     }
 
-    if (allowedRoles.length > 0 && user && !allowedRoles.includes(user.role)) {
-        return null; // Redirect will happen in useEffect
+    // Check role requirements after user is loaded
+    if (user) {
+        if (requiredRole && user.role !== requiredRole) {
+            return null; // Redirect will happen in useEffect
+        }
+        
+        if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
+            return null; // Redirect will happen in useEffect
+        }
     }
 
     return children;

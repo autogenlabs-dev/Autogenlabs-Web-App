@@ -42,8 +42,6 @@ const CreateTemplateForm = () => {
         developerExperience: '',
         isAvailableForDev: true,
         planType: '',
-        pricingINR: '',
-        pricingUSD: '',
         shortDescription: '',
         fullDescription: '',
         dependencies: [],
@@ -139,8 +137,6 @@ const CreateTemplateForm = () => {
                 language: formData.language,
                 difficulty_level: formData.difficultyLevel,
                 plan_type: formData.planType,
-                pricing_inr: parseInt(formData.pricingINR) || 0,
-                pricing_usd: parseInt(formData.pricingUSD) || 0,
                 short_description: formData.shortDescription,
                 full_description: formData.fullDescription,
                 preview_images: [], // Will be set after image upload if any
@@ -212,9 +208,9 @@ const CreateTemplateForm = () => {
 
         const hasRequiredFields = requiredFields.every(field => formData[field]);
         const hasImage = formData.templateImage !== null; // Check if file is uploaded
-        const hasPricing = formData.planType === 'Free' || (formData.pricingINR && formData.pricingUSD);
+        const hasPlanType = formData.planType !== '';
 
-        if (hasRequiredFields && hasImage && hasPricing) {
+        if (hasRequiredFields && hasImage && hasPlanType) {
             return true;
         }
         return false;
@@ -558,7 +554,7 @@ const CreateTemplateForm = () => {
 
                     {/* Pricing */}
                     <div className="bg-white/5 rounded-2xl p-8 border border-white/10">
-                        <h2 className="text-2xl font-bold mb-6">Pricing</h2>
+                        <h2 className="text-2xl font-bold mb-6">Plan Type</h2>
 
                         <div className="space-y-6">
                             {/* Plan Type */}
@@ -580,47 +576,6 @@ const CreateTemplateForm = () => {
                                     ))}
                                 </select>
                             </div>
-
-                            {/* Pricing Fields - Only show if Paid */}
-                            {formData.planType === 'Paid' && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                                            Price in INR *
-                                        </label>
-                                        <div className="relative">
-                                            <IndianRupee className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                                            <input
-                                                type="number"
-                                                value={formData.pricingINR}
-                                                onChange={(e) => handleInputChange('pricingINR', e.target.value)}
-                                                placeholder="2999"
-                                                min="0"
-                                                className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500/50"
-                                                required={formData.planType === 'Paid'}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                                            Price in USD *
-                                        </label>
-                                        <div className="relative">
-                                            <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                                            <input
-                                                type="number"
-                                                value={formData.pricingUSD}
-                                                onChange={(e) => handleInputChange('pricingUSD', e.target.value)}
-                                                placeholder="35"
-                                                min="0"
-                                                className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500/50"
-                                                required={formData.planType === 'Paid'}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
                         </div>
                     </div>
 

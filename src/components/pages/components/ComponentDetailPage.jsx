@@ -1,12 +1,11 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Star, Eye, Download, IndianRupee, DollarSign, Clock, Code, User, Globe, Github, Heart, Share2, ExternalLink, ChevronLeft, ChevronRight, Layers } from 'lucide-react';
+import { ArrowLeft, Star, Eye, Download, Clock, Code, User, Globe, Github, Heart, Share2, ExternalLink, ChevronLeft, ChevronRight, Layers } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { mockUser } from '@/lib/componentData';
 import { componentApi } from '@/lib/componentApi';
-import PaymentModal from '@/components/ui/PaymentModal';
 import SafeRatingSection from '@/components/ui/SafeRatingSection';
 import CodeViewerModal from '@/components/ui/CodeViewerModal';
 import LiveComponentPreview from '@/components/ui/LiveComponentPreview';
@@ -18,8 +17,6 @@ const ComponentDetailPage = ({ componentId }) => {
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [userRating, setUserRating] = useState(0);
     const [isLiked, setIsLiked] = useState(false);
-    const [showPaymentModal, setShowPaymentModal] = useState(false);
-    const [selectedCurrency, setSelectedCurrency] = useState('inr');
     const [mounted, setMounted] = useState(false);
     const [showCodeModal, setShowCodeModal] = useState(false);
 
@@ -129,14 +126,9 @@ const ComponentDetailPage = ({ componentId }) => {
         }
     };
 
-    const handlePurchase = () => {
-        if ((component.planType === 'Free' || component.plan_type === 'Free')) {
-            // Handle free download
-            alert('Free component download started!');
-        } else {
-            // Show payment modal
-            setShowPaymentModal(true);
-        }
+    const handleDownload = () => {
+        alert('Download started!');
+        // Add actual download logic here
     };
 
     const handleRatingSubmit = (rating) => {
@@ -532,76 +524,28 @@ const ComponentDetailPage = ({ componentId }) => {
                                 </div>
                             </div>
 
-                            {/* Pricing */}
+                            {/* Download Section */}
                             <div className="border-t border-white/10 pt-6">
-                                {(component.planType === 'Free' || component.plan_type === 'Free') ? (
-                                    <div className="text-center mb-6">
-                                        <div className="text-3xl font-bold text-green-400 mb-2">Free</div>
-                                        <p className="text-gray-400">No cost to download</p>
+                                <div className="text-center mb-6">
+                                    <div className="text-2xl font-bold text-blue-400 mb-2">
+                                        {(component.planType === 'Premium' || component.plan_type === 'Premium') ? 'Premium' : 'Free'}
                                     </div>
-                                ) : (
-                                    <div className="text-center mb-6">
-                                        <div className="flex items-center justify-center gap-4 mb-4">
-                                            <button
-                                                onClick={() => setSelectedCurrency('inr')}
-                                                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                                                    selectedCurrency === 'inr'
-                                                        ? 'bg-blue-600 text-white'
-                                                        : 'bg-white/10 text-gray-400 hover:bg-white/15'
-                                                }`}
-                                            >
-                                                <IndianRupee className="w-4 h-4" />
-                                                INR
-                                            </button>
-                                            <button
-                                                onClick={() => setSelectedCurrency('usd')}
-                                                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                                                    selectedCurrency === 'usd'
-                                                        ? 'bg-blue-600 text-white'
-                                                        : 'bg-white/10 text-gray-400 hover:bg-white/15'
-                                                }`}
-                                            >
-                                                <DollarSign className="w-4 h-4" />
-                                                USD
-                                            </button>
-                                        </div>
-                                        <div className="text-3xl font-bold text-white mb-2">
-                                            {selectedCurrency === 'inr' 
-                                                ? `₹${component.pricingINR || component.pricing_inr || 0}` 
-                                                : `$${component.pricingUSD || component.pricing_usd || 0}`}
-                                        </div>
-                                        <p className="text-gray-400">One-time purchase</p>
-                                    </div>
-                                )}
+                                    <p className="text-gray-400">Component available for download</p>
+                                </div>
 
-                                {/* Purchase Button */}
+                                {/* Download Button */}
                                 <button
-                                    onClick={handlePurchase}
-                                    className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 ${
-                                        component.planType === 'Free'
-                                            ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:shadow-lg hover:shadow-green-500/25'
-                                            : 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:shadow-lg hover:shadow-blue-500/25'
-                                    }`}
+                                    onClick={handleDownload}
+                                    className="w-full py-3 px-6 rounded-xl font-semibold transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:shadow-lg hover:shadow-blue-500/25"
                                 >
                                     <Download className="w-5 h-5" />
-                                    {(component.planType === 'Free' || component.plan_type === 'Free') ? 'Download Free' : 'Purchase Component'}
+                                    Download Component
                                 </button>
                             </div>
                         </motion.div>
                     </div>
                 </div>
             </div>
-
-            {/* Payment Modal */}
-            {showPaymentModal && (
-                <PaymentModal
-                    isOpen={showPaymentModal}
-                    onClose={() => setShowPaymentModal(false)}
-                    itemType="component"
-                    item={component}
-                    currency={selectedCurrency}
-                />
-            )}
 
             {/* Code Viewer Modal */}
             <CodeViewerModal

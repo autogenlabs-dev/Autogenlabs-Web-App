@@ -1,5 +1,5 @@
 'use client';
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { authApi, tokenUtils, ApiError } from '../lib/api';
 
 const AuthContext = createContext();
@@ -224,6 +224,33 @@ export const AuthProvider = ({ children }) => {
         setError(null);
     };
 
+    const refreshUser = useCallback(async () => {
+        try {
+            const token = tokenUtils.getAccessToken();
+            if (!token) {
+                throw new Error('No access token available');
+            }
+
+            const userData = await authApi.getCurrentUser(token);
+            const userState = {
+                id: userData.id,
+                name: userData.full_name || userData.first_name || userData.name || userData.email.split('@')[0],
+                firstName: userData.first_name || (userData.full_name ? userData.full_name.split(' ')[0] : (userData.name ? userData.name.split(' ')[0] : userData.email.split('@')[0])),
+                lastName: userData.last_name || (userData.full_name ? userData.full_name.split(' ').slice(1).join(' ') : (userData.name ? userData.name.split(' ').slice(1).join(' ') : '')),
+                email: userData.email,
+                role: userData.role || 'user',
+                avatar: '/public/logoAuto.webp',
+                ...userData
+            };
+            
+            setUser(userState);
+            return userState;
+        } catch (error) {
+            console.error('❌ Failed to refresh user:', error);
+            throw error;
+        }
+    }, []);
+
     const value = {
         user,
         loading,
@@ -233,6 +260,7 @@ export const AuthProvider = ({ children }) => {
         logout,
         updateUser,
         updateProfile,
+        refreshUser,
         clearError,
         isAuthenticated: !loading && !!user && !!tokenUtils.getAccessToken(),
         isAdmin: user?.role === 'admin',

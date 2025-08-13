@@ -1,109 +1,183 @@
 'use client'
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
-import { Paperclip, Mic, Send, ChevronDown, FileText, Globe } from 'lucide-react';
 import { DynamicVideoSection } from '@/components/dynamic/DynamicComponents';
 import { LazyVideo } from '@/components/ui/LazyLoader';
 
 const CopilotUIComponent = () => {
-  const [currentText, setCurrentText] = useState('');
+  const [userName, setUserName] = useState('Akarsh'); // Dynamic user name
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [placeholderText, setPlaceholderText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const typewriterTexts = [
-    "How can I optimize this React component?",
-    "Explain this JavaScript function...",
-    "Help me debug this code issue",
-    "Generate a responsive CSS layout",
-    "Create a REST API endpoint",
-    "Write unit tests for this function"
+  const placeholderTexts = [
+    "Build me a React component for user authentication...",
+    "Create an API endpoint for user management...", 
+    "Generate a responsive dashboard layout...",
+    "Help me optimize this React application...",
+    "Write unit tests for my components...",
+    "Build a real-time chat application..."
   ];
 
   useEffect(() => {
-    const currentPhrase = typewriterTexts[currentIndex];
-    if (currentText.length < currentPhrase.length) {
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const currentPhrase = placeholderTexts[currentIndex];
+    
+    if (placeholderText.length < currentPhrase.length) {
       const timeout = setTimeout(() => {
-        setCurrentText(currentPhrase.slice(0, currentText.length + 1));
-      }, 100);
+        setPlaceholderText(currentPhrase.slice(0, placeholderText.length + 1));
+      }, 80);
       return () => clearTimeout(timeout);
     } else {
       const timeout = setTimeout(() => {
-        setCurrentText('');
-        setCurrentIndex((prev) => (prev + 1) % typewriterTexts.length);
+        setPlaceholderText('');
+        setCurrentIndex((prev) => (prev + 1) % placeholderTexts.length);
       }, 2000);
       return () => clearTimeout(timeout);
     }
-  }, [currentText, currentIndex, typewriterTexts]);
-
+  }, [placeholderText, currentIndex, placeholderTexts]);
+  
   return (
-    <div className="w-full max-w-4xl mx-auto bg-[#1e1e1e] rounded-lg border border-gray-700 overflow-hidden shadow-2xl">
-      {/* Header Bar */}
-      <div className="flex items-center justify-between px-4 py-3 bg-[#2d2d30] border-b border-gray-700">
-        {/* Left Side - Add Context Button */}
-        <button className="flex items-center gap-2 px-3 py-1.5 bg-[#3c3c3c] hover:bg-[#464647] rounded text-gray-300 text-sm transition-colors">
-          <Paperclip size={14} />
-          <span>Add Context...</span>
-        </button>
-
-
-        {/* Right Side - Icons */}
-        <div className="flex items-center gap-2">
-          <button className="p-1.5 hover:bg-[#3c3c3c] rounded text-gray-400 hover:text-gray-300 transition-colors">
-            <Globe size={16} />
-          </button>
-          <button className="p-1.5 hover:bg-[#3c3c3c] rounded text-gray-400 hover:text-gray-300 transition-colors">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
-            </svg>
+    <div className="w-full max-w-6xl mx-auto">
+      {/* Main Chat Interface */}
+      <section className="rounded-2xl border border-white/10 bg-neutral-900/40 backdrop-filter backdrop-blur-lg shadow-2xl relative overflow-hidden">
+        {/* Animated SVG Border */}
+        <svg height="100%" width="100%" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0 pointer-events-none">
+          <rect
+            rx="16"
+            ry="16"
+            className="animate-border-dash"
+            height="100%"
+            width="100%"
+            strokeLinejoin="round"
+            fill="transparent"
+            stroke="rgba(78, 255, 13, 0.3)"
+            strokeWidth="1"
+            strokeDasharray="260"
+          />
+        </svg>
+        
+        {/* Header */}
+        <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-3 border-b border-white/10 relative z-10">
+          <div className="flex items-center gap-3 text-sm text-neutral-300">
+            <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-amber-400/20 text-amber-300">
+              🚀
+            </span>
+            <span className="font-medium">AutoGen AI Assistant</span>
+            <span className="hidden sm:inline text-neutral-400">Build powerful applications with AI-driven code generation</span>
+          </div>
+          <button 
+            className="inline-flex items-center gap-2 rounded-xl bg-amber-400 px-4 py-2 text-sm font-semibold text-black hover:bg-amber-300 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+            onClick={() => window.open('https://marketplace.visualstudio.com/items?itemName=AutoGenCodeBuilder.auto-gen-code-builder', '_blank')}
+          >
+            Get now
           </button>
         </div>
-      </div>
 
-      {/* Input Area */}
-      <div className="bg-[#252526] p-4">
-        <div className="flex items-center gap-3">
-          {/* @ Symbol */}
-          <button className="text-gray-400 hover:text-gray-300 transition-colors">
-            <span className="text-lg font-medium">@</span>
-          </button>
+        {/* Main Input Area */}
+        <div className="px-4 sm:px-6 relative z-10">
+          <div className="relative">
+            <textarea
+              placeholder={placeholderText + (placeholderText ? '|' : '')}
+              className="w-full resize-none bg-transparent outline-none placeholder-neutral-500 text-base sm:text-lg leading-7 h-32 pt-4 text-white"
+            />            <div className="absolute inset-x-0 bottom-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <button className="h-9 w-9 inline-flex items-center justify-center rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200 transform hover:scale-105">
+                  📎
+                </button>
 
-          {/* Microphone Icon */}
-          <button className="text-gray-400 hover:text-gray-300 transition-colors">
-            <Mic size={18} />
-          </button>
+                <button className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 h-9 hover:bg-white/10 transition-all duration-200 transform hover:scale-105">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                  </svg>
+                  <span className="text-sm">Connect GitHub</span>
+                </button>
 
-          {/* Input Field with Typewriter Effect */}
-          <div className="flex-1 relative">
-            <div className="bg-[#3c3c3c] rounded-lg px-4 py-3 min-h-[44px] flex items-center">
-              <span className="text-gray-300">
-                {currentText}
-                <span className="animate-pulse text-blue-400">|</span>
-              </span>
+                <button className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 h-9 hover:bg-white/10 transition-all duration-200 transform hover:scale-105">
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/10 text-white text-[11px]">A</span>
+                  <span className="text-sm">A‑1</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="6,9 12,15 18,9"></polyline>
+                  </svg>
+                </button>
+
+                <button className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 h-9 hover:bg-white/10 transition-all duration-200 transform hover:scale-105">
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-pink-500/20 text-pink-300">
+                    🤖
+                  </span>
+                  <span className="text-sm">AutoGen 4.0</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="6,9 12,15 18,9"></polyline>
+                  </svg>
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button className="h-9 w-9 inline-flex items-center justify-center rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200 transform hover:scale-105">
+                  🎤
+                </button>
+                <button className="h-10 w-10 inline-flex items-center justify-center rounded-full bg-emerald-500 text-black hover:bg-emerald-400 transition-all duration-200 transform hover:scale-105">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22,2 15,22 11,13 2,9 22,2"></polygon>
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
-
-          {/* Model Selector */}
-          <div className="flex items-center gap-2 px-3 py-2 bg-[#3c3c3c] rounded-lg text-gray-300 text-sm">
-            <span>Ask</span>
-            <div className="w-px h-4 bg-gray-600"></div>
-            <span className="font-medium">AutoGen AI</span>
-            <ChevronDown size={14} />
-          </div>
-
-          {/* Send Button */}
-          <motion.button
-            className="p-2.5 bg-[#0e639c] hover:bg-[#1177bb] rounded-lg text-white transition-colors"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Send size={16} />
-          </motion.button>
         </div>
+      </section>
 
-        {/* Footer Text */}
-        <div className="text-xs text-gray-500 mt-3 text-center">
-          AutoGen AI can help with deployment, scaling, and infrastructure optimization.
-        </div>
-      </div>
+      {/* Animated Buttons */}
+      <motion.div
+        className="mt-5 flex flex-col sm:flex-row items-center justify-center gap-4 w-full"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 30 }}
+        transition={{ duration: 0.8, delay: 1, ease: "easeOut" }}
+      >
+        <motion.button
+          className="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: isLoaded ? 1 : 0, x: isLoaded ? 0 : -20 }}
+          transition={{ duration: 0.6, delay: 1.2 }}
+          onClick={() => window.open('https://marketplace.visualstudio.com/items?itemName=AutoGenCodeBuilder.auto-gen-code-builder', '_blank')}
+        >
+          Download in Visual Studio
+        </motion.button>
+        <motion.button
+          className="bg-gray-800 hover:bg-gray-700 px-6 py-3 rounded-lg font-medium border border-gray-700 transition-colors"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: isLoaded ? 1 : 0, x: isLoaded ? 0 : 20 }}
+          transition={{ duration: 0.6, delay: 1.4 }}
+          onClick={() => window.open('https://marketplace.visualstudio.com/items?itemName=AutoGenCodeBuilder.auto-gen-code-builder', '_blank')}
+        >
+          Get Started
+        </motion.button>
+      </motion.div>
+
+      <style jsx>{`
+        @keyframes borderDash {
+          from {
+            stroke-dashoffset: 0;
+          }
+          to {
+            stroke-dashoffset: 1000;
+          }
+        }
+        .animate-border-dash {
+          animation: borderDash 2.5s linear infinite;
+        }
+      `}</style>
     </div>
   );
 };
@@ -219,19 +293,29 @@ export default function Hero() {
         animate={{ opacity: isLoaded ? 1 : 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
       >
-        <div className="text-center flex flex-col justify-start h-full items-center w-full">
+        <div className="flex flex-col justify-start h-full items-start w-full md:max-w-5xl mx-auto">
+          {/* Tagline replacing previous Welcome heading */}
           <motion.h1
-            className="font-tight leading-[1.1875] sm:leading-[1.1875] md:leading-[1.1875] text-[32px] sm:text-5xl md:text-6xl max-w-[900px] font-semibold mb-5 tracking-tight text-center w-full"
+            className="font-black tracking-tight leading-tight mb-6 text-left select-none"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 30 }}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
           >
-            AutoGen Labs Free in Visual Studio 2025
+            {/* Line 1 */}
+            <span className="block text-[36px] sm:text-[44px] md:text-[52px] xl:text-[56px] font-semibold bg-gradient-to-r from-cyan-300 via-teal-300 to-emerald-300 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(45,255,196,0.18)] whitespace-nowrap max-w-full tracking-tight">
+              From concept to completion in a click.
+            </span>
+            {/* Line 2 */}
+            <span className="block mt-2 text-[36px] sm:text-[44px] md:text-[52px] xl:text-[56px] font-semibold text-neutral-100 whitespace-nowrap max-w-full">
+              Let <span className="relative font-semibold bg-gradient-to-r from-cyan-300 via-teal-300 to-emerald-300 bg-clip-text text-transparent">AutoGen</span> do the coding magic.
+            </span>
           </motion.h1>
 
-          {/* Copilot UI Component - Load immediately */}
+          {/* Removed old secondary heading & centered layout */}
+
+          {/* Emergent-style Chat Interface */}
           <motion.div
-            className="mb-8 flex items-start justify-center w-full"
+            className="mb-8 flex items-start justify-start w-full"
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={{
               opacity: isLoaded ? 1 : 0,
@@ -243,36 +327,6 @@ export default function Hero() {
             <CopilotUIComponent />
           </motion.div>
 
-          {/* Animated Buttons */}
-          <motion.div
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 30 }}
-            transition={{ duration: 0.8, delay: 1, ease: "easeOut" }}
-          >
-            <motion.button
-              className="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: isLoaded ? 1 : 0, x: isLoaded ? 0 : -20 }}
-              transition={{ duration: 0.6, delay: 1.2 }}
-              onClick={() => window.open('https://marketplace.visualstudio.com/items?itemName=AutoGenCodeBuilder.auto-gen-code-builder', '_blank')}
-            >
-              Download in Visual Studio
-            </motion.button>
-            <motion.button
-              className="bg-gray-800 hover:bg-gray-700 px-6 py-3 rounded-lg font-medium border border-gray-700 transition-colors"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: isLoaded ? 1 : 0, x: isLoaded ? 0 : 20 }}
-              transition={{ duration: 0.6, delay: 1.4 }}
-              onClick={() => window.open('https://marketplace.visualstudio.com/items?itemName=AutoGenCodeBuilder.auto-gen-code-builder', '_blank')}
-            >
-              Get Started
-            </motion.button>
-          </motion.div>
         </div>
       </motion.section>
 

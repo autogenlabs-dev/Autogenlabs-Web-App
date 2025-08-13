@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Play, Star, Plus, Code, Layers, Puzzle, Sparkles } from 'lucide-react';
+import { ArrowRight, Play, Star, Code, Layers, Puzzle, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { mockUser } from '@/lib/componentData';
 
@@ -157,14 +157,7 @@ const ComponentLibraryHero = () => {
                 <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
               </button>
 
-              {(user?.role === 'premium' || user?.role === 'admin') && (
-                <Link href="/components/create">
-                  <button className="group px-8 py-4 bg-white/10 text-white font-semibold rounded-xl border border-white/20 transition-all duration-300 hover:bg-white/15 hover:scale-105 flex items-center justify-center gap-2">
-                    <Plus className="w-5 h-5" />
-                    Create Component
-                  </button>
-                </Link>
-              )}
+              
             </motion.div>
 
             {/* Features Grid */}

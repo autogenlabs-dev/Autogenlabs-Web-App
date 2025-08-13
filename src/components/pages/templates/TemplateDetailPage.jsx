@@ -1,13 +1,12 @@
 'use client';
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Star, Eye, Download, IndianRupee, DollarSign, Clock, Code, User, Globe, Github, Play, Heart, Share2, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Star, Eye, Download, Clock, Code, User, Globe, Github, Play, Heart, Share2, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import { generateMultipleScreenshots, getBestPreviewImage } from '@/utils/livePreviewUtils';
 import { useTemplate } from '@/contexts/TemplateContext';
-import PaymentModal from '@/components/ui/PaymentModal';
 import SafeRatingSection from '@/components/ui/SafeRatingSection';
 import ComponentErrorBoundary from '@/components/ui/ComponentErrorBoundary';
 
@@ -16,8 +15,6 @@ const TemplateDetailPage = ({ templateId }) => {
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [userRating, setUserRating] = useState(0);
     const [isLiked, setIsLiked] = useState(false);
-    const [showPaymentModal, setShowPaymentModal] = useState(false);
-    const [selectedCurrency, setSelectedCurrency] = useState('inr');
     const [template, setTemplate] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -205,12 +202,9 @@ const TemplateDetailPage = ({ templateId }) => {
         }
     };
 
-    const handlePurchase = () => {
-        if (template.plan_type === 'Free' || template.planType === 'Free') {
-            alert('Free template download started!');
-        } else {
-            setShowPaymentModal(true);
-        }
+    const handleDownload = () => {
+        alert('Template download started!');
+        // Add actual download logic here
     };
 
     const handleRatingSubmit = (rating) => {
@@ -374,62 +368,25 @@ const TemplateDetailPage = ({ templateId }) => {
                             </div>
                         </div>
 
-                        {/* Right - Pricing Card */}
+                        {/* Right - Download Card */}
                         <div className="lg:w-80">
                             <div className="bg-gradient-to-br from-purple-500/10 to-cyan-500/10 border border-purple-500/20 rounded-2xl p-8 sticky top-24">
-                                <h3 className="text-2xl font-bold mb-6 text-center">Pricing</h3>
+                                <h3 className="text-2xl font-bold mb-6 text-center">Download Template</h3>
                                 
-                                {(template.plan_type === 'Free' || template.planType === 'Free') ? (
-                                    <div className="text-center mb-8">
-                                        <div className="text-5xl font-bold text-green-400 mb-3">Free</div>
-                                        <p className="text-gray-400 text-lg">No cost to download</p>
+                                <div className="text-center mb-8">
+                                    <div className="text-3xl font-bold text-blue-400 mb-3">
+                                        {(template.plan_type === 'Premium' || template.planType === 'Premium') ? 'Premium' : 'Free'}
                                     </div>
-                                ) : (
-                                    <div className="text-center mb-8">
-                                        <div className="flex items-center justify-center gap-4 mb-6">
-                                            <button
-                                                onClick={() => setSelectedCurrency('inr')}
-                                                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-300 ${
-                                                    selectedCurrency === 'inr'
-                                                        ? 'bg-purple-600 text-white scale-105'
-                                                        : 'bg-white/10 text-gray-400 hover:bg-white/15'
-                                                }`}
-                                            >
-                                                <IndianRupee className="w-4 h-4" />
-                                                INR
-                                            </button>
-                                            <button
-                                                onClick={() => setSelectedCurrency('usd')}
-                                                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-300 ${
-                                                    selectedCurrency === 'usd'
-                                                        ? 'bg-purple-600 text-white scale-105'
-                                                        : 'bg-white/10 text-gray-400 hover:bg-white/15'
-                                                }`}
-                                            >
-                                                <DollarSign className="w-4 h-4" />
-                                                USD
-                                            </button>
-                                        </div>
-                                        <div className="text-5xl font-bold text-white mb-3">
-                                            {selectedCurrency === 'inr' 
-                                                ? `₹${template.pricing_inr || template.pricingINR || 0}` 
-                                                : `$${template.pricing_usd || template.pricingUSD || 0}`}
-                                        </div>
-                                        <p className="text-gray-400 text-lg">One-time purchase</p>
-                                    </div>
-                                )}
+                                    <p className="text-gray-400 text-lg">Template ready for download</p>
+                                </div>
 
-                                {/* Purchase Button */}
+                                {/* Download Button */}
                                 <button
-                                    onClick={handlePurchase}
-                                    className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl flex items-center justify-center gap-3 ${
-                                        (template.plan_type === 'Free' || template.planType === 'Free')
-                                            ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg shadow-green-500/25'
-                                            : 'bg-gradient-to-r from-purple-500 to-cyan-500 text-white shadow-lg shadow-purple-500/25'
-                                    }`}
+                                    onClick={handleDownload}
+                                    className="w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl flex items-center justify-center gap-3 bg-gradient-to-r from-purple-500 to-cyan-500 text-white shadow-lg shadow-purple-500/25"
                                 >
                                     <Download className="w-6 h-6" />
-                                    {(template.plan_type === 'Free' || template.planType === 'Free') ? 'Download Free' : 'Purchase Template'}
+                                    Download Template
                                 </button>
 
                                 {/* Action Buttons */}
@@ -523,14 +480,6 @@ const TemplateDetailPage = ({ templateId }) => {
                     <SafeRatingSection template={template} user={user} />
                 </div>
             </div>
-
-            {/* Payment Modal */}
-            <PaymentModal
-                isOpen={showPaymentModal}
-                onClose={() => setShowPaymentModal(false)}
-                template={template}
-                selectedCurrency={selectedCurrency}
-            />
         </div>
         </ComponentErrorBoundary>
     );

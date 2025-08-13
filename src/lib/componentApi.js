@@ -144,15 +144,25 @@ export const componentApi = {
      */
     async createComponent(componentData) {
         try {
-            // Use basic headers - NO AUTHENTICATION REQUIRED AT ALL
-            const headers = {
-                'Content-Type': 'application/json'
+            // Get authentication headers with auto-refresh
+            const headers = await getAuthHeadersWithRefresh();
+            
+            // Ensure proper data types for required fields
+            const sanitizedData = {
+                ...componentData,
+                // Ensure list fields are arrays, not null/undefined
+                preview_images: Array.isArray(componentData.preview_images) ? componentData.preview_images : [],
+                dependencies: Array.isArray(componentData.dependencies) ? componentData.dependencies : [],
+                tags: Array.isArray(componentData.tags) ? componentData.tags : [],
+                // Ensure boolean fields
+                is_available_for_dev: Boolean(componentData.is_available_for_dev),
+                featured: Boolean(componentData.featured)
             };
             
             const response = await fetch(`${API_BASE_URL}/components`, {
                 method: 'POST',
                 headers: headers,
-                body: JSON.stringify(componentData),
+                body: JSON.stringify(sanitizedData),
             });
 
             const result = await handleApiResponse(response);
@@ -265,10 +275,18 @@ export const componentApi = {
     /**
      * Get user's components
      */
-    async getUserComponents({ skip = 0, limit = 100 } = {}) {
+    async getUserComponents({ skip = 0, limit = 100, page } = {}) {
         try {
             const params = new URLSearchParams();
-            params.append('skip', skip.toString());
+            
+            // Support both skip and page parameters
+            if (page !== undefined) {
+                params.append('page', page.toString());
+            } else {
+                // Convert skip to page for backend compatibility
+                const pageNum = Math.floor(skip / limit) + 1;
+                params.append('page', pageNum.toString());
+            }
             params.append('limit', limit.toString());
 
             const response = await fetch(`${API_BASE_URL}/components/user/my-components?${params.toString()}`, {
@@ -344,8 +362,6 @@ export const componentApi = {
             language: component.language,
             difficultyLevel: component.difficulty_level,
             planType: component.plan_type,
-            pricingINR: component.pricing_inr || 0,
-            pricingUSD: component.pricing_usd || 0,
             shortDescription: component.short_description,
             fullDescription: component.full_description,
             previewImages: previewImages,
@@ -429,8 +445,6 @@ export const componentApi = {
             language: formData.language,
             difficulty_level: formData.difficultyLevel,
             plan_type: formData.planType,
-            pricing_inr: parseInt(formData.pricingINR) || 0,
-            pricing_usd: parseInt(formData.pricingUSD) || 0,
             short_description: formData.shortDescription,
             full_description: formData.fullDescription,
             preview_images: previewImages,

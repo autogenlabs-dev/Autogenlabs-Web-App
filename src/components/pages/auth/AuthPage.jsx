@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import AuthBackground from './AuthBackground';
 import AuthLoadingState from './AuthLoadingState';
 import AuthLoadingOverlay from './AuthLoadingOverlay';
@@ -10,7 +10,9 @@ import AuthForm from './AuthForm';
 import AuthStyles from './AuthStyles';
 
 const AuthPage = () => {
-    const [isSignIn, setIsSignIn] = useState(true);
+    const searchParams = useSearchParams();
+    const mode = searchParams.get('mode');
+    const [isSignIn, setIsSignIn] = useState(mode !== 'signup');
     const [isLoading, setIsLoading] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
     const [error, setError] = useState('');
@@ -23,6 +25,15 @@ const AuthPage = () => {
 
     const { login, signup, isAuthenticated, error: authError, clearError } = useAuth();
     const router = useRouter();
+
+    // Update form mode based on URL parameter
+    useEffect(() => {
+        if (mode === 'signup') {
+            setIsSignIn(false);
+        } else {
+            setIsSignIn(true);
+        }
+    }, [mode]);
 
     // Note: Redirect logic is handled by AuthGuard component
     // No need for redirect logic here to avoid race conditions
@@ -150,10 +161,11 @@ const AuthPage = () => {
         } catch (error) {
             console.error('❌ Form submission error:', error);
             setError(error.message || (isSignIn ? 'Login failed' : 'Signup failed'));
-        } finally {
-            // Only set loading to false if we're not redirecting (i.e., there was an error)
-            if (!isLoading) return; // Already set to false in catch block
+            // Always reset loading state on error
             setIsLoading(false);
+        } finally {
+            // This will run after redirect, so we need to check if we're still on the page
+            // Don't reset loading if redirect was successful
         }
     }, [formData, isSignIn, login, signup, isLoading, validateForm, router]);
 

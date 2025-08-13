@@ -83,7 +83,25 @@ export const authApi = {
         });
 
         return handleApiResponse(response);
-    },    /**
+    },
+
+    /**
+     * Transform backend template data to ensure consistent format
+     */
+    transformTemplateData(template) {
+        if (!template) return template;
+        
+        // Ensure ID is always a string for consistent usage in components
+        const templateId = template.id || template._id;
+        const idString = typeof templateId === 'string' ? templateId : String(templateId);
+        
+        return {
+            ...template,
+            id: idString
+        };
+    },
+
+    /**
      * Get current user profile
      */    async getCurrentUser(accessToken) {
         const response = await fetch(`${API_BASE_URL}/users/me`, {
@@ -250,7 +268,14 @@ export const templateApi = {
             },
         });
 
-        return handleApiResponse(response);
+        const result = await handleApiResponse(response);
+        
+        // Transform templates data to ensure consistent IDs
+        if (result.templates && Array.isArray(result.templates)) {
+            result.templates = result.templates.map(template => this.transformTemplateData(template));
+        }
+        
+        return result;
     },
 
     /**
@@ -347,6 +372,91 @@ export const tokenUtils = {
         } catch (error) {
             return true;
         }
+    },
+};
+
+/**
+ * Admin API functions for admin dashboard
+ */
+export const adminApi = {
+    /**
+     * Get all content for admin review
+     */
+    async getAdminContent(accessToken, params = {}) {
+        const queryParams = new URLSearchParams();
+        
+        Object.keys(params).forEach(key => {
+            if (params[key] !== null && params[key] !== undefined && params[key] !== '') {
+                queryParams.append(key, params[key]);
+            }
+        });
+
+        const url = `${API_BASE_URL}/admin/content${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+        
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        return handleApiResponse(response);
+    },
+
+    /**
+     * Get admin analytics
+     */
+    async getAdminAnalytics(accessToken) {
+        const response = await fetch(`${API_BASE_URL}/admin/analytics`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        return handleApiResponse(response);
+    },
+
+    /**
+     * Approve content
+     */
+    async approveContent(accessToken, contentId, contentType) {
+        const response = await fetch(`${API_BASE_URL}/admin/content/${contentId}/approve?content_type=${contentType}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        return handleApiResponse(response);
+    },
+
+    /**
+     * Get all users for admin management
+     */
+    async getAdminUsers(accessToken, params = {}) {
+        const queryParams = new URLSearchParams();
+        
+        Object.keys(params).forEach(key => {
+            if (params[key] !== null && params[key] !== undefined) {
+                queryParams.append(key, params[key]);
+            }
+        });
+
+        const url = `${API_BASE_URL}/admin/users${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+        
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        return handleApiResponse(response);
     },
 };
 

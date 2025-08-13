@@ -1,59 +1,49 @@
 'use client';
 import { useAuth } from '../../contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import ProtectedRoute from '../../components/shared/ProtectedRoute';
+import EnhancedUserDashboard from '../../components/pages/dashboard/EnhancedUserDashboard';
+import DeveloperDashboard from '../../components/pages/dashboard/DeveloperDashboard';
+import AdminDashboard from '../../components/pages/dashboard/AdminDashboard';
 
 const Dashboard = () => {
-    const { user } = useAuth();
+    const { user, loading } = useAuth();
+    const router = useRouter();
 
-    return (
-        <ProtectedRoute>
-            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 pt-20">
-                <div className="container mx-auto px-4 py-8">
-                    <div className="max-w-4xl mx-auto">
-                        <div className="bg-slate-900/40 backdrop-blur-2xl rounded-2xl shadow-xl border border-white/20 p-8">
-                            <h1 className="text-3xl font-bold text-white mb-6">Welcome to Dashboard</h1>
-                            
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-                                    <h2 className="text-xl font-semibold text-white mb-4">User Information</h2>                                    <div className="space-y-2">
-                                        <p className="text-gray-300"><span className="font-medium">First Name:</span> {user?.firstName || 'Not provided'}</p>
-                                        <p className="text-gray-300"><span className="font-medium">Last Name:</span> {user?.lastName || 'Not provided'}</p>
-                                        <p className="text-gray-300"><span className="font-medium">Email:</span> {user?.email}</p>
-                                        <p className="text-gray-300"><span className="font-medium">Role:</span> {user?.role || 'user'}</p>
-                                        <p className="text-gray-300"><span className="font-medium">ID:</span> {user?.id}</p>
-                                    </div>
-                                </div>
-                                
-                                <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-                                    <h2 className="text-xl font-semibold text-white mb-4">Account Status</h2>
-                                    <div className="space-y-2">
-                                        <p className="text-gray-300"><span className="font-medium">Status:</span> 
-                                            <span className="ml-2 px-2 py-1 bg-green-500/20 text-green-400 rounded text-sm">Active</span>
-                                        </p>
-                                        <p className="text-gray-300"><span className="font-medium">Member since:</span> {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'Unknown'}</p>
-                                        <p className="text-gray-300"><span className="font-medium">Last login:</span> {user?.last_login_at ? new Date(user.last_login_at).toLocaleDateString() : 'Unknown'}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div className="mt-8">
-                                <h2 className="text-xl font-semibold text-white mb-4">Quick Actions</h2>
-                                <div className="flex flex-wrap gap-4">
-                                    <button className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors">
-                                        Update Profile
-                                    </button>
-                                    <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
-                                        Change Password
-                                    </button>
-                                    <button className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
-                                        View Settings
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+    // Show loading while auth is loading
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-[#0A0A0B] via-[#1a1a1a] to-[#2d1b69] py-12 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-7xl mx-auto">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
+                        <p className="text-white mt-4">Loading dashboard...</p>
                     </div>
                 </div>
             </div>
+        );
+    }
+
+    // Render appropriate dashboard based on user role
+    const renderDashboard = () => {
+        if (!user) {
+            return null; // ProtectedRoute will handle redirect
+        }
+
+        switch (user.role) {
+            case 'admin':
+                return <AdminDashboard />;
+            case 'developer':
+                return <DeveloperDashboard />;
+            default:
+                return <EnhancedUserDashboard />;
+        }
+    };
+
+    return (
+        <ProtectedRoute>
+            {renderDashboard()}
         </ProtectedRoute>
     );
 };

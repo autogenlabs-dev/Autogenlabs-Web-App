@@ -1,11 +1,13 @@
 'use client'
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronDown, Menu, X } from 'lucide-react';
+import { ChevronDown, Menu, X, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 import Logo from "../../../public/logoAuto.webp"
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../../contexts/AuthContext';
+import { useCart } from '../../contexts/CartContext';
+import ShoppingCartModal from '../ui/ShoppingCartModal';
 
 const Navbar = () => {
   const [hoveredItem, setHoveredItem] = useState(null);
@@ -13,9 +15,12 @@ const Navbar = () => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [cartModalOpen, setCartModalOpen] = useState(false);
   const timeoutRef = useRef(null);
   const router = useRouter();
-  const pathname = usePathname();  const { user, isAuthenticated, logout, loading } = useAuth();
+  const pathname = usePathname();
+  const { user, isAuthenticated, logout, loading } = useAuth();
+  const { cartCount } = useCart();
 
   useEffect(() => {
     setMounted(true);
@@ -222,6 +227,7 @@ const Navbar = () => {
   };
 
   const navItems = [
+    ...(isAuthenticated ? [{ name: 'Dashboard', hasDropdown: false, href: '/dashboard' }] : []),
     { name: 'Resources', hasDropdown: true },
     { name: 'Company', hasDropdown: true },
     { name: 'Pricing', hasDropdown: false, href: '/pricing' },
@@ -397,6 +403,21 @@ const Navbar = () => {
 
         {/* Right Side Actions */}
         <div className="flex items-center space-x-4">
+          {/* Shopping Cart Icon */}
+          {isAuthenticated && (
+            <button
+              onClick={() => setCartModalOpen(true)}
+              className="relative text-gray-300 hover:text-white transition-colors"
+            >
+              <ShoppingCart className="w-6 h-6" />
+              {cartCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {cartCount > 99 ? '99+' : cartCount}
+                </span>
+              )}
+            </button>
+          )}
+
           {loading ? (
             <div className="animate-pulse">
               <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
@@ -456,13 +477,13 @@ const Navbar = () => {
             /* Guest Menu */
             <>
               <Link
-                href="/auth"
+                href="/auth?mode=signin"
                 className="text-gray-300 hover:text-white transition-colors text-sm font-medium"
               >
                 Sign in
               </Link>
               <Link
-                href="/auth"
+                href="/auth?mode=signup"
                 className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg transition-colors text-sm font-medium text-white"
               >
                 Get Started
@@ -579,14 +600,14 @@ const Navbar = () => {
               ) : (
                 <div className="space-y-2">
                   <Link
-                    href="/auth"
+                    href="/auth?mode=signin"
                     className="block text-gray-300 hover:text-white transition-colors text-sm"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Sign in
                   </Link>
                   <Link
-                    href="/auth"
+                    href="/auth?mode=signup"
                     className="block bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg transition-colors text-sm font-medium text-white text-center"
                     onClick={() => setMobileMenuOpen(false)}
                   >
@@ -598,6 +619,12 @@ const Navbar = () => {
           </div>
         </div>
       )}
+
+      {/* Shopping Cart Modal */}
+      <ShoppingCartModal 
+        isOpen={cartModalOpen}
+        onClose={() => setCartModalOpen(false)}
+      />
     </nav>
   );
 };

@@ -5,14 +5,15 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 
 export default function ProfilePage() {
-    const { user, updateProfile, loading, error, isAuthenticated } = useAuth();
+    const { user, updateProfile, loading, error, isAuthenticated, refreshUser } = useAuth();
     const router = useRouter();
     
-    const [role, setRole] = useState('user');
+    const [role, setRole] = useState(user?.role || 'user');
     const [isEditing, setIsEditing] = useState(false);
     const [updateLoading, setUpdateLoading] = useState(false);
     const [updateError, setUpdateError] = useState('');
     const [updateSuccess, setUpdateSuccess] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
 
     useEffect(() => {
         if (!isAuthenticated && !loading) {
@@ -20,10 +21,28 @@ export default function ProfilePage() {
             return;
         }
         
+        // Refresh user data when component mounts to ensure latest status
+        const refreshUserData = async () => {
+            if (isAuthenticated && !loading) {
+                try {
+                    setRefreshing(true);
+                    await refreshUser();
+                } catch (error) {
+                    console.error('Failed to refresh user data:', error);
+                } finally {
+                    setRefreshing(false);
+                }
+            }
+        };
+
+        refreshUserData();
+    }, [isAuthenticated, loading, router]); // Removed refreshUser from dependencies
+
+    useEffect(() => {
         if (user) {
             setRole(user.role || 'user');
         }
-    }, [user, isAuthenticated, loading, router]);
+    }, [user]);
 
     const handleRoleChange = (e) => {
         setRole(e.target.value);
@@ -58,10 +77,15 @@ export default function ProfilePage() {
         setUpdateSuccess(false);
     };
 
-    if (loading) {
+    if (loading || refreshing) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-[#0A0A0B] via-[#1a1a1a] to-[#2d1b69] flex items-center justify-center">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-500"></div>
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-500 mx-auto"></div>
+                    <p className="text-white mt-4">
+                        {refreshing ? 'Loading profile...' : 'Loading...'}
+                    </p>
+                </div>
             </div>
         );
     }
@@ -158,7 +182,7 @@ export default function ProfilePage() {
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium text-gray-300">Role</label>
                                     <select
-                                        value={role}
+                                        value={user?.role || 'user'}
                                         onChange={handleRoleChange}
                                         disabled={!isEditing}
                                         className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"

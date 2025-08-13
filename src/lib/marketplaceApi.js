@@ -1,0 +1,481 @@
+/**
+ * Marketplace API Service
+ * Comprehensive API integration for AutogenLabs marketplace
+ */
+
+import { tokenUtils, ApiError } from './api';
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+const handleApiResponse = async (response) => {
+    if (!response.ok) {
+        let errorMessage = `HTTP error! status: ${response.status}`;
+        let errorDetails = null;
+        
+        try {
+            const errorData = await response.json();
+            errorMessage = errorData.detail || errorData.message || errorMessage;
+            errorDetails = errorData;
+        } catch (e) {
+            // If we can't parse error response, use default message
+        }
+        
+        throw new ApiError(errorMessage, response.status, errorDetails);
+    }
+    
+    return await response.json();
+};
+
+// Token refresh function
+const refreshAccessToken = async () => {
+    const refreshToken = tokenUtils.getRefreshToken();
+    if (!refreshToken) {
+        throw new ApiError('No refresh token available', 401);
+    }
+
+    const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            refresh_token: refreshToken,
+        }),
+    });
+
+    if (!response.ok) {
+        tokenUtils.clearTokens();
+        throw new ApiError('Token refresh failed - please login again', 401);
+    }
+
+    const data = await response.json();
+    tokenUtils.setTokens(data.access_token, data.refresh_token);
+    return data.access_token;
+};
+
+// Enhanced auth headers with automatic token refresh
+const getAuthHeadersWithRefresh = async () => {
+    if (typeof window === 'undefined') return { 'Content-Type': 'application/json' };
+    
+    let token = tokenUtils.getAccessToken();
+    
+    // Check if token is expired and refresh if needed
+    if (!token || tokenUtils.isTokenExpired(token)) {
+        try {
+            token = await refreshAccessToken();
+        } catch (error) {
+            tokenUtils.clearTokens();
+            throw new ApiError('Authentication required - please login again', 401);
+        }
+    }
+    
+    return {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+    };
+};
+
+export const marketplaceApi = {
+    // ==================== TEMPLATES ====================
+    
+    /**
+     * Get all templates with filtering and pagination
+     */
+    async getTemplates(params = {}) {
+        const queryString = new URLSearchParams();
+        
+        if (params.skip !== undefined) queryString.append('skip', params.skip);
+        if (params.limit !== undefined) queryString.append('limit', params.limit);
+        if (params.category) queryString.append('category', params.category);
+        if (params.difficulty) queryString.append('difficulty', params.difficulty);
+        if (params.plan_type) queryString.append('plan_type', params.plan_type);
+        if (params.search) queryString.append('search', params.search);
+        if (params.sort_by) queryString.append('sort_by', params.sort_by);
+        if (params.show_my_content !== undefined) queryString.append('show_my_content', params.show_my_content);
+        
+        const url = `${API_BASE_URL}/templates${queryString.toString() ? '?' + queryString.toString() : ''}`;
+        
+        try {
+            const headers = await getAuthHeadersWithRefresh();
+            const response = await fetch(url, { headers });
+            return await handleApiResponse(response);
+        } catch (error) {
+            if (error.status === 401) {
+                // For public templates, try without auth
+                const response = await fetch(url);
+                return await handleApiResponse(response);
+            }
+            throw error;
+        }
+    },
+
+    /**
+     * Get single template by ID
+     */
+    async getTemplate(id) {
+        try {
+            const headers = await getAuthHeadersWithRefresh();
+            const response = await fetch(`${API_BASE_URL}/templates/${id}`, { headers });
+            return await handleApiResponse(response);
+        } catch (error) {
+            if (error.status === 401) {
+                // Try without auth for public access
+                const response = await fetch(`${API_BASE_URL}/templates/${id}`);
+                return await handleApiResponse(response);
+            }
+            throw error;
+        }
+    },
+
+    /**
+     * Create new template
+     */
+    async createTemplate(templateData) {
+        const headers = await getAuthHeadersWithRefresh();
+        const response = await fetch(`${API_BASE_URL}/templates`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(templateData),
+        });
+        return await handleApiResponse(response);
+    },
+
+    /**
+     * Update template
+     */
+    async updateTemplate(id, templateData) {
+        const headers = await getAuthHeadersWithRefresh();
+        const response = await fetch(`${API_BASE_URL}/templates/${id}`, {
+            method: 'PUT',
+            headers,
+            body: JSON.stringify(templateData),
+        });
+        return await handleApiResponse(response);
+    },
+
+    /**
+     * Delete template
+     */
+    async deleteTemplate(id) {
+        const headers = await getAuthHeadersWithRefresh();
+        const response = await fetch(`${API_BASE_URL}/templates/${id}`, {
+            method: 'DELETE',
+            headers,
+        });
+        return await handleApiResponse(response);
+    },
+
+    /**
+     * Like/Unlike template
+     */
+    async toggleTemplateLike(id) {
+        const headers = await getAuthHeadersWithRefresh();
+        const response = await fetch(`${API_BASE_URL}/templates/${id}/like`, {
+            method: 'POST',
+            headers,
+        });
+        return await handleApiResponse(response);
+    },
+
+    /**
+     * Get user's own templates
+     */
+    async getUserTemplates(params = {}) {
+        const queryString = new URLSearchParams();
+        
+        if (params.skip !== undefined) queryString.append('skip', params.skip);
+        if (params.limit !== undefined) queryString.append('limit', params.limit);
+        if (params.status_filter) queryString.append('status_filter', params.status_filter);
+        
+        const url = `${API_BASE_URL}/templates/user/my-templates${queryString.toString() ? '?' + queryString.toString() : ''}`;
+        
+        const headers = await getAuthHeadersWithRefresh();
+        const response = await fetch(url, { headers });
+        return await handleApiResponse(response);
+    },
+
+    // ==================== COMPONENTS ====================
+    
+    /**
+     * Get all components with filtering and pagination
+     */
+    async getComponents(params = {}) {
+        const queryString = new URLSearchParams();
+        
+        if (params.skip !== undefined) queryString.append('skip', params.skip);
+        if (params.limit !== undefined) queryString.append('limit', params.limit);
+        if (params.category) queryString.append('category', params.category);
+        if (params.type) queryString.append('type', params.type);
+        if (params.difficulty) queryString.append('difficulty', params.difficulty);
+        if (params.plan_type) queryString.append('plan_type', params.plan_type);
+        if (params.search) queryString.append('search', params.search);
+        if (params.sort_by) queryString.append('sort_by', params.sort_by);
+        if (params.show_my_content !== undefined) queryString.append('show_my_content', params.show_my_content);
+        
+        const url = `${API_BASE_URL}/components${queryString.toString() ? '?' + queryString.toString() : ''}`;
+        
+        try {
+            const headers = await getAuthHeadersWithRefresh();
+            const response = await fetch(url, { headers });
+            return await handleApiResponse(response);
+        } catch (error) {
+            if (error.status === 401) {
+                // For public components, try without auth
+                const response = await fetch(url);
+                return await handleApiResponse(response);
+            }
+            throw error;
+        }
+    },
+
+    /**
+     * Get single component by ID
+     */
+    async getComponent(id) {
+        try {
+            const headers = await getAuthHeadersWithRefresh();
+            const response = await fetch(`${API_BASE_URL}/components/${id}`, { headers });
+            return await handleApiResponse(response);
+        } catch (error) {
+            if (error.status === 401) {
+                // Try without auth for public access
+                const response = await fetch(`${API_BASE_URL}/components/${id}`);
+                return await handleApiResponse(response);
+            }
+            throw error;
+        }
+    },
+
+    /**
+     * Create new component
+     */
+    async createComponent(componentData) {
+        const headers = await getAuthHeadersWithRefresh();
+        const response = await fetch(`${API_BASE_URL}/components`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(componentData),
+        });
+        return await handleApiResponse(response);
+    },
+
+    /**
+     * Update component
+     */
+    async updateComponent(id, componentData) {
+        const headers = await getAuthHeadersWithRefresh();
+        const response = await fetch(`${API_BASE_URL}/components/${id}`, {
+            method: 'PUT',
+            headers,
+            body: JSON.stringify(componentData),
+        });
+        return await handleApiResponse(response);
+    },
+
+    /**
+     * Delete component
+     */
+    async deleteComponent(id) {
+        const headers = await getAuthHeadersWithRefresh();
+        const response = await fetch(`${API_BASE_URL}/components/${id}`, {
+            method: 'DELETE',
+            headers,
+        });
+        return await handleApiResponse(response);
+    },
+
+    /**
+     * Like/Unlike component
+     */
+    async toggleComponentLike(id) {
+        const headers = await getAuthHeadersWithRefresh();
+        const response = await fetch(`${API_BASE_URL}/components/${id}/like`, {
+            method: 'POST',
+            headers,
+        });
+        return await handleApiResponse(response);
+    },
+
+    /**
+     * Get user's own components
+     */
+    async getUserComponents(params = {}) {
+        const queryString = new URLSearchParams();
+        
+        if (params.skip !== undefined) queryString.append('skip', params.skip);
+        if (params.limit !== undefined) queryString.append('limit', params.limit);
+        if (params.status_filter) queryString.append('status_filter', params.status_filter);
+        
+        const url = `${API_BASE_URL}/components/user/my-components${queryString.toString() ? '?' + queryString.toString() : ''}`;
+        
+        const headers = await getAuthHeadersWithRefresh();
+        const response = await fetch(url, { headers });
+        return await handleApiResponse(response);
+    },
+
+    // ==================== COMMENTS & RATINGS ====================
+    
+    /**
+     * Get template comments
+     */
+    async getTemplateComments(templateId, params = {}) {
+        const queryString = new URLSearchParams();
+        if (params.skip !== undefined) queryString.append('skip', params.skip);
+        if (params.limit !== undefined) queryString.append('limit', params.limit);
+        
+        const url = `${API_BASE_URL}/templates/${templateId}/comments${queryString.toString() ? '?' + queryString.toString() : ''}`;
+        const response = await fetch(url);
+        return await handleApiResponse(response);
+    },
+
+    /**
+     * Create template comment
+     */
+    async createTemplateComment(templateId, commentData) {
+        const headers = await getAuthHeadersWithRefresh();
+        const response = await fetch(`${API_BASE_URL}/templates/${templateId}/comments`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(commentData),
+        });
+        return await handleApiResponse(response);
+    },
+
+    /**
+     * Get component comments
+     */
+    async getComponentComments(componentId, params = {}) {
+        const queryString = new URLSearchParams();
+        if (params.skip !== undefined) queryString.append('skip', params.skip);
+        if (params.limit !== undefined) queryString.append('limit', params.limit);
+        
+        const url = `${API_BASE_URL}/components/${componentId}/comments${queryString.toString() ? '?' + queryString.toString() : ''}`;
+        const response = await fetch(url);
+        return await handleApiResponse(response);
+    },
+
+    /**
+     * Create component comment
+     */
+    async createComponentComment(componentId, commentData) {
+        const headers = await getAuthHeadersWithRefresh();
+        const response = await fetch(`${API_BASE_URL}/components/${componentId}/comments`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(commentData),
+        });
+        return await handleApiResponse(response);
+    },
+
+    // ==================== SEARCH ====================
+    
+    /**
+     * Search templates and components
+     */
+    async search(query, filters = {}) {
+        const queryString = new URLSearchParams();
+        queryString.append('q', query);
+        
+        if (filters.type) queryString.append('type', filters.type); // 'template' or 'component'
+        if (filters.category) queryString.append('category', filters.category);
+        if (filters.difficulty) queryString.append('difficulty', filters.difficulty);
+        if (filters.plan_type) queryString.append('plan_type', filters.plan_type);
+        if (filters.limit) queryString.append('limit', filters.limit);
+        
+        const url = `${API_BASE_URL}/search?${queryString.toString()}`;
+        
+        try {
+            const headers = await getAuthHeadersWithRefresh();
+            const response = await fetch(url, { headers });
+            return await handleApiResponse(response);
+        } catch (error) {
+            if (error.status === 401) {
+                const response = await fetch(url);
+                return await handleApiResponse(response);
+            }
+            throw error;
+        }
+    },
+
+    // ==================== USER ANALYTICS ====================
+    
+    /**
+     * Get user analytics data
+     */
+    async getUserAnalytics() {
+        const headers = await getAuthHeadersWithRefresh();
+        const response = await fetch(`${API_BASE_URL}/user/analytics`, {
+            headers,
+        });
+        return await handleApiResponse(response);
+    },
+
+    // ==================== CATEGORIES ====================
+    
+    /**
+     * Get template categories
+     */
+    async getTemplateCategories() {
+        const response = await fetch(`${API_BASE_URL}/templates/categories`);
+        return await handleApiResponse(response);
+    },
+
+    /**
+     * Get component categories  
+     */
+    async getComponentCategories() {
+        const response = await fetch(`${API_BASE_URL}/components/categories`);
+        return await handleApiResponse(response);
+    },
+
+    // ==================== ADMIN APPROVAL ====================
+    
+    /**
+     * Get pending approvals (Admin only)
+     */
+    async getPendingApprovals(params = {}) {
+        const queryString = new URLSearchParams();
+        
+        if (params.content_type) queryString.append('content_type', params.content_type);
+        if (params.status) queryString.append('status', params.status);
+        if (params.skip !== undefined) queryString.append('skip', params.skip);
+        if (params.limit !== undefined) queryString.append('limit', params.limit);
+        
+        const url = `${API_BASE_URL}/admin/approvals${queryString.toString() ? '?' + queryString.toString() : ''}`;
+        
+        const headers = await getAuthHeadersWithRefresh();
+        const response = await fetch(url, { headers });
+        return await handleApiResponse(response);
+    },
+
+    /**
+     * Approve content (Admin only)
+     */
+    async approveContent(approvalId, adminNotes = null) {
+        const headers = await getAuthHeadersWithRefresh();
+        const response = await fetch(`${API_BASE_URL}/admin/approvals/${approvalId}/approve`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ admin_notes: adminNotes }),
+        });
+        return await handleApiResponse(response);
+    },
+
+    /**
+     * Reject content (Admin only)
+     */
+    async rejectContent(approvalId, rejectionReason, adminNotes = null) {
+        const headers = await getAuthHeadersWithRefresh();
+        const response = await fetch(`${API_BASE_URL}/admin/approvals/${approvalId}/reject`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ 
+                rejection_reason: rejectionReason,
+                admin_notes: adminNotes 
+            }),
+        });
+        return await handleApiResponse(response);
+    }
+};
+
+export { ApiError };
