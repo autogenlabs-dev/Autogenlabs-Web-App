@@ -38,7 +38,7 @@ export const ChatbotSkeleton = () => (
     className="fixed bottom-6 -right-2 z-50"
     initial={{ scale: 0 }}
     animate={{ scale: 1 }}
-    transition={{ delay: 2, duration: 0.5 }}
+    transition={{ delay: 7, duration: 0.5 }} // Increased delay to 7 seconds
   >
     <div className="w-20 h-20 md:w-52 md:h-52 rounded-full bg-gradient-to-br from-purple-600 via-cyan-500 to-pink-500 flex items-center justify-center shadow-2xl animate-pulse">
       <div className="w-12 h-12 md:w-24 md:h-24 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
@@ -73,7 +73,7 @@ export const NetworkDiagramSkeleton = () => (
   </div>
 );
 
-// Intersection Observer Hook for lazy loading
+// Intersection Observer Hook for lazy loading - Super optimized for no blank content
 export const useInViewport = (options = {}) => {
   const [isInView, setIsInView] = useState(false);
   const [hasBeenInView, setHasBeenInView] = useState(false);
@@ -95,8 +95,8 @@ export const useInViewport = (options = {}) => {
         }
       },
       {
-        threshold: 0.1,
-        rootMargin: '100px', // Start loading 100px before visible
+        threshold: 0.01, // Very low threshold for immediate triggering
+        rootMargin: '400px', // Very large margin for early loading
         ...options,
       }
     );
@@ -108,11 +108,12 @@ export const useInViewport = (options = {}) => {
   return { elementRef, isInView, hasBeenInView };
 };
 
-// Delay Hook for staged loading
-export const useDelayedMount = (delay = 1000) => {
-  const [shouldMount, setShouldMount] = useState(false);
+// Delay Hook for staged loading - Optimized for faster initial load
+export const useDelayedMount = (delay = 0) => {
+  const [shouldMount, setShouldMount] = useState(delay === 0);
 
   useEffect(() => {
+    if (delay === 0) return; // If no delay, mount immediately
     const timer = setTimeout(() => setShouldMount(true), delay);
     return () => clearTimeout(timer);
   }, [delay]);
@@ -120,7 +121,7 @@ export const useDelayedMount = (delay = 1000) => {
   return shouldMount;
 };
 
-// Main Lazy Component Wrapper
+// Main Lazy Component Wrapper - Optimized for faster loading
 export const LazyComponent = ({ 
   children, 
   fallback = <SkeletonLoader />, 
@@ -132,22 +133,34 @@ export const LazyComponent = ({
   const { elementRef, hasBeenInView } = useInViewport();
   const shouldLoadByDelay = useDelayedMount(delay);
   
-  const shouldLoad = viewport ? hasBeenInView : shouldLoadByDelay;
+  // If viewport is enabled, wait for element to be in view OR delay to pass
+  // If viewport is disabled, only wait for delay
+  const shouldLoad = viewport ? (hasBeenInView || shouldLoadByDelay) : shouldLoadByDelay;
 
   return (
     <div ref={elementRef} className={className} {...props}>
       <Suspense fallback={fallback}>
-        {shouldLoad ? children : fallback}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={shouldLoad ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ 
+            duration: 0.5, 
+            delay: delay > 0 ? delay / 1000 : 0,
+            ease: "easeOut"
+          }}
+        >
+          {shouldLoad ? children : fallback}
+        </motion.div>
       </Suspense>
     </div>
   );
 };
 
-// Specific lazy loaders for different component types
+// Specific lazy loaders for different component types - Optimized
 export const LazyVideo = ({ children, ...props }) => (
   <LazyComponent 
     fallback={<VideoSkeleton />} 
-    delay={2000}
+    delay={500} // Reduced from 2000ms
     {...props}
   >
     {children}
@@ -157,7 +170,7 @@ export const LazyVideo = ({ children, ...props }) => (
 export const LazyChatbot = ({ children, ...props }) => (
   <LazyComponent 
     fallback={<ChatbotSkeleton />} 
-    delay={5000}
+    delay={7000} // Increased to 7 seconds for proper page load
     viewport={false}
     {...props}
   >
@@ -168,7 +181,7 @@ export const LazyChatbot = ({ children, ...props }) => (
 export const LazyGrid = ({ children, ...props }) => (
   <LazyComponent 
     fallback={<GridSkeleton />} 
-    delay={1000}
+    delay={0} // Immediate loading
     {...props}
   >
     {children}
@@ -178,7 +191,7 @@ export const LazyGrid = ({ children, ...props }) => (
 export const LazyNetworkDiagram = ({ children, ...props }) => (
   <LazyComponent 
     fallback={<NetworkDiagramSkeleton />} 
-    delay={1500}
+    delay={200} // Reduced from 1500ms
     {...props}
   >
     {children}

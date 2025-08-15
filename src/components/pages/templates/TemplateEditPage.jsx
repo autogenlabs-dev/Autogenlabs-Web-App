@@ -198,7 +198,7 @@ const TemplateEditPage = ({ templateId }) => {
           <p className="text-gray-400 mb-8">{error || "The template you're looking for doesn't exist."}</p>
           <Link href="/templates">
             <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-xl font-semibold transition-all duration-300 hover:scale-105">
-              Back to Templates
+              Back
             </button>
           </Link>
         </div>
@@ -216,9 +216,12 @@ const TemplateEditPage = ({ templateId }) => {
         >
           {/* Header */}
           <div className="flex items-center gap-4 mb-8">
-            <Link href="/templates" className="text-purple-400 hover:text-purple-300 transition-colors">
+            <button 
+              onClick={() => window.history.back()}
+              className="text-purple-400 hover:text-purple-300 transition-colors"
+            >
               <ArrowLeft className="w-6 h-6" />
-            </Link>
+            </button>
             <div>
               <h1 className="text-3xl font-bold">Edit Template</h1>
               <p className="text-gray-400">Update your template details and information</p>

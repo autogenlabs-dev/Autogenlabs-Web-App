@@ -14,7 +14,7 @@ const Dashboard = () => {
     // Show loading while auth is loading
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-[#0A0A0B] via-[#1a1a1a] to-[#2d1b69] py-12 px-4 sm:px-6 lg:px-8">
+            <div className="min-h-screen bg-gradient-to-br from-[#0A0A0B] via-[#1a1a1a] to-[#2d1b69] pt-24 pb-12 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>

@@ -11,26 +11,10 @@ const VideoSection = () => {
   const videoRef = useRef(null);
   const containerRef = useRef(null);
 
-  // Intersection Observer for lazy loading
+  // Immediate loading for better performance
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsInView(true);
-          observer.disconnect(); 
-        }
-      },
-      {
-        threshold: 0.1, 
-        rootMargin: '50px 0px', 
-      }
-    );
-
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
-    }
-
-    return () => observer.disconnect();
+    // Load video immediately
+    setIsInView(true);
   }, []);
 
   // Handle video loaded

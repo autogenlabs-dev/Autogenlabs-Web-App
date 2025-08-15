@@ -17,21 +17,48 @@ const LayoutWrapper = ({ children }) => {
         return pathname?.startsWith('/auth') ?? false;
     }, [pathname]);
 
+    // Check for pages that should not show footer
+    const shouldHideFooter = useMemo(() => {
+        if (!pathname) return false;
+        
+        const footerHiddenPaths = [
+            '/templates/create',
+            '/components/create',
+            '/dashboard',
+            '/profile'
+        ];
+        
+        // Check exact matches first
+        if (footerHiddenPaths.includes(pathname)) {
+            return true;
+        }
+        
+        // Check dynamic routes patterns
+        const hiddenPatterns = [
+            /^\/templates\/[^\/]+$/,        // /templates/[id]
+            /^\/templates\/[^\/]+\/edit$/,  // /templates/[id]/edit
+            /^\/components\/[^\/]+$/,       // /components/[id]
+            /^\/components\/[^\/]+\/edit$/, // /components/[id]/edit
+        ];
+        
+        return hiddenPatterns.some(pattern => pattern.test(pathname));
+    }, [pathname]);
+
     const content = useMemo(() => {
         if (isAuthPage) {
             // Return only children for auth pages (no navbar/footer)
             return children;
         } else {
-            // Return with navbar/footer for all other pages
+            // Return with navbar and conditionally with footer
             return (
                 <>
                     <Navbar />
                     {children}
-                    <Footer />
+                    {!shouldHideFooter && <Footer />}
                 </>
             );
         }
-    }, [isAuthPage, children]);
+    }, [isAuthPage, shouldHideFooter, children]);
 
     return (
         <NotificationProvider>

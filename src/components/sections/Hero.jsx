@@ -2,7 +2,7 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
 import { DynamicVideoSection } from '@/components/dynamic/DynamicComponents';
-import { LazyVideo } from '@/components/ui/LazyLoader';
+import { FastLoader } from '@/components/ui/OptimizedLoader';
 
 const CopilotUIComponent = () => {
   const [userName, setUserName] = useState('Akarsh'); // Dynamic user name
@@ -20,10 +20,8 @@ const CopilotUIComponent = () => {
   ];
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoaded(true);
-    }, 100);
-    return () => clearTimeout(timer);
+    // Immediate load for better first impression
+    setIsLoaded(true);
   }, []);
 
   useEffect(() => {
@@ -310,9 +308,9 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
           >
             {/* Line 1 (single light color) */}
-            <span className="block text-[36px] sm:text-[44px] md:text-[52px] xl:text-[56px] font-semibold text-neutral-100 drop-shadow-[0_0_8px_rgba(255,255,255,0.18)] whitespace-nowrap max-w-full tracking-tight">
+            {/* <span className="block text-[36px] sm:text-[44px] md:text-[52px] xl:text-[56px] font-semibold text-neutral-100 drop-shadow-[0_0_8px_rgba(255,255,255,0.18)] whitespace-nowrap max-w-full tracking-tight">
               From concept to completion in a click.
-            </span>
+            </span> */}
             {/* Line 2 (same color) */}
             <span className="block mt-2 text-[36px] sm:text-[44px] md:text-[52px] xl:text-[56px] font-semibold text-neutral-100 drop-shadow-[0_0_8px_rgba(255,255,255,0.18)] whitespace-nowrap max-w-full">
               Let <span className="brand-highlight font-semibold">AutoGen</span> do the coding magic.
@@ -338,7 +336,7 @@ export default function Hero() {
         </div>
       </motion.section>
 
-      {/* Lazy-loaded Video Section */}
+      {/* Video Section - Load immediately */}
       <motion.div
         className="flex justify-center items-center w-10/12 mt-10 p-10 border-2 border-amber-50 rounded-3xl relative z-10"
         style={{ scale, opacity, y }}
@@ -348,11 +346,11 @@ export default function Hero() {
           y: isLoaded ? 0 : 100,
           scale: isLoaded ? 1 : 0.8
         }}
-        transition={{ duration: 1.2, delay: 1.6, ease: "easeOut" }}
+        transition={{ duration: 1.2, delay: 0.8, ease: "easeOut" }}
       >
-        <LazyVideo delay={3000}>
+        <FastLoader>
           <DynamicVideoSection />
-        </LazyVideo>
+        </FastLoader>
       </motion.div>
     </div>
   );

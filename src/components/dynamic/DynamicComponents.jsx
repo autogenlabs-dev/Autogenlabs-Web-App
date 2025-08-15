@@ -20,7 +20,7 @@ export const DynamicChatbot = dynamic(
   }
 );
 
-// 2. Video Section - Critical for hero, but can be delayed
+// 2. Video Section - Critical for hero, load immediately
 export const DynamicVideoSection = dynamic(
   () => import('../ui/VideoSection'),
   { 

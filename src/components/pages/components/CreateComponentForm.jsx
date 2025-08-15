@@ -796,12 +796,13 @@ const CreateComponentForm = () => {
             <div className="sticky top-0 z-50 bg-slate-900/40 backdrop-blur-2xl border-b border-white/20">
                 <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <Link href="/components">
-                            <button className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
-                                <ArrowLeft className="w-5 h-5" />
-                                Back to Components
-                            </button>
-                        </Link>
+                        <button 
+                            onClick={() => window.history.back()}
+                            className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors"
+                        >
+                            <ArrowLeft className="w-5 h-5" />
+                            Back
+                        </button>
                         
                         {/* Step Indicator */}
                         <div className="hidden md:flex items-center gap-2 ml-8">

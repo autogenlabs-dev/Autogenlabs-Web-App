@@ -222,12 +222,13 @@ const CreateTemplateForm = () => {
             {/* Header */}
             <div className="sticky top-0 z-50 bg-black/50 backdrop-blur-sm border-b border-white/10">
                 <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-                    <Link href="/templates">
-                        <button className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
-                            <ArrowLeft className="w-5 h-5" />
-                            Back to Templates
-                        </button>
-                    </Link>
+                    <button 
+                        onClick={() => window.history.back()}
+                        className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+                    >
+                        <ArrowLeft className="w-5 h-5" />
+                        Back
+                    </button>
 
                     <div className="flex items-center gap-4">
                         <button

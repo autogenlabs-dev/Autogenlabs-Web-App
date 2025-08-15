@@ -1,4 +1,4 @@
-// src/app/page.jsx (Optimized with Lazy Loading)
+// src/app/page.jsx (Optimized for Fast Initial Load)
 import Hero from "@/components/sections/Hero";
 import LogoScrollSection from "@/components/sections/LogoScrollSection";
 
@@ -20,7 +20,8 @@ import {
   DynamicChatbot
 } from "@/components/dynamic/DynamicComponents";
 
-import { LazyComponent, LazyVideo } from "@/components/ui/LazyLoader";
+import { LazyComponent } from "@/components/ui/LazyLoader";
+import { OptimizedComponent, StaggeredContainer, StaggeredItem, PreloadedComponent } from "@/components/ui/OptimizedLoader";
 
 export default function Home() {
   return (
@@ -29,66 +30,67 @@ export default function Home() {
       <Hero />
       <LogoScrollSection />
 
-      {/* High Priority - Load when in viewport */}
-      <LazyComponent delay={500}>
-        <DynamicThreeSteps />
-      </LazyComponent>
+      {/* Above-the-fold content - Load immediately with staggered animations */}
+      <StaggeredContainer staggerDelay={100}>
+        <StaggeredItem>
+          <DynamicThreeSteps />
+        </StaggeredItem>
 
-      <LazyComponent delay={800}>
-        <DynamicTipOne />
-      </LazyComponent>
+        <StaggeredItem>
+          <DynamicTipOne />
+        </StaggeredItem>
 
-      <LazyComponent delay={1000}>
-        <DynamicTipTwo />
-      </LazyComponent>
+        <StaggeredItem>
+          <DynamicTipTwo />
+        </StaggeredItem>
 
-      {/* Medium Priority - Load when in viewport with more delay */}
-      <LazyComponent delay={1200}>
-        <DynamicTipThree />
-      </LazyComponent>
+        <StaggeredItem>
+          <DynamicTipThree />
+        </StaggeredItem>
 
-      <LazyComponent delay={1400}>
-        <DynamicTipFour />
-      </LazyComponent>
+        <StaggeredItem>
+          <DynamicTipFour />
+        </StaggeredItem>
 
-      <LazyComponent delay={1600}>
-        <DynamicTipFive />
-      </LazyComponent>
+        <StaggeredItem>
+          <DynamicTipFive />
+        </StaggeredItem>
 
-      <LazyComponent delay={1800}>
-        <DynamicTrainSectionTwo />
-      </LazyComponent>
+        <StaggeredItem>
+          <DynamicTrainSectionTwo />
+        </StaggeredItem>
+      </StaggeredContainer>
 
-      {/* Feature Section - Heavy network diagrams */}
+      {/* Feature Section - Preloaded, no blank content */}
       <div className="px-8">
-        <LazyComponent delay={2000}>
+        <PreloadedComponent delay={600}>
           <DynamicFeatureSection />
-        </LazyComponent>
+        </PreloadedComponent>
       </div>
 
-      {/* Lower Priority - Load when scrolled to */}
-      <LazyComponent delay={2200}>
+      {/* Below-the-fold content - All preloaded to avoid blank scroll */}
+      <PreloadedComponent delay={700}>
         <DynamicPricingSection />
-      </LazyComponent>
+      </PreloadedComponent>
 
-      <LazyComponent delay={2400}>
+      <PreloadedComponent delay={800}>
         <DynamicTestimonialSection />
-      </LazyComponent>
+      </PreloadedComponent>
 
-      <LazyComponent delay={2600}>
+      <PreloadedComponent delay={900}>
         <DynamicContactSection />
-      </LazyComponent>
+      </PreloadedComponent>
 
-      <LazyComponent delay={2800}>
+      <PreloadedComponent delay={1000}>
         <DynamicAboutUsSection />
-      </LazyComponent>
+      </PreloadedComponent>
 
-      <LazyComponent delay={3000}>
+      <PreloadedComponent delay={1100}>
         <DynamicFAQSection />
-      </LazyComponent>
+      </PreloadedComponent>
 
-      {/* Lowest Priority - Load last */}
-      <LazyComponent delay={5000} viewport={false}>
+      {/* Chatbot - Load after 7 seconds for proper page load */}
+      <LazyComponent delay={7000} viewport={false}>
         <DynamicChatbot />
       </LazyComponent>
     </div>

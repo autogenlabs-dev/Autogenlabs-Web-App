@@ -151,7 +151,7 @@ const ComponentEditPage = ({ componentId }) => {
           <p className="text-gray-400 mb-8">{error || "The component you're looking for doesn't exist."}</p>
           <Link href="/components">
             <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-xl font-semibold transition-all duration-300 hover:scale-105">
-              Back to Components
+              Back
             </button>
           </Link>
         </div>
@@ -164,12 +164,13 @@ const ComponentEditPage = ({ componentId }) => {
       {/* Header */}
       <div className="sticky top-0 z-50 bg-black/50 backdrop-blur-sm border-b border-white/10">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/components">
-            <button className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
-              <ArrowLeft className="w-5 h-5" />
-              Back to Components
-            </button>
-          </Link>
+          <button 
+            onClick={() => window.history.back()}
+            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            Back
+          </button>
           
           <div className="flex items-center gap-4">
             <Link href={`/components/${componentId}`}>
