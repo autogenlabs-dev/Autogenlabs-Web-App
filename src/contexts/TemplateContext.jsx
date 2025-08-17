@@ -172,12 +172,12 @@ export const TemplateProvider = ({ children }) => {
 
   // Like/Unlike template
   const toggleTemplateLike = async (templateId) => {
-    if (!accessToken) {
+    if (!isAuthenticated) {
       throw new Error('Authentication required');
     }
 
     try {
-      const response = await templateApi.toggleTemplateLike(templateId);
+      const response = await templateApi.toggleLike(templateId);
       
       // Update like count in templates
       setTemplates(prev => prev.map(t => 
@@ -196,7 +196,7 @@ export const TemplateProvider = ({ children }) => {
 
   // Download template
   const downloadTemplate = async (templateId) => {
-    if (!accessToken) {
+    if (!isAuthenticated) {
       throw new Error('Authentication required');
     }
 

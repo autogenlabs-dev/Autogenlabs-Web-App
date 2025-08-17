@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Star, Eye, Download, Clock, Code, User, Globe, Github, Play, Heart, Share2, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Star, Eye, Download, Clock, Code, User, Globe, Github, Play, Heart, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
@@ -9,19 +9,21 @@ import { generateMultipleScreenshots, getBestPreviewImage } from '@/utils/livePr
 import { useTemplate } from '@/contexts/TemplateContext';
 import SafeRatingSection from '@/components/ui/SafeRatingSection';
 import ComponentErrorBoundary from '@/components/ui/ComponentErrorBoundary';
+import CommentSystem from '@/components/ui/CommentSystem';
 
 const TemplateDetailPage = ({ templateId }) => {
     // All hooks must be called at the top level, in the same order every time
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [userRating, setUserRating] = useState(0);
     const [isLiked, setIsLiked] = useState(false);
+    const [likeCount, setLikeCount] = useState(0);
     const [template, setTemplate] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const mountedRef = useRef(true);
 
     const { user, isAuthenticated } = useAuth();
-    const { getTemplateById } = useTemplate();
+    const { getTemplateById, toggleTemplateLike } = useTemplate();
 
     // Cleanup on unmount
     useEffect(() => {
@@ -105,6 +107,8 @@ const TemplateDetailPage = ({ templateId }) => {
                 if (!isCancelled) {
                     if (templateData && templateData.id) {
                         setTemplate(templateData);
+                        setIsLiked(templateData.liked || false);
+                        setLikeCount(templateData.likes || templateData.total_likes || 0);
                         setError(null);
                     } else {
                         setTemplate(null);
@@ -212,6 +216,22 @@ const TemplateDetailPage = ({ templateId }) => {
         alert(`Thank you for rating this template ${rating} stars!`);
     };
 
+    const handleToggleLike = async () => {
+        if (!isAuthenticated) {
+            alert('Please login to like templates');
+            return;
+        }
+
+        try {
+            const response = await toggleTemplateLike(templateId);
+            setIsLiked(response.liked);  // Changed from user_has_liked to liked
+            setLikeCount(response.total_likes);
+        } catch (error) {
+            console.error('Failed to toggle like:', error);
+            alert('Failed to update like status');
+        }
+    };
+
     return (
         <ComponentErrorBoundary>
             <div className="min-h-screen bg-[linear-gradient(180deg,#040406_50%,#09080D_100%)] text-white">
@@ -229,16 +249,13 @@ const TemplateDetailPage = ({ templateId }) => {
 
                     <div className="flex items-center gap-4">
                         <button
-                            onClick={() => setIsLiked(!isLiked)}
-                            className={`p-2 rounded-lg transition-all duration-300 ${isLiked
-                                    ? 'bg-red-500/20 text-red-400'
-                                    : 'bg-white/10 text-gray-400 hover:text-red-400'
+                            onClick={handleToggleLike}
+                            className={`p-3 rounded-lg transition-all duration-300 ${isLiked
+                                    ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                                    : 'bg-white/10 text-gray-400 border border-white/20 hover:bg-white/15'
                                 }`}
                         >
                             <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
-                        </button>
-                        <button className="p-2 rounded-lg bg-white/10 text-gray-400 hover:text-white transition-colors">
-                            <Share2 className="w-5 h-5" />
                         </button>
                     </div>
                 </div>
@@ -271,17 +288,6 @@ const TemplateDetailPage = ({ templateId }) => {
                                         <ExternalLink className="w-4 h-4" />
                                         Open in New Tab
                                     </a>
-                                    
-                                    <button
-                                        onClick={() => setIsLiked(!isLiked)}
-                                        className={`p-3 rounded-xl transition-all duration-300 backdrop-blur-sm shadow-lg hover:scale-105 ${
-                                            isLiked
-                                                ? 'bg-red-500/90 text-white'
-                                                : 'bg-white/10 text-gray-300 hover:bg-red-500/20 hover:text-red-400'
-                                        }`}
-                                    >
-                                        <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
-                                    </button>
                                 </div>
 
                                 {/* Live Status Indicator */}
@@ -479,6 +485,15 @@ const TemplateDetailPage = ({ templateId }) => {
                 {/* Rating Section */}
                 <div className="mt-16">
                     <SafeRatingSection template={template} user={user} />
+                </div>
+
+                {/* Comments Section */}
+                <div className="mt-16">
+                    <CommentSystem 
+                        itemId={templateId}
+                        itemType="template"
+                        itemTitle={template?.title}
+                    />
                 </div>
             </div>
         </div>

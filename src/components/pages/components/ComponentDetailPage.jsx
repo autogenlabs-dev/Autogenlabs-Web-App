@@ -1,14 +1,17 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Star, Eye, Download, Clock, Code, User, Globe, Github, Heart, Share2, ExternalLink, ChevronLeft, ChevronRight, Layers } from 'lucide-react';
+import { ArrowLeft, Star, Eye, Download, Clock, Code, User, Globe, Github, Heart, ExternalLink, ChevronLeft, ChevronRight, Layers } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { mockUser } from '@/lib/componentData';
 import { componentApi } from '@/lib/componentApi';
+import { marketplaceApi } from '@/lib/marketplaceApi';
+import { useAuth } from '@/contexts/AuthContext';
 import SafeRatingSection from '@/components/ui/SafeRatingSection';
 import CodeViewerModal from '@/components/ui/CodeViewerModal';
 import LiveComponentPreview from '@/components/ui/LiveComponentPreview';
+import CommentSystem from '@/components/ui/CommentSystem';
 
 const ComponentDetailPage = ({ componentId }) => {
     const [component, setComponent] = useState(null);
@@ -17,8 +20,11 @@ const ComponentDetailPage = ({ componentId }) => {
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [userRating, setUserRating] = useState(0);
     const [isLiked, setIsLiked] = useState(false);
+    const [likeCount, setLikeCount] = useState(0);
     const [mounted, setMounted] = useState(false);
     const [showCodeModal, setShowCodeModal] = useState(false);
+
+    const { user: authUser, isAuthenticated } = useAuth();
 
     useEffect(() => {
         setMounted(true);
@@ -33,8 +39,9 @@ const ComponentDetailPage = ({ componentId }) => {
             setError(null);
             const component = await componentApi.getComponent(componentId);
            
-           
             setComponent(component);
+            setIsLiked(component.liked || false);
+            setLikeCount(component.likes || component.total_likes || 0);
         } catch (err) {
             console.error('Failed to fetch component:', err);
             setError(err.message);
@@ -43,7 +50,26 @@ const ComponentDetailPage = ({ componentId }) => {
         }
     };
 
-    const user = mockUser;
+    const handleToggleLike = async () => {
+        if (!isAuthenticated) {
+            alert('Please login to like components');
+            return;
+        }
+
+        try {
+            const response = await marketplaceApi.toggleComponentLike(componentId);
+            setIsLiked(response.liked);
+            setLikeCount(response.total_likes);
+        } catch (error) {
+            console.error('Failed to toggle like:', error);
+            alert('Failed to update like status');
+        }
+    };
+
+    const handleDownload = () => {
+        alert('Component download started!');
+        // Add actual download logic here
+    };
 
     if (!mounted) {
         return (
@@ -126,11 +152,6 @@ const ComponentDetailPage = ({ componentId }) => {
         }
     };
 
-    const handleDownload = () => {
-        alert('Download started!');
-        // Add actual download logic here
-    };
-
     const handleRatingSubmit = (rating) => {
         setUserRating(rating);
         // In real app, this would make an API call
@@ -180,20 +201,14 @@ const ComponentDetailPage = ({ componentId }) => {
 
                     <div className="flex items-center gap-4">
                         <button
-                            onClick={() => setIsLiked(!isLiked)}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 ${
+                            onClick={handleToggleLike}
+                            className={`p-3 rounded-lg transition-all duration-300 ${
                                 isLiked 
                                     ? 'bg-red-500/20 text-red-400 border border-red-500/30' 
                                     : 'bg-white/10 text-gray-400 border border-white/20 hover:bg-white/15'
                             }`}
                         >
                             <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
-                            {component.likes + (isLiked ? 1 : 0)}
-                        </button>
-
-                        <button className="flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/15 transition-all duration-300">
-                            <Share2 className="w-5 h-5" />
-                            Share
                         </button>
                     </div>
                 </div>
@@ -438,7 +453,7 @@ const ComponentDetailPage = ({ componentId }) => {
                         {/* Rating Section */}
                         <SafeRatingSection
                             template={component}
-                            user={user}
+                            user={authUser}
                         />
                     </div>
 
@@ -545,6 +560,15 @@ const ComponentDetailPage = ({ componentId }) => {
                             </div>
                         </motion.div>
                     </div>
+                </div>
+
+                {/* Comments Section */}
+                <div className="max-w-7xl mx-auto px-6 mt-16">
+                    <CommentSystem 
+                        itemId={componentId}
+                        itemType="component"
+                        itemTitle={component?.title}
+                    />
                 </div>
             </div>
 

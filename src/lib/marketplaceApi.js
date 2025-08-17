@@ -367,6 +367,179 @@ export const marketplaceApi = {
         return await handleApiResponse(response);
     },
 
+    /**
+     * Update template comment
+     */
+    async updateTemplateComment(templateId, commentId, commentData) {
+        const headers = await getAuthHeadersWithRefresh();
+        const response = await fetch(`${API_BASE_URL}/templates/${templateId}/comments/${commentId}`, {
+            method: 'PUT',
+            headers,
+            body: JSON.stringify(commentData),
+        });
+        return await handleApiResponse(response);
+    },
+
+    /**
+     * Delete template comment
+     */
+    async deleteTemplateComment(templateId, commentId) {
+        const headers = await getAuthHeadersWithRefresh();
+        const response = await fetch(`${API_BASE_URL}/templates/${templateId}/comments/${commentId}`, {
+            method: 'DELETE',
+            headers,
+        });
+        return await handleApiResponse(response);
+    },
+
+    /**
+     * Update component comment
+     */
+    async updateComponentComment(componentId, commentId, commentData) {
+        const headers = await getAuthHeadersWithRefresh();
+        const response = await fetch(`${API_BASE_URL}/components/${componentId}/comments/${commentId}`, {
+            method: 'PUT',
+            headers,
+            body: JSON.stringify(commentData),
+        });
+        return await handleApiResponse(response);
+    },
+
+    /**
+     * Delete component comment
+     */
+    async deleteComponentComment(componentId, commentId) {
+        const headers = await getAuthHeadersWithRefresh();
+        const response = await fetch(`${API_BASE_URL}/components/${componentId}/comments/${commentId}`, {
+            method: 'DELETE',
+            headers,
+        });
+        return await handleApiResponse(response);
+    },
+
+    // ==================== LIKE/DISLIKE FUNCTIONS ====================
+
+    /**
+     * Like a template comment
+     */
+    async likeTemplateComment(templateId, commentId) {
+        const headers = await getAuthHeadersWithRefresh();
+        const response = await fetch(`${API_BASE_URL}/templates/${templateId}/comments/${commentId}/like`, {
+            method: 'POST',
+            headers,
+        });
+        return await handleApiResponse(response);
+    },
+
+    /**
+     * Dislike a template comment
+     */
+    async dislikeTemplateComment(templateId, commentId) {
+        const headers = await getAuthHeadersWithRefresh();
+        const response = await fetch(`${API_BASE_URL}/templates/${templateId}/comments/${commentId}/dislike`, {
+            method: 'POST',
+            headers,
+        });
+        return await handleApiResponse(response);
+    },
+
+    /**
+     * Like a component comment
+     */
+    async likeComponentComment(componentId, commentId) {
+        const headers = await getAuthHeadersWithRefresh();
+        const response = await fetch(`${API_BASE_URL}/components/${componentId}/comments/${commentId}/like`, {
+            method: 'POST',
+            headers,
+        });
+        return await handleApiResponse(response);
+    },
+
+    /**
+     * Dislike a component comment
+     */
+    async dislikeComponentComment(componentId, commentId) {
+        const headers = await getAuthHeadersWithRefresh();
+        const response = await fetch(`${API_BASE_URL}/components/${componentId}/comments/${commentId}/dislike`, {
+            method: 'POST',
+            headers,
+        });
+        return await handleApiResponse(response);
+    },
+
+    /**
+     * Vote on comment (helpful/not helpful)
+     */
+    async voteComment(commentId, voteType) {
+        const headers = await getAuthHeadersWithRefresh();
+        const response = await fetch(`${API_BASE_URL}/comments/${commentId}/vote`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ vote_type: voteType }),
+        });
+        return await handleApiResponse(response);
+    },
+
+    /**
+     * Get comments for any item type
+     */
+    async getComments(itemId, itemType, params = {}) {
+        if (itemType === 'template') {
+            return this.getTemplateComments(itemId, params);
+        } else if (itemType === 'component') {
+            return this.getComponentComments(itemId, params);
+        } else {
+            throw new Error('Invalid item type');
+        }
+    },
+
+    /**
+     * Create comment for any item type
+     */
+    async createComment(itemId, itemType, commentData) {
+        if (itemType === 'template') {
+            return this.createTemplateComment(itemId, commentData);
+        } else if (itemType === 'component') {
+            return this.createComponentComment(itemId, commentData);
+        } else {
+            throw new Error('Invalid item type');
+        }
+    },
+
+    /**
+     * Update comment for any item type
+     */
+    async updateComment(commentId, commentData) {
+        // Try both template and component endpoints
+        try {
+            const headers = await getAuthHeadersWithRefresh();
+            const response = await fetch(`${API_BASE_URL}/comments/${commentId}`, {
+                method: 'PUT',
+                headers,
+                body: JSON.stringify(commentData),
+            });
+            return await handleApiResponse(response);
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    /**
+     * Delete comment for any item type
+     */
+    async deleteComment(commentId) {
+        try {
+            const headers = await getAuthHeadersWithRefresh();
+            const response = await fetch(`${API_BASE_URL}/comments/${commentId}`, {
+                method: 'DELETE',
+                headers,
+            });
+            return await handleApiResponse(response);
+        } catch (error) {
+            throw error;
+        }
+    },
+
     // ==================== SEARCH ====================
     
     /**

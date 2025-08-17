@@ -26,33 +26,7 @@ const RatingSection = ({ template, user = null }) => {
         ...template
     };
 
-    // Mock reviews data
-    const mockReviews = [
-        {
-            id: 1,
-            userName: 'Alice Johnson',
-            rating: 5,
-            comment: 'Excellent template! Very well structured and easy to customize. Saved me hours of work.',
-            date: '2024-01-15',
-            helpful: 12
-        },
-        {
-            id: 2,
-            userName: 'Bob Smith',
-            rating: 4,
-            comment: 'Good quality template. The code is clean and well documented. Minor issue with mobile responsiveness but overall great.',
-            date: '2024-01-12',
-            helpful: 8
-        },
-        {
-            id: 3,
-            userName: 'Carol Williams',
-            rating: 5,
-            comment: 'Amazing work! The design is modern and the animations are smooth. Highly recommended.',
-            date: '2024-01-10',
-            helpful: 15
-        }
-    ];
+    // No mock reviews - using real data from CommentSystem
 
     const renderStars = (rating, interactive = false, onStarClick = null, size = 'w-5 h-5') => {
         const stars = [];

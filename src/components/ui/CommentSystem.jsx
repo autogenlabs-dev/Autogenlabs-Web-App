@@ -1,10 +1,38 @@
 /**
  * Comment System Component
- * Handles comments and ratings for templates and components
+ * Handles comments and rating        try {
+            setSubmitting(true);
+            setError('');
+
+            const commentData = {
+                content: newComment.trim(),
+                rating: replyingTo ? null : newRating,
+                parent_comment_id: replyingTo?.id || null
+            };
+
+            let response;
+            if (itemType === 'template') {
+                response = await marketplaceApi.createTemplateComment(itemId, commentData);
+            } else if (itemType === 'component') {
+                response = await marketplaceApi.createComponentComment(itemId, commentData);
+            } else {
+                throw new Error('Invalid item type');
+            }
+
+            setNewComment('');
+            setNewRating(0);
+            setReplyingTo(null);
+            await loadComments();
+        } catch (err) {
+            console.error('Failed to submit comment:', err);
+            setError('Failed to submit comment. Please try again.');
+        } finally {
+            setSubmitting(false);
+        }components
  */
 
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Star, MessageSquare, Send, ThumbsUp, ThumbsDown, MoreVertical, Edit, Trash2, Reply, Flag } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { marketplaceApi } from '@/lib/marketplaceApi';
@@ -20,8 +48,28 @@ const CommentSystem = ({ itemId, itemType, itemTitle }) => {
     const [replyingTo, setReplyingTo] = useState(null);
     const [editingComment, setEditingComment] = useState(null);
     const [showAllComments, setShowAllComments] = useState(false);
+    const [expandedReplies, setExpandedReplies] = useState({}); // Track which comments have expanded replies
     
     const { user, isAuthenticated } = useAuth();
+    const commentFormRef = useRef(null);
+
+    // Scroll to comment form when replying
+    useEffect(() => {
+        if (replyingTo && commentFormRef.current) {
+            commentFormRef.current.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center' 
+            });
+        }
+    }, [replyingTo]);
+
+    // Toggle replies visibility
+    const toggleRepliesVisibility = (commentId) => {
+        setExpandedReplies(prev => ({
+            ...prev,
+            [commentId]: !prev[commentId]
+        }));
+    };
 
     useEffect(() => {
         loadComments();
@@ -30,7 +78,16 @@ const CommentSystem = ({ itemId, itemType, itemTitle }) => {
     const loadComments = async () => {
         try {
             setLoading(true);
-            const response = await marketplaceApi.getComments(itemId, itemType);
+            let response;
+            
+            if (itemType === 'template') {
+                response = await marketplaceApi.getTemplateComments(itemId);
+            } else if (itemType === 'component') {
+                response = await marketplaceApi.getComponentComments(itemId);
+            } else {
+                throw new Error('Invalid item type');
+            }
+            
             setComments(response.comments || []);
         } catch (err) {
             console.error('Failed to load comments:', err);
@@ -57,11 +114,20 @@ const CommentSystem = ({ itemId, itemType, itemTitle }) => {
             setSubmitting(true);
             setError('');
 
-            await marketplaceApi.addComment(itemId, itemType, {
+            const commentData = {
                 content: newComment.trim(),
-                rating: newRating,
-                parent_id: replyingTo?.id || null
-            });
+                rating: replyingTo ? null : newRating,
+                parent_comment_id: replyingTo?.id || null
+            };
+
+            let response;
+            if (itemType === 'template') {
+                response = await marketplaceApi.createTemplateComment(itemId, commentData);
+            } else if (itemType === 'component') {
+                response = await marketplaceApi.createComponentComment(itemId, commentData);
+            } else {
+                throw new Error('Invalid item type');
+            }
 
             setNewComment('');
             setNewRating(0);
@@ -77,7 +143,16 @@ const CommentSystem = ({ itemId, itemType, itemTitle }) => {
 
     const handleEditComment = async (commentId, newContent) => {
         try {
-            await marketplaceApi.updateComment(commentId, { content: newContent });
+            const updateData = { content: newContent };
+            
+            if (itemType === 'template') {
+                await marketplaceApi.updateTemplateComment(itemId, commentId, updateData);
+            } else if (itemType === 'component') {
+                await marketplaceApi.updateComponentComment(itemId, commentId, updateData);
+            } else {
+                throw new Error('Invalid item type');
+            }
+            
             setEditingComment(null);
             await loadComments();
         } catch (err) {
@@ -90,7 +165,14 @@ const CommentSystem = ({ itemId, itemType, itemTitle }) => {
         if (!confirm('Are you sure you want to delete this comment?')) return;
 
         try {
-            await marketplaceApi.deleteComment(commentId);
+            if (itemType === 'template') {
+                await marketplaceApi.deleteTemplateComment(itemId, commentId);
+            } else if (itemType === 'component') {
+                await marketplaceApi.deleteComponentComment(itemId, commentId);
+            } else {
+                throw new Error('Invalid item type');
+            }
+            
             await loadComments();
         } catch (err) {
             console.error('Failed to delete comment:', err);
@@ -99,16 +181,35 @@ const CommentSystem = ({ itemId, itemType, itemTitle }) => {
     };
 
     const handleVoteComment = async (commentId, voteType) => {
-        if (!isAuthenticated) {
-            setError('Please login to vote on comments');
-            return;
-        }
-
         try {
-            await marketplaceApi.voteComment(commentId, voteType);
-            await loadComments();
+            let response;
+            if (itemType === 'template') {
+                if (voteType === 'upvote') {
+                    response = await marketplaceApi.likeTemplateComment(itemId, commentId);
+                } else {
+                    response = await marketplaceApi.dislikeTemplateComment(itemId, commentId);
+                }
+            } else if (itemType === 'component') {
+                if (voteType === 'upvote') {
+                    response = await marketplaceApi.likeComponentComment(itemId, commentId);
+                } else {
+                    response = await marketplaceApi.dislikeComponentComment(itemId, commentId);
+                }
+            }
+            
+            // Update local state
+            setComments(prev => prev.map(comment => 
+                comment.id === commentId 
+                    ? { 
+                        ...comment, 
+                        helpful_votes: response.helpful_count,
+                        unhelpful_votes: response.unhelpful_count
+                    }
+                    : comment
+            ));
         } catch (err) {
             console.error('Failed to vote on comment:', err);
+            setError('Failed to vote on comment');
         }
     };
 
@@ -139,13 +240,13 @@ const CommentSystem = ({ itemId, itemType, itemTitle }) => {
                         {/* User Avatar */}
                         <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
                             <span className="text-white font-medium">
-                                {comment.user_name?.charAt(0)?.toUpperCase() || 'U'}
+                                {(comment.user?.username || comment.user_name)?.charAt(0)?.toUpperCase() || 'U'}
                             </span>
                         </div>
 
                         <div className="flex-1">
                             <div className="flex items-center space-x-2 mb-2">
-                                <h4 className="text-white font-medium">{comment.user_name || 'Anonymous'}</h4>
+                                <h4 className="text-white font-medium">{comment.user?.username || comment.user_name || 'Anonymous'}</h4>
                                 {comment.rating > 0 && (
                                     <div className="flex items-center">
                                         {[1, 2, 3, 4, 5].map((star) => (
@@ -197,14 +298,14 @@ const CommentSystem = ({ itemId, itemType, itemTitle }) => {
                                     className="flex items-center space-x-1 hover:text-green-400 transition-colors"
                                 >
                                     <ThumbsUp className="w-4 h-4" />
-                                    <span>{comment.upvotes || 0}</span>
+                                    <span>{comment.helpful_votes || 0}</span>
                                 </button>
                                 <button
                                     onClick={() => handleVoteComment(comment.id, 'downvote')}
                                     className="flex items-center space-x-1 hover:text-red-400 transition-colors"
                                 >
                                     <ThumbsDown className="w-4 h-4" />
-                                    <span>{comment.downvotes || 0}</span>
+                                    <span>{comment.unhelpful_votes || 0}</span>
                                 </button>
                                 {!isReply && (
                                     <button
@@ -212,7 +313,7 @@ const CommentSystem = ({ itemId, itemType, itemTitle }) => {
                                         className="flex items-center space-x-1 hover:text-blue-400 transition-colors"
                                     >
                                         <Reply className="w-4 h-4" />
-                                        <span>Reply</span>
+                                        <span>Reply ({comment.replies_count || 0})</span>
                                     </button>
                                 )}
                             </div>
@@ -259,9 +360,40 @@ const CommentSystem = ({ itemId, itemType, itemTitle }) => {
                 {/* Replies */}
                 {comment.replies && comment.replies.length > 0 && (
                     <div className="mt-4">
-                        {comment.replies.map((reply) => (
-                            <CommentItem key={reply.id} comment={reply} isReply={true} />
-                        ))}
+                        {/* Show first reply by default */}
+                        <CommentItem key={comment.replies[0].id} comment={comment.replies[0]} isReply={true} />
+                        
+                        {/* Show "View more" button if there are more than 1 reply */}
+                        {comment.replies.length > 1 && !expandedReplies[comment.id] && (
+                            <button
+                                onClick={() => toggleRepliesVisibility(comment.id)}
+                                className="mt-3 ml-12 text-blue-400 hover:text-blue-300 text-sm flex items-center space-x-1 transition-colors"
+                            >
+                                <span>View {comment.replies.length - 1} more {comment.replies.length - 1 === 1 ? 'reply' : 'replies'}</span>
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                        )}
+                        
+                        {/* Show remaining replies when expanded */}
+                        {comment.replies.length > 1 && expandedReplies[comment.id] && (
+                            <div className="space-y-0">
+                                {comment.replies.slice(1).map((reply) => (
+                                    <CommentItem key={reply.id} comment={reply} isReply={true} />
+                                ))}
+                                {/* Show "View less" button */}
+                                <button
+                                    onClick={() => toggleRepliesVisibility(comment.id)}
+                                    className="mt-3 ml-12 text-blue-400 hover:text-blue-300 text-sm flex items-center space-x-1 transition-colors"
+                                >
+                                    <span>View less</span>
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                                    </svg>
+                                </button>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
@@ -301,21 +433,27 @@ const CommentSystem = ({ itemId, itemType, itemTitle }) => {
 
             {/* Add Comment Form */}
             {isAuthenticated ? (
-                <form onSubmit={handleSubmitComment} className="mb-6">
+                <form ref={commentFormRef} onSubmit={handleSubmitComment} className="mb-6">
                     {replyingTo && (
-                        <div className="mb-3 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                        <div className="mb-3 p-4 bg-blue-500/20 border-2 border-blue-500/40 rounded-lg shadow-lg">
                             <div className="flex items-center justify-between">
-                                <span className="text-blue-400 text-sm">
-                                    Replying to {replyingTo.user_name}
-                                </span>
+                                <div className="flex items-center space-x-2">
+                                    <Reply className="w-4 h-4 text-blue-400" />
+                                    <span className="text-blue-300 font-medium">
+                                        Replying to {replyingTo.user?.name || replyingTo.user_name || 'Anonymous'}
+                                    </span>
+                                </div>
                                 <button
                                     type="button"
                                     onClick={() => setReplyingTo(null)}
-                                    className="text-gray-400 hover:text-white"
+                                    className="text-gray-400 hover:text-white bg-gray-700/50 hover:bg-gray-700 rounded p-1 transition-colors"
                                 >
                                     ×
                                 </button>
                             </div>
+                            <p className="text-gray-300 text-sm mt-2 italic">
+                                "{replyingTo.content || replyingTo.comment}"
+                            </p>
                         </div>
                     )}
 
@@ -353,13 +491,14 @@ const CommentSystem = ({ itemId, itemType, itemTitle }) => {
                         <textarea
                             value={newComment}
                             onChange={(e) => setNewComment(e.target.value)}
-                            placeholder={`Share your thoughts about this ${itemType}...`}
-                            className="w-full bg-white/10 border border-white/20 rounded-xl p-4 pr-12 text-white placeholder-gray-400 resize-none focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                            placeholder={replyingTo ? `Write your reply...` : `Share your thoughts about this ${itemType}...`}
+                            className={`w-full ${replyingTo ? 'bg-blue-500/10 border-blue-500/40' : 'bg-white/10 border-white/20'} rounded-xl p-4 pr-12 text-white placeholder-gray-400 resize-none focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20`}
                             rows="4"
                         />
                         <button
                             type="submit"
                             disabled={submitting || !newComment.trim()}
+                            title={replyingTo ? "Send Reply" : "Post Comment"}
                             className="absolute bottom-3 right-3 p-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
                         >
                             {submitting ? (
