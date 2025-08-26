@@ -544,7 +544,7 @@ const ComponentDetailPage = ({ componentId }) => {
                             <div className="border-t border-white/10 pt-6">
                                 <div className="text-center mb-6">
                                     <div className="text-2xl font-bold text-blue-400 mb-2">
-                                        {(component.planType === 'Premium' || component.plan_type === 'Premium') ? 'Premium' : 'Free'}
+                                        Free
                                     </div>
                                     <p className="text-gray-400">Component available for download</p>
                                 </div>

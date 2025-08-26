@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Grid3X3, List, Star, Download, Eye, Heart, Code, Filter, Trash2, Edit } from 'lucide-react';
+import { Search, Grid3X3, List, Star, Download, Eye, Heart, Code, Filter, Trash2, Edit, MessageSquare } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { marketplaceApi } from '@/lib/marketplaceApi';
@@ -547,7 +547,6 @@ const ComponentGallery = () => {
             >
               <option value="All" className="bg-gray-800">All Plans</option>
               <option value="Free" className="bg-gray-800">Free</option>
-              <option value="Premium" className="bg-gray-800">Premium</option>
             </select>
 
             {/* Sort Filter */}
@@ -693,9 +692,8 @@ const ComponentGallery = () => {
                     />
                   </div>
 
-                  {/* ONLY Preview and Icons - No Text */}
+                  {/* Action Icons for List View */}
                   <div className="flex-1 flex items-center justify-end">
-                    {/* Action Icons for List View */}
                     <div className="flex items-center gap-2">
                       {shouldShowEditDelete(component) ? (
                         /* Show Edit/Delete icons for authorized users */

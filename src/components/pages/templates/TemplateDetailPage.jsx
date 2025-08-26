@@ -382,7 +382,7 @@ const TemplateDetailPage = ({ templateId }) => {
                                 
                                 <div className="text-center mb-8">
                                     <div className="text-3xl font-bold text-blue-400 mb-3">
-                                        {(template.plan_type === 'Premium' || template.planType === 'Premium') ? 'Premium' : 'Free'}
+                                        Free
                                     </div>
                                     <p className="text-gray-400 text-lg">Template ready for download</p>
                                 </div>

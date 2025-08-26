@@ -157,8 +157,11 @@ export const templateApi = {
 
         const result = await handleApiResponse(response);
         
+        // Check if the response has nested template data
+        const templateData = result.template || result;
+        
         // Transform the response to ensure consistent format
-        const transformed = this.transformTemplateData(result);
+        const transformed = this.transformTemplateData(templateData);
         return transformed;
     },
 

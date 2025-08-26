@@ -39,7 +39,7 @@ const TemplateForm = ({ template = null, onSubmit, onCancel, isEditing = false }
     const componentTypes = ['React', 'Vue', 'Angular', 'HTML/CSS', 'Svelte', 'Flutter'];
     const languages = ['JavaScript', 'TypeScript', 'Python', 'Java', 'C++', 'Go', 'Rust'];
     const difficultyLevels = ['Easy', 'Medium', 'Tough'];
-    const planTypes = ['Free'];
+    const planTypes = ['Free']; // Only Free templates allowed
     const experienceLevels = ['1+ years', '2+ years', '3+ years', '4+ years', '5+ years', '6+ years', '7+ years', '8+ years', '9+ years', '10+ years'];
 
     // Initialize form with template data if editing
@@ -233,21 +233,8 @@ const TemplateForm = ({ template = null, onSubmit, onCancel, isEditing = false }
                         </select>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Plan Type
-                        </label>
-                        <select
-                            name="plan_type"
-                            value={formData.plan_type}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-                        >
-                            {planTypes.map(plan => (
-                                <option key={plan} value={plan}>{plan}</option>
-                            ))}
-                        </select>
-                    </div>
+                    {/* Hidden Plan Type - Always Free */}
+                    <input type="hidden" name="plan_type" value="Free" />
                 </div>
 
                 {/* Descriptions */}

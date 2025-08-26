@@ -1,7 +1,11 @@
 'use client';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Star, Eye, Download, IndianRupee, DollarSign, Clock, Code, User, Heart, MessageSquare } from 'lucide-react';
+import {                         {template.featured && (
+                            <div className="px-2 py-1 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 text-yellow-400 rounded-lg text-xs font-bold border border-yellow-500/30">
+                                Featured
+                            </div>
+                        )}ownload, IndianRupee, DollarSign, Clock, Code, User } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -225,14 +229,6 @@ const TemplateCard = ({ template, user = null, cardHeight = 450 }) => {
                     {/* Engagement Stats */}
                     <div className="flex items-center gap-4 mb-4 text-sm text-gray-400">
                         <div className="flex items-center gap-1">
-                            <Heart className="w-4 h-4" />
-                            <span>{template.likes || template.total_likes || 0}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                            <MessageSquare className="w-4 h-4" />
-                            <span>{template.comments_count || template.total_comments || 0}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
                             <Eye className="w-4 h-4" />
                             <span>{template.views || 0}</span>
                         </div>
@@ -249,24 +245,9 @@ const TemplateCard = ({ template, user = null, cardHeight = 450 }) => {
                         </div>
                     </div>
 
-                    {/* Pricing */}
+                    {/* Free Template */}
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            {template.planType === 'Paid' ? (
-                                <>
-                                    <div className="flex items-center gap-1">
-                                        <IndianRupee className="w-4 h-4 text-green-400" />
-                                        <span className="text-lg font-bold text-green-400">₹{template.pricingINR || template.pricing_inr || 0}</span>
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                        <DollarSign className="w-4 h-4 text-green-400" />
-                                        <span className="text-lg font-bold text-green-400">${template.pricingUSD || template.pricing_usd || 0}</span>
-                                    </div>
-                                </>
-                            ) : (
-                                <span className="text-lg font-bold text-green-400">Free</span>
-                            )}
-                        </div>
+                        <span className="text-lg font-bold text-green-400">Free</span>
 
                         {/* Available Status */}
                         {template.isAvailableForDev && (

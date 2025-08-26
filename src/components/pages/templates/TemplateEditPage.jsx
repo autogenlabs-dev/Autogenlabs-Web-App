@@ -471,62 +471,18 @@ const TemplateEditPage = ({ templateId }) => {
               
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Plan Type *
+                  Plan Type
                 </label>
                 <select
                   value={formData.planType}
                   onChange={(e) => handleInputChange('planType', e.target.value)}
                   className="w-full p-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:border-purple-500/50"
-                  required
                 >
-                  <option value="" className="bg-gray-800">Select Plan Type</option>
-                  {planTypes.map(plan => (
-                    <option key={plan} value={plan} className="bg-gray-800">
-                      {plan}
-                    </option>
-                  ))}
+                  <option value="Free" className="bg-gray-800">Free</option>
                 </select>
               </div>
 
-              {formData.planType === 'Premium' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Price (INR) *
-                    </label>
-                    <div className="relative">
-                      <IndianRupee className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                      <input
-                        type="number"
-                        value={formData.pricingINR}
-                        onChange={(e) => handleInputChange('pricingINR', e.target.value)}
-                        placeholder="999"
-                        min="0"
-                        className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500/50"
-                        required={formData.planType === 'Premium'}
-                      />
-                    </div>
-                  </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Price (USD) *
-                    </label>
-                    <div className="relative">
-                      <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                      <input
-                        type="number"
-                        value={formData.pricingUSD}
-                        onChange={(e) => handleInputChange('pricingUSD', e.target.value)}
-                        placeholder="12"
-                        min="0"
-                        className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500/50"
-                        required={formData.planType === 'Premium'}
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* Description */}

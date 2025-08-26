@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Grid3X3, List, Star, Download, Eye, Heart, Code, Trash2, Edit } from 'lucide-react';
+import { Search, Grid3X3, List, Star, Download, Eye, Code, Trash2, Edit } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { marketplaceApi } from '@/lib/marketplaceApi';
@@ -143,8 +143,7 @@ const TemplateGallery = () => {
       const matchesDifficulty = selectedDifficulty === 'All' || template.difficulty_level === selectedDifficulty;
       const matchesType = selectedType === 'All' || template.item_type === selectedType;
       const matchesPlan = selectedPlan === 'All' || 
-                         (selectedPlan === 'Free' && (template.plan_type === 'Free' || template.planType === 'Free')) ||
-                         (selectedPlan === 'Premium' && (template.plan_type === 'Premium' || template.planType === 'Premium'));
+                         (selectedPlan === 'Free' && (template.plan_type === 'Free' || template.planType === 'Free'));
 
       return matchesSearch && matchesCategory && matchesDifficulty && matchesType && matchesPlan;
     });
@@ -397,7 +396,6 @@ const TemplateGallery = () => {
             >
               <option value="All" className="bg-gray-800">All Plans</option>
               <option value="Free" className="bg-gray-800">Free</option>
-              <option value="Premium" className="bg-gray-800">Premium</option>
             </select>
 
             {/* Sort Filter */}
@@ -442,8 +440,8 @@ const TemplateGallery = () => {
           </div>
         </motion.div>
 
-        {/* Templates Layout - 2 CARDS PER ROW WITH LIVE PREVIEW */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Templates Layout - 2 LARGE CARDS PER ROW */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {filteredTemplates.map((template, index) => (
             <motion.div
               key={String(template.id || template._id)}
@@ -456,8 +454,8 @@ const TemplateGallery = () => {
             >
               <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden transition-all duration-500 hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:shadow-blue-500/10">
                 
-                {/* Template Image Preview */}
-                <div className="relative w-full h-48 bg-gradient-to-br from-gray-800 to-gray-900 overflow-hidden">
+                {/* Template Image Preview - Full Card */}
+                <div className="relative w-full h-80 bg-gradient-to-br from-gray-800 to-gray-900 overflow-hidden">
                   {template.preview_images && template.preview_images.length > 0 ? (
                     <Image
                       src={template.preview_images[0]}
@@ -480,19 +478,6 @@ const TemplateGallery = () => {
                   
                   {/* Dark overlay for better text visibility */}
                   <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-all duration-300"></div>
-                  
-                  {/* Price Badge - Top Left Corner - Only in main view */}
-                  {!showMyContent && (
-                    <div className="absolute top-3 left-3 z-10">
-                      <span className={`px-2 py-1 text-xs font-bold rounded-full shadow-lg ${
-                        (template.plan_type === 'Free' || template.planType === 'Free')
-                          ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-                          : 'bg-purple-500/20 text-purple-400 border-purple-500/30'
-                      }`}>
-                        {(template.plan_type === 'Free' || template.planType === 'Free') ? 'Free' : 'Premium'}
-                      </span>
-                    </div>
-                  )}
                   
                   {/* View Details Icon - Top Right Corner */}
                   {shouldShowEditDelete(template) ? (
@@ -542,21 +527,6 @@ const TemplateGallery = () => {
                       </div>
                     );
                   })()}
-                </div>
-
-                {/* Template Details */}
-                <div className="p-4">
-                  {showMyContent ? (
-                    /* My Templates - Show only title */
-                    <h3 className="text-lg font-semibold text-white group-hover:text-blue-400 transition-colors">
-                      {template.title}
-                    </h3>
-                  ) : (
-                    /* Main Templates - Show only title */
-                    <h3 className="text-lg font-semibold text-white group-hover:text-blue-400 transition-colors">
-                      {template.title}
-                    </h3>
-                  )}
                 </div>
               </div>
             </motion.div>

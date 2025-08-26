@@ -37,8 +37,6 @@ const TemplateUploadForm = ({ onSuccess, onCancel }) => {
         description: '',
         category: '',
         difficulty: '',
-        price_inr: '',
-        pricing_type: 'one_time', // 'one_time', 'subscription'
         tags: [],
         preview_images: [],
         template_files: null,

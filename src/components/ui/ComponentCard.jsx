@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Star, Eye, Download, IndianRupee, DollarSign, Clock, Code, User, Heart, MessageSquare, Play } from 'lucide-react';
+import { Star, Eye, Download, IndianRupee, DollarSign, Clock, Code, User, Play } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -112,13 +112,6 @@ const ComponentCard = ({ component, user = null, cardHeight = 450 }) => {
                                 Featured
                             </div>
                         )}
-                        {/* Plan Type Badge */}
-                        <div className={`px-2 py-1 rounded-lg text-xs font-bold ${component.planType === 'Free'
-                                ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                                : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                            }`}>
-                            {component.planType}
-                        </div>
                     </div>
                 </div>
 
@@ -227,20 +220,10 @@ const ComponentCard = ({ component, user = null, cardHeight = 450 }) => {
                     {/* Engagement Stats */}
                     <div className="flex items-center gap-4 mb-4 text-sm text-gray-400">
                         <div className="flex items-center gap-1">
-                            <Heart className="w-4 h-4" />
-                            <span>{component.likes || component.total_likes || 0}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                            <MessageSquare className="w-4 h-4" />
-                            <span>{component.comments_count || component.total_comments || 0}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
                             <Eye className="w-4 h-4" />
                             <span>{component.views || 0}</span>
                         </div>
-                    </div>
-
-                    {/* Tech & Difficulty */}
+                    </div>                    {/* Tech & Difficulty */}
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex flex-col gap-1">
                             <span className="text-xs text-gray-500">Technology</span>
@@ -251,24 +234,9 @@ const ComponentCard = ({ component, user = null, cardHeight = 450 }) => {
                         </div>
                     </div>
 
-                    {/* Pricing */}
+                    {/* Free Component */}
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            {component.planType === 'Paid' ? (
-                                <>
-                                    <div className="flex items-center gap-1">
-                                        <IndianRupee className="w-4 h-4 text-green-400" />
-                                        <span className="text-lg font-bold text-green-400">₹{component.pricingINR}</span>
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                        <DollarSign className="w-4 h-4 text-green-400" />
-                                        <span className="text-lg font-bold text-green-400">${component.pricingUSD}</span>
-                                    </div>
-                                </>
-                            ) : (
-                                <span className="text-lg font-bold text-green-400">Free</span>
-                            )}
-                        </div>
+                        <span className="text-lg font-bold text-green-400">Free</span>
 
                         {/* Developer Availability */}
                         {component.isAvailableForDev && (
