@@ -11,21 +11,29 @@ const CodeViewerModal = ({ isOpen, onClose, component }) => {
   const componentCode = component.code || '';
   const componentTitle = component.title || 'Component';
   
-  // Check if this is a CSS technology component with JSON code
-  let isJsonCode = false;
+  // Check if this is code object (new format) or JSON string (old format)
+  let isObjectCode = false;
   let htmlCode = '';
   let cssCode = '';
   
-  try {
-    const parsedCode = JSON.parse(componentCode);
-    if (parsedCode.html && parsedCode.css) {
-      isJsonCode = true;
-      htmlCode = parsedCode.html;
-      cssCode = parsedCode.css;
+  if (typeof componentCode === 'object' && componentCode !== null) {
+    // New format: code is already an object
+    isObjectCode = true;
+    htmlCode = componentCode.html || '';
+    cssCode = componentCode.css || '';
+  } else {
+    // Old format: try to parse as JSON
+    try {
+      const parsedCode = JSON.parse(componentCode);
+      if (parsedCode.html && parsedCode.css) {
+        isObjectCode = true;
+        htmlCode = parsedCode.html;
+        cssCode = parsedCode.css;
+      }
+    } catch (e) {
+      // Not JSON, use as single code
+      isObjectCode = false;
     }
-  } catch (e) {
-    // Not JSON, use as single code
-    isJsonCode = false;
   }
 
   const isCSSComponent = component.technology === 'css' || component.language?.toLowerCase().includes('css');
@@ -64,7 +72,7 @@ const CodeViewerModal = ({ isOpen, onClose, component }) => {
 
           {/* Code Editor */}
           <div className="p-6">
-            {isCSSComponent && isJsonCode ? (
+            {isCSSComponent && isObjectCode ? (
               // Show dual editor for CSS components
               <DualCodeEditor
                 initialHtmlCode={htmlCode}
@@ -79,7 +87,7 @@ const CodeViewerModal = ({ isOpen, onClose, component }) => {
             ) : (
               // Show single editor for other components
               <CodeEditor
-                initialCode={componentCode}
+                initialCode={typeof componentCode === 'object' ? JSON.stringify(componentCode, null, 2) : componentCode}
                 language={component.language?.toLowerCase().includes('html') ? 'html' : 
                          component.language?.toLowerCase().includes('css') ? 'css' : 'html'}
                 showPreview={true}

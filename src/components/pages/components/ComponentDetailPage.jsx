@@ -1,14 +1,13 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Star, Eye, Download, Clock, Code, User, Globe, Github, Heart, ExternalLink, ChevronLeft, ChevronRight, Layers } from 'lucide-react';
+import { ArrowLeft, Star, Eye, Download, Clock, Code, User, Globe, Github, Heart, ExternalLink, ChevronLeft, ChevronRight, Layers, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { mockUser } from '@/lib/componentData';
 import { componentApi } from '@/lib/componentApi';
 import { marketplaceApi } from '@/lib/marketplaceApi';
 import { useAuth } from '@/contexts/AuthContext';
-import SafeRatingSection from '@/components/ui/SafeRatingSection';
 import CodeViewerModal from '@/components/ui/CodeViewerModal';
 import LiveComponentPreview from '@/components/ui/LiveComponentPreview';
 import CommentSystem from '@/components/ui/CommentSystem';
@@ -38,6 +37,9 @@ const ComponentDetailPage = ({ componentId }) => {
             setLoading(true);
             setError(null);
             const component = await componentApi.getComponent(componentId);
+            console.log('Component data loaded:', component);
+            console.log('Component likes:', component.likes, 'total_likes:', component.total_likes);
+            console.log('Component comments_count:', component.comments_count, 'total_comments:', component.total_comments);
            
             setComponent(component);
             setIsLiked(component.liked || false);
@@ -56,20 +58,38 @@ const ComponentDetailPage = ({ componentId }) => {
             return;
         }
 
+        // Store original values for potential rollback
+        const originalLiked = isLiked;
+        const originalCount = likeCount;
+
         try {
+            // Optimistic update
+            setIsLiked(!isLiked);
+            setLikeCount(prev => isLiked ? prev - 1 : prev + 1);
+            
             const response = await marketplaceApi.toggleComponentLike(componentId);
+            console.log('Like response:', response); // Debug log
+            
+            // Update with server response (in case of any discrepancy)
             setIsLiked(response.liked);
             setLikeCount(response.total_likes);
+            
+            // Update the component object as well
+            setComponent(prev => ({
+                ...prev,
+                liked: response.liked,
+                likes: response.total_likes,
+                total_likes: response.total_likes
+            }));
         } catch (error) {
             console.error('Failed to toggle like:', error);
+            // Revert optimistic update
+            setIsLiked(originalLiked);
+            setLikeCount(originalCount);
             alert('Failed to update like status');
         }
     };
 
-    const handleDownload = () => {
-        alert('Component download started!');
-        // Add actual download logic here
-    };
 
     if (!mounted) {
         return (
@@ -207,6 +227,8 @@ const ComponentDetailPage = ({ componentId }) => {
                                     ? 'bg-red-500/20 text-red-400 border border-red-500/30' 
                                     : 'bg-white/10 text-gray-400 border border-white/20 hover:bg-white/15'
                             }`}
+                            aria-label={`${isLiked ? 'Unlike' : 'Like'} this component (${likeCount} likes)`}
+                            title={`${isLiked ? 'Unlike' : 'Like'} this component (${likeCount} likes)`}
                         >
                             <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
                         </button>
@@ -449,12 +471,6 @@ const ComponentDetailPage = ({ componentId }) => {
                                 </div>
                             </div>
                         </motion.div>
-
-                        {/* Rating Section */}
-                        <SafeRatingSection
-                            template={component}
-                            user={authUser}
-                        />
                     </div>
 
                     {/* Right Side - Component Info & Purchase */}
@@ -489,20 +505,27 @@ const ComponentDetailPage = ({ componentId }) => {
                             </div>
 
                             {/* Stats */}
-                            <div className="grid grid-cols-2 gap-4 mb-6">
+                            <div className="grid grid-cols-3 gap-3 mb-6">
+                                <div className="text-center p-3 bg-white/5 rounded-lg border border-white/10">
+                                    <div className="flex items-center justify-center gap-2 text-gray-400 mb-1">
+                                        <Heart className="w-4 h-4" />
+                                        <span className="text-sm">Likes</span>
+                                    </div>
+                                    <div className="text-white font-semibold">{component.likes || component.total_likes || 0}</div>
+                                </div>
+                                <div className="text-center p-3 bg-white/5 rounded-lg border border-white/10">
+                                    <div className="flex items-center justify-center gap-2 text-gray-400 mb-1">
+                                        <MessageCircle className="w-4 h-4" />
+                                        <span className="text-sm">Comments</span>
+                                    </div>
+                                    <div className="text-white font-semibold">{component.comments_count || component.total_comments || 0}</div>
+                                </div>
                                 <div className="text-center p-3 bg-white/5 rounded-lg border border-white/10">
                                     <div className="flex items-center justify-center gap-2 text-gray-400 mb-1">
                                         <Eye className="w-4 h-4" />
                                         <span className="text-sm">Views</span>
                                     </div>
-                                    <div className="text-white font-semibold">{component.views}</div>
-                                </div>
-                                <div className="text-center p-3 bg-white/5 rounded-lg border border-white/10">
-                                    <div className="flex items-center justify-center gap-2 text-gray-400 mb-1">
-                                        <Download className="w-4 h-4" />
-                                        <span className="text-sm">Downloads</span>
-                                    </div>
-                                    <div className="text-white font-semibold">{component.downloads}</div>
+                                    <div className="text-white font-semibold">{component.views || 0}</div>
                                 </div>
                             </div>
 
@@ -540,23 +563,28 @@ const ComponentDetailPage = ({ componentId }) => {
                                 </div>
                             </div>
 
-                            {/* Download Section */}
+                            {/* Extension Download Section */}
                             <div className="border-t border-white/10 pt-6">
                                 <div className="text-center mb-6">
                                     <div className="text-2xl font-bold text-blue-400 mb-2">
                                         Free
                                     </div>
-                                    <p className="text-gray-400">Component available for download</p>
+                                    <p className="text-gray-400">Download this component with our VS Code extension</p>
                                 </div>
 
-                                {/* Download Button */}
-                                <button
-                                    onClick={handleDownload}
+                                {/* Extension Download Button */}
+                                <motion.button
                                     className="w-full py-3 px-6 rounded-xl font-semibold transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:shadow-lg hover:shadow-blue-500/25"
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => window.open(
+                                        'https://marketplace.visualstudio.com/items?itemName=AutoGenCodeBuilder.auto-gen-code-builder',
+                                        '_blank'
+                                    )}
                                 >
-                                    <Download className="w-5 h-5" />
-                                    Download Component
-                                </button>
+                                    <Code className="w-5 h-5" />
+                                    Get VS Code Extension
+                                </motion.button>
                             </div>
                         </motion.div>
                     </div>

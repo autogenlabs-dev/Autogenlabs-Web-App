@@ -313,7 +313,7 @@ export default function Hero() {
             </span> */}
             {/* Line 2 (same color) */}
             <span className="block mt-2 text-[36px] sm:text-[44px] md:text-[52px] xl:text-[56px] font-semibold text-neutral-100 drop-shadow-[0_0_8px_rgba(255,255,255,0.18)] whitespace-nowrap max-w-full">
-              Let <span className="brand-highlight font-semibold">AutoGen</span> do the coding magic.
+              Let's <span className="brand-highlight font-semibold">Build</span> a website without coding.
             </span>
           </motion.h1>
 

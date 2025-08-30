@@ -319,10 +319,10 @@ const CreateComponentForm = () => {
             setCssCode(template.css || '');
             setFormData(prev => ({ 
                 ...prev, 
-                code: JSON.stringify({
+                code: {
                     html: template.html || '',
                     css: template.css || ''
-                })
+                }
             }));
         } else {
             // For other technologies, use single code editor
@@ -349,10 +349,10 @@ const CreateComponentForm = () => {
         setHtmlCode(newHtmlCode);
         setFormData(prev => ({ 
             ...prev, 
-            code: JSON.stringify({
+            code: {
                 html: newHtmlCode,
                 css: cssCode
-            })
+            }
         }));
     };
 
@@ -360,10 +360,10 @@ const CreateComponentForm = () => {
         setCssCode(newCssCode);
         setFormData(prev => ({ 
             ...prev, 
-            code: JSON.stringify({
+            code: {
                 html: htmlCode,
                 css: newCssCode
-            })
+            }
         }));
     };
 
@@ -740,7 +740,7 @@ const CreateComponentForm = () => {
             const completeData = {
                 ...formData,
                 category: getCategoryFromType(selectedType?.id),
-                code: selectedTech?.id === 'css' ? JSON.stringify({ html: htmlCode, css: cssCode }) : code.trim(),
+                code: selectedTech?.id === 'css' ? { html: htmlCode, css: cssCode } : code.trim(),
                 componentType: selectedType?.id,
                 technology: selectedTech?.id,
                 previewImages: previewImage ? [previewImage] : []

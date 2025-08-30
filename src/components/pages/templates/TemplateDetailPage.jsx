@@ -1,13 +1,12 @@
 'use client';
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Star, Eye, Download, Clock, Code, User, Globe, Github, Play, Heart, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Star, Eye, Download, Clock, Code, User, Globe, Github, Play, Heart, ExternalLink, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import { generateMultipleScreenshots, getBestPreviewImage } from '@/utils/livePreviewUtils';
 import { useTemplate } from '@/contexts/TemplateContext';
-import SafeRatingSection from '@/components/ui/SafeRatingSection';
 import ComponentErrorBoundary from '@/components/ui/ComponentErrorBoundary';
 import CommentSystem from '@/components/ui/CommentSystem';
 
@@ -103,6 +102,7 @@ const TemplateDetailPage = ({ templateId }) => {
             
             try {
                 const templateData = await getTemplateById(templateId);
+                console.log('📄 Template data received:', templateData); // Debug log
                 
                 if (!isCancelled) {
                     if (templateData && templateData.id) {
@@ -110,6 +110,9 @@ const TemplateDetailPage = ({ templateId }) => {
                         setIsLiked(templateData.liked || false);
                         setLikeCount(templateData.likes || templateData.total_likes || 0);
                         setError(null);
+                        console.log('💖 Like status set:', templateData.liked);
+                        console.log('🔢 Like count set:', templateData.likes || templateData.total_likes || 0);
+                        console.log('💬 Comments count:', templateData.comments_count || templateData.total_comments || 0);
                     } else {
                         setTemplate(null);
                         setError('Template not found');
@@ -206,11 +209,6 @@ const TemplateDetailPage = ({ templateId }) => {
         }
     };
 
-    const handleDownload = () => {
-        alert('Template download started!');
-        // Add actual download logic here
-    };
-
     const handleRatingSubmit = (rating) => {
         setUserRating(rating);
         alert(`Thank you for rating this template ${rating} stars!`);
@@ -222,12 +220,34 @@ const TemplateDetailPage = ({ templateId }) => {
             return;
         }
 
+        // Store original values for potential rollback
+        const originalLiked = isLiked;
+        const originalCount = likeCount;
+
         try {
+            // Optimistic update
+            setIsLiked(!isLiked);
+            setLikeCount(prev => isLiked ? prev - 1 : prev + 1);
+            
             const response = await toggleTemplateLike(templateId);
-            setIsLiked(response.liked);  // Changed from user_has_liked to liked
+            console.log('Like response:', response); // Debug log
+            
+            // Update with server response (in case of any discrepancy)
+            setIsLiked(response.liked);
             setLikeCount(response.total_likes);
+            
+            // Update the template object as well
+            setTemplate(prev => ({
+                ...prev,
+                liked: response.liked,
+                likes: response.total_likes,
+                total_likes: response.total_likes
+            }));
         } catch (error) {
             console.error('Failed to toggle like:', error);
+            // Revert optimistic update
+            setIsLiked(originalLiked);
+            setLikeCount(originalCount);
             alert('Failed to update like status');
         }
     };
@@ -254,6 +274,8 @@ const TemplateDetailPage = ({ templateId }) => {
                                     ? 'bg-red-500/20 text-red-400 border border-red-500/30'
                                     : 'bg-white/10 text-gray-400 border border-white/20 hover:bg-white/15'
                                 }`}
+                            aria-label={`${isLiked ? 'Unlike' : 'Like'} this template (${likeCount} likes)`}
+                            title={`${isLiked ? 'Unlike' : 'Like'} this template (${likeCount} likes)`}
                         >
                             <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
                         </button>
@@ -357,44 +379,48 @@ const TemplateDetailPage = ({ templateId }) => {
                                 </div>
                             </div>
 
-                            {/* Rating Section */}
-                            <div className="flex items-center gap-6">
-                                <div className="flex items-center gap-3">
-                                    <div className="flex items-center gap-1">
-                                        {renderStars(template.rating || 0)}
-                                    </div>
-                                    <span className="text-2xl font-bold text-white">{template.rating || 0}</span>
-                                </div>
-                                <div className="text-gray-400">
-                                    <span className="text-lg">({template.total_ratings || template.totalRatings || 0} reviews)</span>
+                            {/* Stats */}
+                            <div className="flex flex-wrap items-center gap-6 mb-8">
+                                <div className="flex items-center gap-2 text-gray-400">
+                                    <Heart className="w-5 h-5" />
+                                    <span>{template.likes || template.total_likes || 0} likes</span>
                                 </div>
                                 <div className="flex items-center gap-2 text-gray-400">
-                                    <Download className="w-5 h-5" />
-                                    <span>{template.downloads || 0} downloads</span>
+                                    <MessageCircle className="w-5 h-5" />
+                                    <span>{template.comments_count || template.total_comments || 0} comments</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-gray-400">
+                                    <Eye className="w-5 h-5" />
+                                    <span>{template.views || 0} views</span>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Right - Download Card */}
+                        {/* Right - Extension Download Card */}
                         <div className="lg:w-80">
                             <div className="bg-gradient-to-br from-purple-500/10 to-cyan-500/10 border border-purple-500/20 rounded-2xl p-8 sticky top-24">
-                                <h3 className="text-2xl font-bold mb-6 text-center">Download Template</h3>
+                                <h3 className="text-2xl font-bold mb-6 text-center">Get AutoGen Extension</h3>
                                 
                                 <div className="text-center mb-8">
                                     <div className="text-3xl font-bold text-blue-400 mb-3">
                                         Free
                                     </div>
-                                    <p className="text-gray-400 text-lg">Template ready for download</p>
+                                    <p className="text-gray-400 text-lg">Download this template with our VS Code extension</p>
                                 </div>
 
-                                {/* Download Button */}
-                                <button
-                                    onClick={handleDownload}
+                                {/* Extension Download Button */}
+                                <motion.button
                                     className="w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl flex items-center justify-center gap-3 bg-gradient-to-r from-purple-500 to-cyan-500 text-white shadow-lg shadow-purple-500/25"
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => window.open(
+                                        'https://marketplace.visualstudio.com/items?itemName=AutoGenCodeBuilder.auto-gen-code-builder',
+                                        '_blank'
+                                    )}
                                 >
-                                    <Download className="w-6 h-6" />
-                                    Download Template
-                                </button>
+                                    <Code className="w-6 h-6" />
+                                    Get VS Code Extension
+                                </motion.button>
 
                                 {/* Action Buttons */}
                                 <div className="flex gap-3 mt-6">
@@ -480,11 +506,6 @@ const TemplateDetailPage = ({ templateId }) => {
                             </p>
                         </div>
                     </div>
-                </div>
-
-                {/* Rating Section */}
-                <div className="mt-16">
-                    <SafeRatingSection template={template} user={user} />
                 </div>
 
                 {/* Comments Section */}

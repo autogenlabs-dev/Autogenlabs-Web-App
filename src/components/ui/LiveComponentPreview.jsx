@@ -38,9 +38,14 @@ const LiveComponentPreview = ({
       let htmlContent = '';
       let cssContent = '';
 
-      // Check if code is JSON format (HTML + CSS)
-      if (component.language?.toLowerCase() === 'css' || 
+      // Check if code is already an object (new format) or string (old format)
+      if (typeof codeContent === 'object' && codeContent !== null) {
+        // New format: code is already an object with html and css properties
+        htmlContent = codeContent.html || '';
+        cssContent = codeContent.css || '';
+      } else if (component.language?.toLowerCase() === 'css' || 
           component.language?.toLowerCase() === 'html/css') {
+        // Old format: check if code is JSON string (HTML + CSS)
         try {
           const parsedCode = JSON.parse(codeContent);
           if (parsedCode.html && parsedCode.css) {

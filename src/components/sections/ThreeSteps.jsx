@@ -6,24 +6,24 @@ export default function ThreeSteps() {
   const steps = [
     {
       id: 1,
-      title: "Install latest version of Visual Studio 2022",
-      description: "GitHub Copilot's latest experience is integrated into Visual Studio and combines the capabilities of GitHub Copilot's code completion and GitHub Copilot Chat into one convenient package. Download the latest Visual Studio 2022 to discover the new features and improvements.",
+      title: "Install Visual Studio 2022 – Build Smarter, Code Faster",
+      description: "Unlock the power of Visual Studio 2022 with built-in GitHub Copilot support. From AI code generator to AI coding assistant, get intelligent tools that simplify workflows and help developers code with speed and confidence.",
       buttonText: "Download",
       hasDropdown: true,
       image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&h=250&fit=crop"
     },
     {
       id: 2,
-      title: "Start using Copilot for free",
-      description: "GitHub Copilot is free to use in Visual Studio, with limited access to select Copilot features. No trial. No credit card required. Just your GitHub account.",
+      title: "Codemurf Brings You Free Copilot Access",
+      description: "Get Copilot in Visual Studio at no cost. Explore its code automation tool features with support from Codemurf, no trial, no credit card, only smarter coding.",
       buttonText: "Get Started",
       hasDropdown: false,
       image: "https://images.unsplash.com/photo-1556075798-4825dfaaf498?w=400&h=250&fit=crop"
     },
     {
       id: 3,
-      title: "Sign in with your GitHub account",
-      description: "To enable GitHub Copilot, ensure you have added your GitHub account to Visual Studio. For more information, see Work with GitHub accounts in Visual Studio in the Microsoft documentation.",
+      title: "Enable Copilot with Your GitHub Account",
+      description: "Add your GitHub account in Visual Studio to unlock Copilot. With Codemurf, you can turn it into an AI code generator and auto code builder for smarter development.",
       buttonText: "Learn more",
       hasDropdown: false,
       image: "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=400&h=250&fit=crop"

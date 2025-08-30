@@ -299,6 +299,10 @@ export const TemplateProvider = ({ children }) => {
       setError(null);
       
       const response = await templateApi.getTemplate(templateId);
+      console.log('🎯 Template API Response:', response);
+      console.log('💖 Likes from API:', response.likes, response.total_likes);
+      console.log('💬 Comments from API:', response.comments_count, response.total_comments);
+      console.log('👀 Views from API:', response.views);
       
       return response;
     } catch (err) {
