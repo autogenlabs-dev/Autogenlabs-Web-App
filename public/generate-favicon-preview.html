@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate Favicon</title>
+</head>
+<body>
+    <canvas id="canvas" width="32" height="32" style="border: 1px solid #ccc;"></canvas>
+    <canvas id="canvas16" width="16" height="16" style="border: 1px solid #ccc; margin-left: 10px;"></canvas>
+    
+    <script>
+        // 32x32 version
+        const canvas32 = document.getElementById('canvas');
+        const ctx32 = canvas32.getContext('2d');
+        
+        // Clear and set black background
+        ctx32.fillStyle = '#000000';
+        ctx32.fillRect(0, 0, 32, 32);
+        
+        // Draw white dots in a diamond pattern
+        ctx32.fillStyle = '#FFFFFF';
+        
+        // Top dot
+        ctx32.beginPath();
+        ctx32.arc(16, 8, 3.5, 0, 2 * Math.PI);
+        ctx32.fill();
+        
+        // Left dot
+        ctx32.beginPath();
+        ctx32.arc(8, 16, 3.5, 0, 2 * Math.PI);
+        ctx32.fill();
+        
+        // Bottom dot
+        ctx32.beginPath();
+        ctx32.arc(16, 24, 3.5, 0, 2 * Math.PI);
+        ctx32.fill();
+        
+        // Right dot
+        ctx32.beginPath();
+        ctx32.arc(24, 16, 3.5, 0, 2 * Math.PI);
+        ctx32.fill();
+        
+        // 16x16 version
+        const canvas16 = document.getElementById('canvas16');
+        const ctx16 = canvas16.getContext('2d');
+        
+        // Clear and set black background
+        ctx16.fillStyle = '#000000';
+        ctx16.fillRect(0, 0, 16, 16);
+        
+        // Draw white dots in a diamond pattern
+        ctx16.fillStyle = '#FFFFFF';
+        
+        // Top dot
+        ctx16.beginPath();
+        ctx16.arc(8, 4, 2, 0, 2 * Math.PI);
+        ctx16.fill();
+        
+        // Left dot
+        ctx16.beginPath();
+        ctx16.arc(4, 8, 2, 0, 2 * Math.PI);
+        ctx16.fill();
+        
+        // Bottom dot
+        ctx16.beginPath();
+        ctx16.arc(8, 12, 2, 0, 2 * Math.PI);
+        ctx16.fill();
+        
+        // Right dot
+        ctx16.beginPath();
+        ctx16.arc(12, 8, 2, 0, 2 * Math.PI);
+        ctx16.fill();
+        
+        // Convert to data URLs
+        const dataURL32 = canvas32.toDataURL('image/png');
+        const dataURL16 = canvas16.toDataURL('image/png');
+        
+        console.log('32x32 Favicon data URL:', dataURL32);
+        console.log('16x16 Favicon data URL:', dataURL16);
+        
+        // Create download links
+        const link32 = document.createElement('a');
+        link32.download = 'favicon-32x32.png';
+        link32.href = dataURL32;
+        link32.textContent = 'Download 32x32 Favicon';
+        document.body.appendChild(link32);
+        
+        const br = document.createElement('br');
+        document.body.appendChild(br);
+        
+        const link16 = document.createElement('a');
+        link16.download = 'favicon-16x16.png';
+        link16.href = dataURL16;
+        link16.textContent = 'Download 16x16 Favicon';
+        document.body.appendChild(link16);
+    </script>
+</body>
+</html>

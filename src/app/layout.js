@@ -69,9 +69,15 @@ export const metadata = {
     },
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: [
+      { url: '/favicon.ico', sizes: '16x16', type: 'image/x-icon' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon-48x48.svg', sizes: '48x48', type: 'image/svg+xml' },
+    ],
     shortcut: '/favicon.ico',
-    apple: '/apple-touch-icon.png',
+    apple: [
+      { url: '/apple-touch-icon.svg', sizes: '180x180', type: 'image/svg+xml' },
+    ],
   },
   manifest: '/site.webmanifest',
 };
@@ -79,6 +85,31 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        {/* Standard favicon */}
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        
+        {/* SVG favicon for modern browsers */}
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        
+        {/* Different sizes for various use cases */}
+        <link rel="icon" type="image/svg+xml" sizes="16x16" href="/favicon-16x16.svg" />
+        <link rel="icon" type="image/svg+xml" sizes="32x32" href="/favicon.svg" />
+        <link rel="icon" type="image/svg+xml" sizes="48x48" href="/favicon-48x48.svg" />
+        
+        {/* Apple touch icon */}
+        <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
+        
+        {/* Web app manifest */}
+        <link rel="manifest" href="/site.webmanifest" />
+        
+        {/* Theme color for browser UI */}
+        <meta name="theme-color" content="#000000" />
+        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" />
+        <meta name="msapplication-TileColor" content="#000000" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
