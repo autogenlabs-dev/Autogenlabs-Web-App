@@ -399,7 +399,7 @@ const TemplateDetailPage = ({ templateId }) => {
                         {/* Right - Extension Download Card */}
                         <div className="lg:w-80">
                             <div className="bg-gradient-to-br from-purple-500/10 to-cyan-500/10 border border-purple-500/20 rounded-2xl p-8 sticky top-24">
-                                <h3 className="text-2xl font-bold mb-6 text-center">Get AutoGen Extension</h3>
+                                <h3 className="text-2xl font-bold mb-6 text-center">Get Codemurf Extension</h3>
                                 
                                 <div className="text-center mb-8">
                                     <div className="text-3xl font-bold text-blue-400 mb-3">

@@ -125,7 +125,7 @@ export default function TipOne() {
           viewport={{ once: false }}
         >
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            5 AutoGen Labs tips and tricks
+            5 Codemurf tips and tricks
           </h2>
         </motion.div>
 
@@ -148,7 +148,7 @@ export default function TipOne() {
 
               </h3>
               <p className="text-gray-300 text-lg leading-relaxed mb-8">
-              AutoGen is a coding assistant powered by Artificial Intelligence (AI), which can run in various environments and help you be more efficient in your daily coding tasks. In this new series of content, we will show you how AutoGen works in Visual Studio specifically and how it helps you being more productive.
+              Codemurf is a coding assistant powered by Artificial Intelligence (AI), which can run in various environments and help you be more efficient in your daily coding tasks. In this new series of content, we will show you how Codemurf works in Visual Studio specifically and how it helps you being more productive.
               </p>
               
               {/* Link */}
@@ -206,10 +206,10 @@ export default function TipOne() {
               {/* Video Info Overlay */}
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
                 <h4 className="text-white font-bold text-lg mb-2">
-                  Comments as prompts in AutoGen Labs for Visual Studio
+                  Comments as prompts in Codemurf for Visual Studio
                 </h4>
                 <p className="text-gray-300 text-sm">
-                  AutoGen Labs for Visual Studio 2022
+                  Codemurf for Visual Studio 2022
                 </p>
               </div>
               

@@ -221,7 +221,7 @@ export default function CareersPage() {
             transition={{ duration: 0.6 }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">Why Join AutoGen?</h2>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">Why Join Codemurf?</h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
               We offer comprehensive benefits and perks designed to support your career growth, 
               well-being, and work-life balance.
@@ -351,7 +351,7 @@ export default function CareersPage() {
               you&apos;d like to contribute to the future of software development.
             </p>
             <Link 
-              href="mailto:careers@autogenlabs.com"
+              href="mailto:careers@codemurf.com"
               className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 hover:scale-105 inline-flex items-center gap-2"
             >
               Contact Our Team <ArrowRight className="w-5 h-5" />

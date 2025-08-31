@@ -153,10 +153,10 @@ export default function TipFour() {
               {/* Video Info Overlay */}
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
                 <h4 className="text-white font-bold text-lg mb-2">
-                  Visual Studio prompt engineering with AutoGen Labs
+                  Visual Studio prompt engineering with Codemurf
                 </h4>
                 <p className="text-gray-300 text-sm">
-                  AutoGen Labs for Visual Studio 2022
+                  Codemurf for Visual Studio 2022
                 </p>
               </div>
               
@@ -190,7 +190,7 @@ export default function TipFour() {
                 Inline Chat
               </h3>
               <p className="text-gray-300 text-lg leading-relaxed mb-8">
-              Use Inline Chat will help you write your methods, classes, unit tests by converting your prompts to code. Open Inline by right-clicking in your text file and selecting “Ask Autogen” or Alt + /`
+              Use Inline Chat will help you write your methods, classes, unit tests by converting your prompts to code. Open Inline by right-clicking in your text file and selecting “Ask Codemurf” or Alt + /`
 <br/>Tip: Use”/” to state your intent or “#” to refer to your files(s). Like “/test for #filename”
               </p>
               

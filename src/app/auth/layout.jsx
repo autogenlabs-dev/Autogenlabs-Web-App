@@ -12,8 +12,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-    title: "Sign In | AutoGen Labs",
-    description: "Sign in to your AutoGen Labs account",
+    title: "Sign In | Codemurf",
+    description: "Sign in to your Codemurf account",
 };
 
 export default function AuthLayout({ children }) {

@@ -72,7 +72,7 @@ const ContactSection = () => {
     {
       icon: Mail,
       title: 'Email Us',
-      details: ['hello@autogenlabs.com', 'support@autogenlabs.com'],
+      details: ['hello@codemurf.com', 'support@codemurf.com'],
       description: 'Get in touch with our team'
     },
     {

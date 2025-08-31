@@ -21,7 +21,7 @@ export default function PartnershipsPage() {
     {
       icon: <Users className="w-8 h-8" />,
       title: "Channel Partners",
-      description: "Expand your portfolio by reselling AutoGen solutions to your customers.",
+      description: "Expand your portfolio by reselling Codemurf solutions to your customers.",
       benefits: ["Revenue sharing", "Sales enablement", "Marketing support", "Dedicated partner manager"],
       ideal: "System integrators, consultancies, agencies"
     },
@@ -80,7 +80,7 @@ export default function PartnershipsPage() {
       role: "VP of Partnerships",
       company: "DevTools Inc.",
       image: "/testimonials/sarah-chen.jpg",
-      quote: "Partnering with AutoGen has transformed our development workflow. The AI capabilities have reduced our development time by 40% and improved code quality significantly.",
+      quote: "Partnering with Codemurf has transformed our development workflow. The AI capabilities have reduced our development time by 40% and improved code quality significantly.",
       rating: 5
     },
     {
@@ -96,7 +96,7 @@ export default function PartnershipsPage() {
       role: "Partner Manager",
       company: "Enterprise Systems",
       image: "/testimonials/emily-johnson.jpg",
-      quote: "AutoGen's enterprise partnership program has opened new market opportunities for us. The joint go-to-market strategy has been incredibly effective.",
+      quote: "Codemurf's enterprise partnership program has opened new market opportunities for us. The joint go-to-market strategy has been incredibly effective.",
       rating: 5
     }
   ];
@@ -468,7 +468,7 @@ export default function PartnershipsPage() {
                 Apply for Partnership <ArrowRight className="w-5 h-5" />
               </Link>
               <Link 
-                href="mailto:partnerships@autogenlabs.com"
+                href="mailto:partnerships@codemurf.com"
                 className="border border-gray-600 hover:border-orange-500 px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 hover:bg-orange-600/10 inline-flex items-center gap-2"
               >
                 <Mail className="w-5 h-5" />

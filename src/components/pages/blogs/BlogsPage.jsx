@@ -114,7 +114,7 @@ const BlogsPage = () => {
                 variants={itemVariants}
                 className="text-4xl md:text-5xl font-bold text-white mb-4"
               >
-                AutoGen Labs Blog
+                Codemurf Blog
               </motion.h1>
               <motion.p 
                 variants={itemVariants}

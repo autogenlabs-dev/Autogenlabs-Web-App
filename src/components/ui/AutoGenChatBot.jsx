@@ -11,13 +11,13 @@ const AutoGenChatbot = () => {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Sample bot responses for AutoGen Labs
+  // Sample bot responses for Codemurf
   const botResponses = [
-    "I can help you learn more about AutoGen Labs and our infrastructure platform!",
-    "AutoGen Labs simplifies deployment and scaling with intelligent automation. Would you like to know more about our features?",
+    "I can help you learn more about Codemurf and our infrastructure platform!",
+    "Codemurf simplifies deployment and scaling with intelligent automation. Would you like to know more about our features?",
     "Our platform supports any framework and provides seamless CI/CD integration. What specific area interests you?",
     "We offer real-time monitoring, auto-scaling, and smart deployment strategies. How can I assist you today?",
-    "AutoGen Labs is designed for developers who want powerful infrastructure without complexity. What would you like to explore?",
+    "Codemurf is designed for developers who want powerful infrastructure without complexity. What would you like to explore?",
     "You can deploy applications instantly with zero configuration. Would you like to see a demo?",
     "Our intelligent platform handles everything from databases to networking. What questions do you have?"
   ];
@@ -28,7 +28,7 @@ const AutoGenChatbot = () => {
       setTimeout(() => {
         setMessages([{
           id: 1,
-          text: "Hi! How can I help you with AutoGen Labs?",
+          text: "Hi! How can I help you with Codemurf?",
           isBot: true,
           timestamp: new Date()
         }]);
@@ -136,7 +136,7 @@ const AutoGenChatbot = () => {
   position:'absolute',
   top:"26px"
 }}
-            title="AutoGen Chatbot"
+            title="Codemurf Chatbot"
             intersectionDelay={1000}
           />
         </motion.button>
@@ -185,13 +185,13 @@ const AutoGenChatbot = () => {
                         fallback={<AvatarFallback />}
                         delay={8000} // Load much later (least critical)
                         className="w-full h-full scale-75"
-                        title="AutoGen Assistant"
+                        title="Codemurf Assistant"
                         intersectionDelay={2000}
                       />
                     </div>
                   </div>
                   <div>
-                    <h3 className="text-white font-semibold">AutoGen Assistant</h3>
+                    <h3 className="text-white font-semibold">Codemurf Assistant</h3>
                     <div className="text-green-400 text-xs flex items-center">
                       <div className="w-2 h-2 bg-green-400 rounded-full mr-1"></div>
                       Online

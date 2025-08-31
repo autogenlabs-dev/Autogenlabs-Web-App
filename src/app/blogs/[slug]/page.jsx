@@ -21,15 +21,15 @@ export async function generateMetadata({ params }) {
   }
 
   return {
-    title: `${post.title} | AutoGen Labs Blog`,
+    title: `${post.title} | Codemurf Blog`,
     description: post.excerpt,
     keywords: post.tags.join(', '),
     authors: [{ name: post.author.name }],
     openGraph: {
       title: post.title,
       description: post.excerpt,
-      url: `https://autogenlabs.com/blogs/${post.slug}`,
-      siteName: 'AutoGen Labs',
+      url: `https://codemurf.com/blogs/${post.slug}`,
+      siteName: 'Codemurf',
       images: [
         {
           url: post.image,
@@ -65,7 +65,7 @@ export async function generateMetadata({ params }) {
       },
     },
     alternates: {
-      canonical: `https://autogenlabs.com/blogs/${post.slug}`,
+      canonical: `https://codemurf.com/blogs/${post.slug}`,
     },
   };
 }

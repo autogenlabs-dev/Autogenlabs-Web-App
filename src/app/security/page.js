@@ -425,7 +425,7 @@ export default function SecurityPage() {
                 please contact our security team immediately.
               </p>
               <Link 
-                href="mailto:security@autogenlabs.com"
+                href="mailto:security@codemurf.com"
                 className="bg-red-600 hover:bg-red-700 px-6 py-3 rounded-lg font-semibold transition-colors inline-flex items-center gap-2"
               >
                 Report Security Issue <ArrowRight className="w-4 h-4" />

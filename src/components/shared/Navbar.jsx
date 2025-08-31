@@ -1,8 +1,6 @@
 'use client'
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronDown, Menu, X, ShoppingCart } from 'lucide-react';
-import Image from 'next/image';
-import Logo from "../../../public/logoAuto.webp"
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../../contexts/AuthContext';
@@ -186,7 +184,7 @@ const Navbar = () => {
             },
             {
               name: "Community",
-              description: "Connect with the AutoGen community",
+              description: "Connect with the CodeMurf community",
               icon: "🤝",
               href: "/community"
             },
@@ -203,7 +201,7 @@ const Navbar = () => {
           items: [
             {
               name: "Changelog",
-              description: "Latest updates and changes for AutoGen",
+              description: "Latest updates and changes for CodeMurf",
               icon: "📊",
               href: "/changelog"
             },
@@ -266,8 +264,13 @@ const Navbar = () => {
       <nav className="w-full px-6 md:px-44 py-4 fixed top-0 z-50 bg-transparent">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center">
-            <Image src={Logo} width={30} height={30} alt='Company Logo' loading='lazy' />
-            <span className="text-xl font-medium text-white">utoGen Labs</span>
+            <svg width="40" height="40" viewBox="0 0 40 40">
+              <circle cx="20" cy="8" r="4" fill="#fff" />
+              <circle cx="8" cy="20" r="4" fill="#fff" />
+              <circle cx="20" cy="32" r="4" fill="#fff" />
+              <circle cx="32" cy="20" r="4" fill="#fff" />
+            </svg>
+            <span className="text-xl font-medium text-white ml-2">CodeMurf</span>
           </Link>
           <div className="hidden md:flex items-center space-x-8">
             <Link href="/pricing" className="text-gray-300 text-sm font-medium">Pricing</Link>
@@ -288,8 +291,13 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo */}
         <Link href={"/"} className="flex items-center ">
-          <Image src={Logo} width={30} height={30} alt='Company Logo' loading='lazy' />
-          <span className="text-xl font-medium text-white">utoGen Labs</span>
+          <svg width="40" height="40" viewBox="0 0 40 40">
+            <circle cx="20" cy="8" r="4" fill="#fff" />
+            <circle cx="8" cy="20" r="4" fill="#fff" />
+            <circle cx="20" cy="32" r="4" fill="#fff" />
+            <circle cx="32" cy="20" r="4" fill="#fff" />
+          </svg>
+          <span className="text-xl font-medium text-white ml-2">CodeMurf</span>
         </Link>
 
         {/* Center Navigation */}

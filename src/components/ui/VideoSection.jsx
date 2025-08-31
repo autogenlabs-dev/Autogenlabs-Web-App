@@ -145,7 +145,7 @@ const VideoSection = () => {
           <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white text-sm opacity-0 hover:opacity-100 transition-opacity duration-300">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-              <span>AutoGen Platform Demo</span>
+              <span>Codemurf Platform Demo</span>
             </div>
             <div className="px-2 py-1 bg-black/50 rounded text-xs">
               {isPlaying ? 'Playing' : 'Paused'}

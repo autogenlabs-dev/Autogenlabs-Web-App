@@ -152,9 +152,9 @@ const PricingPage = () => {
         key: orderDetails.key_id,
         amount: orderDetails.amount,
         currency: orderDetails.currency,
-        name: 'AutoGen Labs',
+        name: 'Codemurf',
         description: `${plan.name} Plan Subscription`,
-        image: '/logoAuto.webp',
+        image: '/logo-icon.png', // Use a simple icon for payment
         order_id: orderDetails.order_id,
         handler: function (response) {
           handlePaymentSuccess(response, plan, accessToken);
@@ -228,7 +228,7 @@ const PricingPage = () => {
       console.log('Verification response:', verificationResponse);
       
       if (verificationResponse.success && verificationResponse.verified) {
-        alert('Payment successful! Welcome to AutoGen ' + plan.name + '!');
+        alert('Payment successful! Welcome to Codemurf ' + plan.name + '!');
         window.location.href = '/dashboard';
       } else {
         console.error('Verification failed - response:', verificationResponse);

@@ -337,7 +337,7 @@ export default function ChangelogPage() {
               className="text-xl md:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed"
             >
               Stay up to date with all the latest features, improvements, and bug fixes 
-              in AutoGen. We ship updates regularly to improve your experience.
+              in Codemurf. We ship updates regularly to improve your experience.
             </motion.p>
             <motion.div 
               variants={fadeInUp}
@@ -446,7 +446,7 @@ export default function ChangelogPage() {
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-6">Release History</h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Detailed changelog of all AutoGen releases with features, improvements, and fixes.
+              Detailed changelog of all Codemurf releases with features, improvements, and fixes.
             </p>
           </motion.div>
 
@@ -598,7 +598,7 @@ export default function ChangelogPage() {
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-6">Related Resources</h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Explore more resources to help you stay informed about AutoGen updates and features.
+              Explore more resources to help you stay informed about Codemurf updates and features.
             </p>
           </motion.div>
 

@@ -48,7 +48,7 @@ export default function CommunityPage() {
       description: "Join our vibrant Discord server for real-time discussions, support, and collaboration with fellow developers.",
       icon: <MessageSquareText className="w-8 h-8" />,
       members: "15,000+ members",
-      link: "https://discord.gg/autogen",
+      link: "https://discord.gg/codemurf",
       color: "from-indigo-500 to-purple-500",
       features: ["Real-time chat", "Voice channels", "Screen sharing", "Community events"]
     },
@@ -57,7 +57,7 @@ export default function CommunityPage() {
       description: "Participate in technical discussions, feature requests, and contribute to our open-source projects.",
       icon: <Github className="w-8 h-8" />,
       members: "8,000+ developers",
-      link: "https://github.com/autogenlabs/discussions",
+      link: "https://github.com/codemurf/discussions",
       color: "from-gray-600 to-gray-800",
       features: ["Technical discussions", "Feature requests", "Bug reports", "Code reviews"]
     },
@@ -66,16 +66,16 @@ export default function CommunityPage() {
       description: "Share your projects, get feedback, and discover amazing AI-powered applications built by our community.",
       icon: <MessageCircle className="w-8 h-8" />,
       members: "12,000+ subscribers",
-      link: "https://reddit.com/r/autogenlabs",
+      link: "https://reddit.com/r/codemurf",
       color: "from-orange-500 to-red-500",
       features: ["Project showcases", "Tutorials", "Community feedback", "AMAs"]
     },
     {
       name: "Twitter/X Community",
-      description: "Follow us for the latest updates, tips, and announcements from the AutoGen Labs team.",
+      description: "Follow us for the latest updates, tips, and announcements from the CodeMurf team.",
       icon: <Twitter className="w-8 h-8" />,
       members: "20,000+ followers",
-      link: "https://twitter.com/autogenlabs",
+      link: "https://twitter.com/codemurf",
       color: "from-blue-400 to-blue-600",
       features: ["News & updates", "Quick tips", "Community highlights", "Live threads"]
     }
@@ -83,7 +83,7 @@ export default function CommunityPage() {
 
   const communityPrograms = [
     {
-      title: "AutoGen Ambassadors",
+      title: "Codemurf Ambassadors",
       description: "Become a community leader and help shape the future of AI-powered development tools.",
       icon: <Trophy className="w-6 h-6" />,
       benefits: ["Exclusive access to beta features", "Direct line to our team", "Speaking opportunities", "Special recognition"],
@@ -105,7 +105,7 @@ export default function CommunityPage() {
     },
     {
       title: "Beta Testers",
-      description: "Get early access to new features and help us improve AutoGen before official releases.",
+      description: "Get early access to new features and help us improve Codemurf before official releases.",
       icon: <Zap className="w-6 h-6" />,
       benefits: ["Early feature access", "Direct feedback channel", "Bug bounty rewards", "Beta tester recognition"],
       apply: "/beta"
@@ -114,7 +114,7 @@ export default function CommunityPage() {
 
   const upcomingEvents = [
     {
-      title: "AutoGen Developer Conference 2025",
+      title: "Codemurf Developer Conference 2025",
       date: "March 15-17, 2025",
       type: "Virtual Conference",
       description: "Join us for our biggest event of the year featuring workshops, keynotes, and networking.",
@@ -133,7 +133,7 @@ export default function CommunityPage() {
       title: "Community Showcase",
       date: "February 14, 2025",
       type: "Virtual Meetup",
-      description: "Community members present their amazing projects built with AutoGen tools.",
+      description: "Community members present their amazing projects built with Codemurf tools.",
       attendees: "1,000+ participants",
       status: "Free Event"
     },
@@ -151,7 +151,7 @@ export default function CommunityPage() {
     {
       name: "Alex Chen",
       role: "Community Leader",
-      bio: "Full-stack developer who has built 20+ projects using AutoGen. Active mentor and contributor.",
+      bio: "Full-stack developer who has built 20+ projects using Codemurf. Active mentor and contributor.",
       contributions: ["100+ forum answers", "5 open-source contributions", "Workshop organizer"],
       avatar: "AC"
     },
@@ -172,7 +172,7 @@ export default function CommunityPage() {
     {
       name: "Emily Watson",
       role: "Content Creator",
-      bio: "Creates amazing tutorials and educational content to help developers learn AutoGen.",
+      bio: "Creates amazing tutorials and educational content to help developers learn Codemurf.",
       contributions: ["Video tutorials", "Blog posts", "Live streaming"],
       avatar: "EW"
     }
@@ -228,14 +228,14 @@ export default function CommunityPage() {
               className="text-xl md:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed"
             >
               Connect with thousands of developers building the future with AI. Share knowledge, 
-              get support, and contribute to the growing AutoGen ecosystem.
+              get support, and contribute to the growing Codemurf ecosystem.
             </motion.p>
             <motion.div 
               variants={fadeInUp}
               className="flex flex-col sm:flex-row gap-4 justify-center"
             >
               <Link 
-                href="https://discord.gg/autogen"
+                href="https://discord.gg/codemurf"
                 className="bg-indigo-600 hover:bg-indigo-700 px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 hover:scale-105 flex items-center gap-2"
               >
                 <MessageSquareText className="w-5 h-5" />
@@ -476,7 +476,7 @@ export default function CommunityPage() {
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-6">Featured Community Members</h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Meet some of our most active and influential community members who are helping shape the future of AutoGen.
+              Meet some of our most active and influential community members who are helping shape the future of Codemurf.
             </p>
           </motion.div>
 
@@ -570,7 +570,7 @@ export default function CommunityPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link 
-                href="https://discord.gg/autogen"
+                href="https://discord.gg/codemurf"
                 className="bg-indigo-600 hover:bg-indigo-700 px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 hover:scale-105 flex items-center gap-2"
               >
                 <MessageSquareText className="w-5 h-5" />

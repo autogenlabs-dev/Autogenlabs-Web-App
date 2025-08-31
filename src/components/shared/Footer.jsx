@@ -1,8 +1,6 @@
 'use client';
 import React from 'react';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
-import logo from "../../../public/logoAuto.webp"
 import { Mail, Instagram, Music, Twitter, MessageCircle, Linkedin, Bot, Youtube } from 'lucide-react';
 import LazySpline from '../ui/LazySpline';
 
@@ -22,11 +20,11 @@ const Footer = () => {
     product: {
       title: 'Product',
       links: [
-        'AutoGen Platform',
+        'Codemurf Platform',
         'Infrastructure Plugins',
         'Service Reviews',
         'Pricing',
-        'AutoGen for Enterprise'
+        'Codemurf for Enterprise'
       ]
     },
     capabilities: {
@@ -50,7 +48,7 @@ const Footer = () => {
         'Terms of Service',
         'Privacy Policy',
         'Security',
-        'AutoGen for Government'
+        'Codemurf for Government'
       ]
     },
     resources: {
@@ -203,8 +201,13 @@ const Footer = () => {
             {/* Logo & Brand */}
             <div className="space-y-4">
               <div className="flex items-center">
-                <Image src={logo} alt='Company logo' width={30} height={30} loading='lazy' />
-                <span className="text-2xl font-bold text-white">utoGen Labs</span>
+                <svg width="30" height="30" viewBox="0 0 40 40">
+                  <circle cx="20" cy="8" r="4" fill="#fff" />
+                  <circle cx="8" cy="20" r="4" fill="#fff" />
+                  <circle cx="20" cy="32" r="4" fill="#fff" />
+                  <circle cx="32" cy="20" r="4" fill="#fff" />
+                </svg>
+                <span className="text-2xl font-bold text-white ml-2">CodeMurf</span>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
                 Built to keep your infrastructure in perfect state.
@@ -271,7 +274,7 @@ const Footer = () => {
         >
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-gray-400 text-sm">
-              © 2024 AutoGen. All rights reserved.
+              © 2024 Codemurf. All rights reserved.
             </div>
             {/* Additional Legal Links */}
             <div className="flex flex-wrap gap-6 text-sm">

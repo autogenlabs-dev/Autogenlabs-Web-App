@@ -61,8 +61,8 @@ export default function EventsPage() {
   const upcomingEvents = [
     {
       id: 1,
-      title: "AutoGen Developer Conference 2025",
-      description: "Our biggest event of the year featuring keynotes, workshops, and networking opportunities with the AutoGen community.",
+      title: "Codemurf Developer Conference 2025",
+      description: "Our biggest event of the year featuring keynotes, workshops, and networking opportunities with the Codemurf community.",
       category: "conference",
       date: "March 15-17, 2025",
       time: "9:00 AM - 6:00 PM EST",
@@ -73,15 +73,15 @@ export default function EventsPage() {
       status: "Early Bird",
       image: "/events/dev-conference-2025.jpg",
       highlights: [
-        "Keynote by AutoGen founders",
+        "Keynote by Codemurf founders",
         "50+ technical sessions",
         "Hands-on workshops",
         "Community showcase",
         "Networking opportunities"
       ],
       speakers: [
-        { name: "Alex Chen", role: "CEO, AutoGen Labs", company: "AutoGen" },
-        { name: "Sarah Rodriguez", role: "CTO, AutoGen Labs", company: "AutoGen" },
+        { name: "Alex Chen", role: "CEO, Codemurf", company: "Codemurf" },
+        { name: "Sarah Rodriguez", role: "CTO, Codemurf", company: "Codemurf" },
         { name: "John Smith", role: "VP Engineering", company: "Microsoft" }
       ]
     },
@@ -106,8 +106,8 @@ export default function EventsPage() {
         "Q&A with experts"
       ],
       speakers: [
-        { name: "Dr. Emily Watson", role: "AI Research Lead", company: "AutoGen" },
-        { name: "Mike Chen", role: "Senior AI Engineer", company: "AutoGen" }
+        { name: "Dr. Emily Watson", role: "AI Research Lead", company: "Codemurf" },
+        { name: "Mike Chen", role: "Senior AI Engineer", company: "Codemurf" }
       ]
     },
     {
@@ -131,7 +131,7 @@ export default function EventsPage() {
         "Open discussions"
       ],
       speakers: [
-        { name: "Community Members", role: "Various", company: "AutoGen Community" }
+        { name: "Community Members", role: "Various", company: "Codemurf Community" }
       ]
     },
     {
@@ -155,14 +155,14 @@ export default function EventsPage() {
         "Live Q&A session"
       ],
       speakers: [
-        { name: "David Kim", role: "VP Engineering", company: "AutoGen" },
-        { name: "Lisa Chang", role: "DevOps Lead", company: "AutoGen" }
+        { name: "David Kim", role: "VP Engineering", company: "Codemurf" },
+        { name: "Lisa Chang", role: "DevOps Lead", company: "Codemurf" }
       ]
     },
     {
       id: 5,
-      title: "AutoGen Global Hackathon",
-      description: "48-hour global hackathon building innovative AI-powered applications using AutoGen tools.",
+      title: "Codemurf Global Hackathon",
+      description: "48-hour global hackathon building innovative AI-powered applications using Codemurf tools.",
       category: "hackathon",
       date: "April 5-7, 2025",
       time: "All Day",
@@ -180,13 +180,13 @@ export default function EventsPage() {
         "Job opportunities"
       ],
       speakers: [
-        { name: "AutoGen Team", role: "Mentors & Judges", company: "AutoGen" }
+        { name: "Codemurf Team", role: "Mentors & Judges", company: "Codemurf" }
       ]
     },
     {
       id: 6,
       title: "Mobile AI Development Workshop",
-      description: "Hands-on workshop for building AI-powered mobile applications using AutoGen mobile toolkit.",
+      description: "Hands-on workshop for building AI-powered mobile applications using Codemurf mobile toolkit.",
       category: "workshop",
       date: "March 8, 2025",
       time: "10:00 AM - 4:00 PM EST",
@@ -204,7 +204,7 @@ export default function EventsPage() {
         "Lunch and networking"
       ],
       speakers: [
-        { name: "Michael Brown", role: "Mobile Lead", company: "AutoGen" },
+        { name: "Michael Brown", role: "Mobile Lead", company: "Codemurf" },
         { name: "Jennifer Liu", role: "React Native Expert", company: "Facebook" }
       ]
     }
@@ -212,7 +212,7 @@ export default function EventsPage() {
 
   const pastEvents = [
     {
-      title: "AutoGen Developer Summit 2024",
+      title: "Codemurf Developer Summit 2024",
       date: "November 2024",
       attendees: "3,500+",
       highlights: "Product roadmap reveal, community awards"
@@ -348,7 +348,7 @@ export default function EventsPage() {
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-6">Featured Event</h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Don&apos;t miss our biggest event of the year - the AutoGen Developer Conference 2025.
+              Don&apos;t miss our biggest event of the year - the Codemurf Developer Conference 2025.
             </p>
           </motion.div>
 
@@ -371,10 +371,10 @@ export default function EventsPage() {
                   </span>
                 </div>
                 
-                <h3 className="text-3xl md:text-4xl font-bold mb-4">AutoGen Developer Conference 2025</h3>
+                <h3 className="text-3xl md:text-4xl font-bold mb-4">Codemurf Developer Conference 2025</h3>
                 <p className="text-xl text-gray-300 mb-6 leading-relaxed">
                   Join 5,000+ developers for the ultimate AI development experience. Three days of keynotes, 
-                  workshops, and networking with the AutoGen community.
+                  workshops, and networking with the Codemurf community.
                 </p>
 
                 <div className="space-y-4 mb-8">
@@ -482,7 +482,7 @@ export default function EventsPage() {
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-6">Upcoming Events</h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Discover upcoming events where you can learn, network, and grow with the AutoGen community.
+              Discover upcoming events where you can learn, network, and grow with the Codemurf community.
             </p>
           </motion.div>
 
@@ -647,7 +647,7 @@ export default function EventsPage() {
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-6">Want to Host an Event?</h2>
             <p className="text-xl text-gray-300 mb-8">
-              Interested in organizing a local AutoGen meetup or workshop? We&apos;d love to support you with 
+              Interested in organizing a local Codemurf meetup or workshop? We&apos;d love to support you with 
               resources, speakers, and promotional assistance.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

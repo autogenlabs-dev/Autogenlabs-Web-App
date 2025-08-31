@@ -187,10 +187,10 @@ Tip: Use #solution to refer to your active solution (only for C#) in Visual Stud
               {/* Video Info Overlay */}
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
                 <h4 className="text-white font-bold text-lg mb-2">
-                  Smart Deployment Strategies in AutoGen Labs
+                  Smart Deployment Strategies in Codemurf
                 </h4>
                 <p className="text-gray-300 text-sm">
-                  AutoGen Labs Infrastructure Platform
+                  Codemurf Infrastructure Platform
                 </p>
               </div>
               

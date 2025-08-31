@@ -18,7 +18,7 @@ const PricingSection = () => {
       price: 0,
       priceINR: 0,
       period: 'forever',
-      description: 'A fast way to get started with AutoGen Labs',
+      description: 'A fast way to get started with Codemurf',
       features: [
         'Up to 3 AI agents',
         '100 messages per month',
@@ -128,9 +128,9 @@ const PricingSection = () => {
         key: orderDetails.key_id,
         amount: orderDetails.amount,
         currency: orderDetails.currency,
-        name: 'AutoGen Labs',
+        name: 'Codemurf',
         description: `${plan.name} Plan Subscription`,
-        image: '/logoAuto.webp',
+        image: '/logo-icon.png', // Use a simple icon for payment
         order_id: orderDetails.order_id,
         handler: function (response) {
           handlePaymentSuccess(response, plan, accessToken);
@@ -195,7 +195,7 @@ const PricingSection = () => {
       const verificationResponse = await paymentApi.verifyPayment(accessToken, verificationData);
       
       if (verificationResponse.success && verificationResponse.verified) {
-        alert('Payment successful! Welcome to AutoGen ' + plan.name + '!');
+        alert('Payment successful! Welcome to Codemurf ' + plan.name + '!');
         window.location.href = '/dashboard';
       } else {
         throw new Error('Payment verification failed');

@@ -1,4 +1,4 @@
-# 🚀 Autogen Labs
+# 🚀 Codemurf Labs
 ### Next.js Website + VS Code Extension Monorepo
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -8,14 +8,14 @@
 
 ## 📋 Project Overview
 
-**Autogen Labs** is a comprehensive development platform that combines:
+**Codemurf Labs** is a comprehensive development platform that combines:
 - 🌐 **Modern Next.js Website** - Professional web presence with advanced features
 - 🔧 **VS Code Extension** - Powerful IDE extension for enhanced development experience
 
 ## 🏗️ Project Structure
 
 ```
-autogen-labs/
+codemurf-labs/
 ├── 📁 website/                    # Next.js Website (Current Directory)
 │   ├── src/
 │   │   ├── app/                   # App Router (Next.js 13+)
@@ -44,7 +44,7 @@ autogen-labs/
 
 ```powershell
 # Navigate to project root
-cd "d:\Autogen\gennext"
+cd "d:\Codemurf\gennext"
 
 # Install dependencies
 npm install
@@ -103,10 +103,10 @@ ssh-keygen -t ed25519 -C "your-email@example.com"
 ### 2. Repository Creation
 ```powershell
 # Create private repository
-gh repo create autogen-labs --private --description "Next.js Website + VS Code Extension"
+gh repo create codemurf-labs --private --description "Next.js Website + VS Code Extension"
 
 # Add remote origin
-git remote add origin https://github.com/yourusername/autogen-labs.git
+git remote add origin https://github.com/yourusername/codemurf-labs.git
 ```
 
 ### 3. VS Code Git Integration
@@ -157,14 +157,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🔗 Links
 
-- [Website Demo](https://autogenlabs.com)
-- [Extension Marketplace](https://marketplace.visualstudio.com/items?itemName=autogen-labs.extension)
+- [Website Demo](https://codemurf.com)
+- [Extension Marketplace](https://marketplace.visualstudio.com/items?itemName=codemurf-labs.extension)
 - [Documentation](./docs/README.md)
 
 ## 📞 Support
 
-For support, email support@autogenlabs.com or join our [Discord](https://discord.gg/autogenlabs).
+For support, email support@codemurf.com or join our [Discord](https://discord.gg/codemurf).
 
 ---
 
-**Made with ❤️ by Autogen Labs Team**
+**Made with ❤️ by Codemurf Labs Team**

@@ -268,7 +268,7 @@ export default function FeatureRequestsPage() {
               variants={fadeInUp}
               className="text-xl md:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed"
             >
-              Shape the future of AutoGen by submitting and voting on feature requests. 
+              Shape the future of Codemurf by submitting and voting on feature requests. 
               Your ideas drive our development roadmap.
             </motion.p>
             <motion.div 
@@ -520,7 +520,7 @@ export default function FeatureRequestsPage() {
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-6">Have an Idea?</h2>
             <p className="text-xl text-gray-300 mb-8">
-              Submit your feature request and help shape the future of AutoGen. Every great feature starts with a great idea.
+              Submit your feature request and help shape the future of Codemurf. Every great feature starts with a great idea.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link 

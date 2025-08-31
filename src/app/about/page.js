@@ -99,7 +99,7 @@ export default function AboutPage() {
     {
       year: "2020",
       title: "Company Founded",
-      description: "AutoGen Labs was founded with a vision to democratize AI-powered software development.",
+      description: "Codemurf was founded with a vision to democratize AI-powered software development.",
       icon: <Building className="w-6 h-6" />
     },
     {
@@ -159,7 +159,7 @@ export default function AboutPage() {
 
   const testimonials = [
     {
-      quote: "AutoGen has transformed how our team approaches software development. The AI-powered code generation has increased our productivity by 40%.",
+      quote: "Codemurf has transformed how our team approaches software development. The AI-powered code generation has increased our productivity by 40%.",
       author: "Jennifer Liu",
       role: "Senior Software Engineer",
       company: "TechCorp Inc."
@@ -171,7 +171,7 @@ export default function AboutPage() {
       company: "StartupXYZ"
     },
     {
-      quote: "What impressed me most is how AutoGen understands context and generates code that actually follows our team's coding standards.",
+      quote: "What impressed me most is how Codemurf understands context and generates code that actually follows our team's coding standards.",
       author: "Priya Patel",
       role: "Engineering Manager",
       company: "Enterprise Solutions Ltd."
@@ -194,7 +194,7 @@ export default function AboutPage() {
               variants={fadeInUp}
               className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-purple-200 to-blue-400 bg-clip-text text-transparent"
             >
-              About AutoGen Labs
+              About Codemurf
             </motion.h1>
             <motion.p 
               variants={fadeInUp}
@@ -452,7 +452,7 @@ export default function AboutPage() {
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-6">What Developers Say</h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Hear from the developers who are building amazing software with AutoGen.
+              Hear from the developers who are building amazing software with Codemurf.
             </p>
           </motion.div>
 

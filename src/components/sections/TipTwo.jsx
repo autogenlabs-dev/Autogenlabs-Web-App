@@ -153,10 +153,10 @@ export default function TipTwo() {
               {/* Video Info Overlay */}
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
                 <h4 className="text-white font-bold text-lg mb-2">
-                  Visual Studio prompt engineering with AutoGen Labs
+                  Visual Studio prompt engineering with Codemurf
                 </h4>
                 <p className="text-gray-300 text-sm">
-                  AutoGen Labs for Visual Studio 2022
+                  Codemurf for Visual Studio 2022
                 </p>
               </div>
               
@@ -190,7 +190,7 @@ export default function TipTwo() {
                 Prompt like a pro
               </h3>
               <p className="text-gray-300 text-lg leading-relaxed mb-8">
-              The quality of the output of any Large Language Model depends largely on the quality of the prompt, and AutoGen is no exception. In this new video, Gwyn teaches about “prompt engineering” for AutoGen in Visual Studio 2022, and how to create better results with better prompts.
+              The quality of the output of any Large Language Model depends largely on the quality of the prompt, and Codemurf is no exception. In this new video, Gwyn teaches about “prompt engineering” for Codemurf in Visual Studio 2022, and how to create better results with better prompts.
               </p>
               
               {/* Link */}

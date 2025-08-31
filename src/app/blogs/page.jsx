@@ -1,20 +1,20 @@
 import BlogsPage from '@/components/pages/blogs/BlogsPage';
 
 export const metadata = {
-  title: 'AutoGen Labs Blog - Infrastructure Insights & Tutorials',
-  description: 'Discover the latest insights, tutorials, and updates from AutoGen Labs. Learn about infrastructure automation, deployment strategies, and platform best practices.',
-  keywords: 'AutoGen Labs, infrastructure, blog, tutorials, DevOps, automation, deployment, platform updates',
+  title: 'Codemurf Blog - Infrastructure Insights & Tutorials',
+  description: 'Discover the latest insights, tutorials, and updates from Codemurf. Learn about infrastructure automation, deployment strategies, and platform best practices.',
+  keywords: 'Codemurf, infrastructure, blog, tutorials, DevOps, automation, deployment, platform updates',
   openGraph: {
-    title: 'AutoGen Labs Blog - Infrastructure Insights & Tutorials',
-    description: 'Discover the latest insights, tutorials, and updates from AutoGen Labs. Learn about infrastructure automation, deployment strategies, and platform best practices.',
-    url: 'https://autogenlabs.com/blogs',
-    siteName: 'AutoGen Labs',
+    title: 'Codemurf Blog - Infrastructure Insights & Tutorials',
+    description: 'Discover the latest insights, tutorials, and updates from Codemurf. Learn about infrastructure automation, deployment strategies, and platform best practices.',
+    url: 'https://codemurf.com/blogs',
+    siteName: 'Codemurf',
     images: [
       {
         url: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&h=630&fit=crop',
         width: 1200,
         height: 630,
-        alt: 'AutoGen Labs Blog',
+        alt: 'Codemurf Blog',
       },
     ],
     locale: 'en_US',
@@ -22,8 +22,8 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AutoGen Labs Blog - Infrastructure Insights & Tutorials',
-    description: 'Discover the latest insights, tutorials, and updates from AutoGen Labs.',
+    title: 'Codemurf Blog - Infrastructure Insights & Tutorials',
+    description: 'Discover the latest insights, tutorials, and updates from Codemurf.',
     images: ['https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&h=630&fit=crop'],
   },
   robots: {

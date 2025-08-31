@@ -1,7 +1,7 @@
 {
-    "name": "autogen-labs",
+    "name": "codemurf-labs",
     "version": "1.0.0",
-    "description": "Autogen Labs - MCP Server Configuration",
+    "description": "Codemurf Labs - MCP Server Configuration",
     "mcpServers": {
         "git": {
             "command": "git",

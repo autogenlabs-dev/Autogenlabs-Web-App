@@ -67,7 +67,7 @@ const CopilotUIComponent = () => {
             <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-amber-400/20 text-amber-300">
               🚀
             </span>
-            <span className="font-medium">AutoGen AI Assistant</span>
+            <span className="font-medium">Codemurf AI Assistant</span>
             <span className="hidden sm:inline text-neutral-400">Build powerful applications with AI-driven code generation</span>
           </div>
           <button 
@@ -109,7 +109,7 @@ const CopilotUIComponent = () => {
                   <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-pink-500/20 text-pink-300">
                     🤖
                   </span>
-                  <span className="text-sm">AutoGen 4.0</span>
+                  <span className="text-sm">Codemurf 4.0</span>
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="6,9 12,15 18,9"></polyline>
                   </svg>
@@ -283,7 +283,7 @@ export default function Hero() {
           0%, 100% { opacity: 0.2; transform: scale(1); }
           50% { opacity: 0.8; transform: scale(1.5); }
         }
-        /* Static brand highlight for 'AutoGen' */
+        /* Static brand highlight for 'Codemurf' */
         .brand-highlight {
           background: linear-gradient(90deg,#34d399,#06b6d4,#3b82f6);
           -webkit-background-clip: text;

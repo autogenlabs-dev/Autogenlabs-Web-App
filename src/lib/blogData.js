@@ -11,12 +11,12 @@ export const blogCategories = [
 export const mockBlogPosts = [
   {
     id: 1,
-    slug: 'autogen-labs-unveils-ai-infrastructure-catalyst',
-    title: 'AutoGen Labs Unveils AI Infrastructure Catalyst That Could Trigger Nearly 50% Performance Boost for Deployments',
+    slug: 'codemurf-labs-unveils-ai-infrastructure-catalyst',
+    title: 'Codemurf Unveils AI Infrastructure Catalyst That Could Trigger Nearly 50% Performance Boost for Deployments',
     excerpt: 'Revolutionary AI-powered infrastructure optimization that automatically scales and optimizes your deployment pipeline for maximum efficiency.',
-    content: `# AutoGen Labs Unveils AI Infrastructure Catalyst
+    content: `# Codemurf Unveils AI Infrastructure Catalyst
 
-AutoGen Labs has announced a groundbreaking advancement in AI-powered infrastructure management that promises to revolutionize how developers deploy and scale applications.
+Codemurf has announced a groundbreaking advancement in AI-powered infrastructure management that promises to revolutionize how developers deploy and scale applications.
 
 ## The Catalyst Technology
 
@@ -56,8 +56,8 @@ This represents a major step forward in making infrastructure management truly i
   {
     id: 2,
     slug: 'devops-pipeline-optimization-guide',
-    title: 'Complete Guide to DevOps Pipeline Optimization with AutoGen Labs',
-    excerpt: 'Learn how to optimize your CI/CD pipelines for maximum efficiency and reliability using AutoGen Labs platform.',
+    title: 'Complete Guide to DevOps Pipeline Optimization with Codemurf',
+    excerpt: 'Learn how to optimize your CI/CD pipelines for maximum efficiency and reliability using Codemurf platform.',
     content: `# Complete Guide to DevOps Pipeline Optimization
 
 Optimizing your DevOps pipeline is crucial for maintaining development velocity while ensuring reliability.
@@ -74,7 +74,7 @@ Optimizing your DevOps pipeline is crucial for maintaining development velocity 
 - Quality gates implementation
 - Performance testing
 
-## AutoGen Labs Integration
+## Codemurf Integration
 
 Our platform provides seamless integration with popular CI/CD tools and offers intelligent optimization suggestions.`,
     author: {
@@ -148,7 +148,7 @@ Building ML infrastructure that scales requires careful planning and the right a
 - Real-time data processing
 - Data versioning and lineage
 
-## AutoGen Labs ML Features
+## Codemurf ML Features
 
 Our platform provides specialized tools for ML workloads including automated model deployment and monitoring.`,
     author: {
@@ -208,12 +208,12 @@ Modern applications require comprehensive monitoring and observability to mainta
   },
   {
     id: 6,
-    slug: 'autogen-platform-january-updates',
-    title: 'AutoGen Platform January 2024 Updates: New Features and Improvements',
+    slug: 'codemurf-platform-january-updates',
+    title: 'Codemurf Platform January 2024 Updates: New Features and Improvements',
     excerpt: 'Explore the latest platform updates including enhanced AI capabilities, improved dashboard, and new integration options.',
-    content: `# AutoGen Platform January 2024 Updates
+    content: `# Codemurf Platform January 2024 Updates
 
-We're excited to share the latest updates to the AutoGen platform, packed with new features and improvements.
+We're excited to share the latest updates to the Codemurf platform, packed with new features and improvements.
 
 ## New Features
 
@@ -232,7 +232,7 @@ We're excited to share the latest updates to the AutoGen platform, packed with n
 - Reduced resource overhead
 - Optimized scaling algorithms`,
     author: {
-      name: 'AutoGen Team',
+      name: 'Codemurf Team',
       role: 'Product Updates',
       avatar: 'https://images.unsplash.com/photo-1551808525-51a94da548ce?w=150&h=150&fit=crop&crop=face'
     },

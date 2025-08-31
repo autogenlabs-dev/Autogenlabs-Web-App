@@ -21,32 +21,32 @@ const FAQSection = () => {
     {
       id: 1,
       category: 'getting-started',
-      question: 'What is AutoGen Labs and how does it work?',
-      answer: 'AutoGen Labs is an intelligent infrastructure platform that automates deployment and scaling. It uses advanced AI to optimize your infrastructure configurations, manage deployments, and provide real-time monitoring across multiple environments.'
+      question: 'What is Codemurf and how does it work?',
+      answer: 'Codemurf is an intelligent infrastructure platform that automates deployment and scaling. It uses advanced AI to optimize your infrastructure configurations, manage deployments, and provide real-time monitoring across multiple environments.'
     },
     {
       id: 2,
       category: 'getting-started',
       question: 'How quickly can I deploy my first application?',
-      answer: 'With AutoGen Labs, you can deploy your first application in under 5 minutes. Simply connect your repository, configure your settings, and let our platform handle the rest. No complex setup or manual configuration required.'
+      answer: 'With Codemurf, you can deploy your first application in under 5 minutes. Simply connect your repository, configure your settings, and let our platform handle the rest. No complex setup or manual configuration required.'
     },
     {
       id: 3,
       category: 'deployment',
-      question: 'What frameworks and languages does AutoGen Labs support?',
-      answer: 'AutoGen Labs supports all major frameworks including React, Node.js, Python, Ruby, Go, PHP, and more. Our platform automatically detects your technology stack and configures the optimal deployment strategy.'
+      question: 'What frameworks and languages does Codemurf support?',
+      answer: 'Codemurf supports all major frameworks including React, Node.js, Python, Ruby, Go, PHP, and more. Our platform automatically detects your technology stack and configures the optimal deployment strategy.'
     },
     {
       id: 4,
       category: 'deployment',
       question: 'Can I deploy to multiple environments simultaneously?',
-      answer: 'Yes! AutoGen Labs supports multi-environment deployments. You can deploy to staging, production, and custom environments with different configurations, all managed from a single dashboard.'
+      answer: 'Yes! Codemurf supports multi-environment deployments. You can deploy to staging, production, and custom environments with different configurations, all managed from a single dashboard.'
     },
     {
       id: 5,
       category: 'pricing',
       question: 'Do you offer a free tier?',
-      answer: 'Yes, we offer a generous free tier that includes up to 3 applications, basic monitoring, and community support. Perfect for personal projects and getting started with AutoGen Labs.'
+      answer: 'Yes, we offer a generous free tier that includes up to 3 applications, basic monitoring, and community support. Perfect for personal projects and getting started with Codemurf.'
     },
     {
       id: 6,
@@ -57,7 +57,7 @@ const FAQSection = () => {
     {
       id: 7,
       category: 'security',
-      question: 'How secure is my data with AutoGen Labs?',
+      question: 'How secure is my data with Codemurf?',
       answer: 'Security is our top priority. We use enterprise-grade encryption, SOC 2 compliance, and follow industry best practices. Your code and data are protected with end-to-end encryption and isolated environments.'
     },
     {
@@ -176,7 +176,7 @@ const FAQSection = () => {
             className="text-lg text-gray-400 max-w-2xl mx-auto"
             variants={itemVariants}
           >
-            Everything you need to know about AutoGen Labs infrastructure platform
+            Everything you need to know about Codemurf infrastructure platform
           </motion.p>
         </motion.div>
 
@@ -395,7 +395,7 @@ const FAQSection = () => {
               Still have questions?
             </h3>
             <p className="text-gray-400 mb-6">
-              Our team is here to help you get the most out of AutoGen Labs.
+              Our team is here to help you get the most out of Codemurf.
             </p>
             <motion.button
               className="px-6 py-3 bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-semibold rounded-xl transition-all duration-300 hover:from-purple-700 hover:to-cyan-700"

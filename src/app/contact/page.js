@@ -72,7 +72,7 @@ export default function ContactPage() {
       icon: <Mail className="w-8 h-8" />,
       title: "Email Support",
       description: "Get help from our support team",
-      contact: "support@autogenlabs.com",
+      contact: "support@codemurf.com",
       availability: "24/7",
       responseTime: "Within 4 hours"
     },
@@ -96,7 +96,7 @@ export default function ContactPage() {
       icon: <HeadphonesIcon className="w-8 h-8" />,
       title: "Enterprise Support",
       description: "Dedicated support for enterprise clients",
-      contact: "enterprise@autogenlabs.com",
+      contact: "enterprise@codemurf.com",
       availability: "24/7 SLA",
       responseTime: "Within 1 hour"
     }
@@ -155,7 +155,7 @@ export default function ContactPage() {
     },
     {
       question: "How can I get a demo of your platform?",
-      answer: "You can request a personalized demo by filling out our contact form or emailing sales@autogenlabs.com. Our team will schedule a live demonstration tailored to your needs."
+      answer: "You can request a personalized demo by filling out our contact form or emailing sales@codemurf.com. Our team will schedule a live demonstration tailored to your needs."
     },
     {
       question: "Do you offer enterprise solutions?",
@@ -163,7 +163,7 @@ export default function ContactPage() {
     },
     {
       question: "How do I report a security vulnerability?",
-      answer: "Please report security issues to security@autogenlabs.com. We take security seriously and will respond to all reports promptly."
+      answer: "Please report security issues to security@codemurf.com. We take security seriously and will respond to all reports promptly."
     }
   ];
 
@@ -515,7 +515,7 @@ export default function ContactPage() {
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Get Started?</h2>
             <p className="text-xl text-gray-300 mb-8">
-              Join thousands of developers who are already building amazing software with AutoGen. 
+              Join thousands of developers who are already building amazing software with Codemurf. 
               Start your free trial today.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

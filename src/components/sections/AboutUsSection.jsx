@@ -53,19 +53,19 @@ const AboutUsSection = () => {
           viewport={{ once: false }}
         >
           <p className="text-gray-300 text-lg leading-relaxed mb-6">
-            At AutoGen Labs, we're redefining how developers interact with their infrastructure.
+            At Codemurf, we're redefining how developers interact with their infrastructure.
           </p>
           
           <p className="text-gray-300 text-lg leading-relaxed mb-6">
-            Born out of a need for smarter, more intuitive deployment tools, <span className="text-cyan-400 font-semibold">AutoGen Labs</span> is an intelligent infrastructure platform that lives right inside your 
+            Born out of a need for smarter, more intuitive deployment tools, <span className="text-cyan-400 font-semibold">Codemurf</span> is an intelligent infrastructure platform that lives right inside your 
             favorite workflow. It helps you deploy, scale, monitor, and manage applications through seamless automation, making development 
             faster, easier, and a lot more reliable.
           </p>
           
           <p className="text-gray-300 text-lg leading-relaxed mb-8">
-            We designed AutoGen Labs for developers who want full control with zero complexity. Every action it suggests—from scaling services to 
+            We designed Codemurf for developers who want full control with zero complexity. Every action it suggests—from scaling services to 
             optimizing deployments—requires your approval, ensuring a safe and transparent workflow. And with support for any framework, 
-            multiple deployment strategies, and a powerful observability suite under the hood, <span className="text-cyan-400 font-semibold">AutoGen Labs</span> adapts to your needs, whether you're shipping a new 
+            multiple deployment strategies, and a powerful observability suite under the hood, <span className="text-cyan-400 font-semibold">Codemurf</span> adapts to your needs, whether you're shipping a new 
             feature or architecting an entire system.
           </p>
         </motion.div>
@@ -79,7 +79,7 @@ const AboutUsSection = () => {
           viewport={{ once: false }}
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            <span className="text-cyan-400">Let AutoGen Labs</span>{" "}
+            <span className="text-cyan-400">Let Codemurf</span>{" "}
             <span className="text-white">take care of the infrastructure, so you can focus on building amazing things.</span>
           </h2>
         </motion.div>
@@ -138,13 +138,13 @@ const AboutUsSection = () => {
             {/* Mission Text */}
             <div className="lg:w-2/3 space-y-6">
               <p className="text-gray-300 text-lg leading-relaxed">
-                At AutoGen Labs, our mission is to make infrastructure management 
+                At Codemurf, our mission is to make infrastructure management 
                 smarter, faster, and more intuitive—without sacrificing developer control.
               </p>
               
               <p className="text-gray-300 text-lg leading-relaxed">
                 We believe that automation should empower developers, not replace 
-                them. That's why AutoGen Labs is built to work with you, not for you. 
+                them. That's why Codemurf is built to work with you, not for you. 
                 Our AI assistant listens carefully, acts transparently, and 
                 helps you focus on what truly matters: solving problems and 
                 building great software.
@@ -173,7 +173,7 @@ const AboutUsSection = () => {
           
           <div className="max-w-3xl mx-auto space-y-6">
             <p className="text-gray-300 text-lg leading-relaxed">
-              Behind AutoGen Labs is a small but passionate team of developers, designers, and infrastructure enthusiasts 
+              Behind Codemurf is a small but passionate team of developers, designers, and infrastructure enthusiasts 
               driven by one goal: to build tools that genuinely make deployment better.
             </p>
             

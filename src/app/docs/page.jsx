@@ -86,7 +86,7 @@ const DocsPage = () => {
                 return (
                     <div className="space-y-8">            <div>
                         <h1 className="text-4xl font-bold text-white mb-4">Installation Guide</h1>
-                        <p className="text-gray-300 text-lg mb-8">Get started with AutoGen Labs IDE in just a few simple steps.</p>
+                        <p className="text-gray-300 text-lg mb-8">Get started with Codemurf IDE in just a few simple steps.</p>
                     </div>
 
                         <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6">
@@ -110,7 +110,7 @@ const DocsPage = () => {
                         <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6">
                             <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
                                 <span className="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-3">2</span>
-                                Download AutoGen Labs IDE
+                                Download Codemurf IDE
                             </h2>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div className="bg-gray-700/30 border border-gray-600 rounded-lg p-4 text-center">
@@ -146,18 +146,18 @@ const DocsPage = () => {
                                 <div>
                                     <h4 className="text-lg font-semibold text-white mb-2">Windows Installation:</h4>
                                     <ol className="text-gray-300 space-y-2 ml-4">
-                                        <li>1. Run the downloaded <code className="bg-gray-700 px-2 py-1 rounded text-sm">AutoGen LabsIDE-Setup.exe</code></li>
+                                        <li>1. Run the downloaded <code className="bg-gray-700 px-2 py-1 rounded text-sm">Codemurf LabsIDE-Setup.exe</code></li>
                                         <li>2. Follow the installation wizard</li>
                                         <li>3. Choose installation directory (default recommended)</li>
                                         <li>4. Select additional components (Git integration, Shell integration)</li>
-                                        <li>5. Complete the installation and launch AutoGen Labs IDE</li>
+                                        <li>5. Complete the installation and launch Codemurf IDE</li>
                                     </ol>
                                 </div>
                                 <div>
                                     <h4 className="text-lg font-semibold text-white mb-2">macOS Installation:</h4>
                                     <ol className="text-gray-300 space-y-2 ml-4">
-                                        <li>1. Open the downloaded <code className="bg-gray-700 px-2 py-1 rounded text-sm">AutoGen LabsIDE.dmg</code></li>
-                                        <li>2. Drag AutoGen Labs IDE to Applications folder</li>
+                                        <li>1. Open the downloaded <code className="bg-gray-700 px-2 py-1 rounded text-sm">Codemurf LabsIDE.dmg</code></li>
+                                        <li>2. Drag Codemurf IDE to Applications folder</li>
                                         <li>3. Launch from Applications or Spotlight</li>
                                         <li>4. Allow necessary permissions when prompted</li>
                                     </ol>
@@ -167,13 +167,13 @@ const DocsPage = () => {
                                     <div className="bg-gray-900/50 border border-gray-600 rounded-lg p-4">
                                         <code className="text-green-400 text-sm">
                                             # Using .deb package (Ubuntu/Debian)<br />
-                                            sudo dpkg -i AutoGen Labs-ide_*.deb<br />
+                                            sudo dpkg -i Codemurf-ide_*.deb<br />
                                             <br />
                                             # Using .rpm package (RHEL/Fedora)<br />
-                                            sudo rpm -i AutoGen Labs-ide-*.rpm<br />
+                                            sudo rpm -i Codemurf-ide-*.rpm<br />
                                             <br />
                                             # Using Snap<br />
-                                            sudo snap install AutoGen Labs-ide
+                                            sudo snap install Codemurf-ide
                                         </code>
                                     </div>
                                 </div>
@@ -187,11 +187,11 @@ const DocsPage = () => {
                     <div className="space-y-8">
                         <div>
                             <h1 className="text-4xl font-bold text-white mb-4">Setup & Configuration</h1>
-                            <p className="text-gray-300 text-lg mb-8">Configure AutoGen Labs IDE for optimal performance and personalization.</p>
+                            <p className="text-gray-300 text-lg mb-8">Configure Codemurf IDE for optimal performance and personalization.</p>
                         </div>
 
                         <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6">              <h2 className="text-2xl font-semibold text-white mb-4">Initial Setup Wizard</h2>
-                            <p className="text-gray-300 mb-4">When you first launch AutoGen Labs IDE, you'll be guided through a setup process:</p>
+                            <p className="text-gray-300 mb-4">When you first launch Codemurf IDE, you'll be guided through a setup process:</p>
                             <div className="space-y-4">
                                 <div className="flex items-start space-x-3">
                                     <span className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mt-0.5">1</span>
@@ -225,7 +225,7 @@ const DocsPage = () => {
                         </div>
 
                         <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6">              <h2 className="text-2xl font-semibold text-white mb-4">Account Setup</h2>
-                            <p className="text-gray-300 mb-4">Create your AutoGen Labs account to access cloud features and sync settings.</p>
+                            <p className="text-gray-300 mb-4">Create your Codemurf account to access cloud features and sync settings.</p>
                             <div className="bg-yellow-900/20 border border-yellow-600 rounded-lg p-4 mb-4">
                                 <p className="text-yellow-200 text-sm">
                                     <strong>Free Credits Included:</strong> New accounts receive $10 in API credits for Requesty testing and OpenRouter AI models.
@@ -252,7 +252,7 @@ const DocsPage = () => {
                                 <h2 className="text-2xl font-semibold text-white">Free API Testing Credits</h2>
                             </div>
                             <p className="text-gray-300 mb-4">
-                                Every AutoGen Labs IDE user gets <strong className="text-purple-400">$5 worth of free Requesty credits</strong> for API testing and development.
+                                Every Codemurf IDE user gets <strong className="text-purple-400">$5 worth of free Requesty credits</strong> for API testing and development.
                             </p>
                             <ul className="text-gray-300 space-y-2 mb-4">
                                 <li>• Test REST APIs, GraphQL, and WebSocket connections</li>
@@ -270,7 +270,7 @@ const DocsPage = () => {
                             <div className="space-y-6">
                                 <div>
                                     <h3 className="text-xl font-semibold text-white mb-2">1. Enable Requesty Integration</h3>
-                                    <p className="text-gray-300 mb-2">Open AutoGen Labs IDE settings and navigate to Extensions → Requesty</p>
+                                    <p className="text-gray-300 mb-2">Open Codemurf IDE settings and navigate to Extensions → Requesty</p>
                                     <div className="bg-gray-900/50 border border-gray-600 rounded-lg p-4">
                                         <code className="text-green-400 text-sm">
                                             Settings → Extensions → Requesty → Enable Integration
@@ -320,7 +320,7 @@ const DocsPage = () => {
                     <div className="space-y-8">
                         <div>
                             <h1 className="text-4xl font-bold text-white mb-4">OpenRouter AI Models Integration</h1>
-                            <p className="text-gray-300 text-lg mb-8">Access 400+ AI models from 60+ providers directly in AutoGen Labs IDE.</p>
+                            <p className="text-gray-300 text-lg mb-8">Access 400+ AI models from 60+ providers directly in Codemurf IDE.</p>
                         </div>
 
                         <div className="bg-gradient-to-r from-emerald-900/20 to-blue-900/20 border border-emerald-600 rounded-xl p-6 mb-8">
@@ -329,7 +329,7 @@ const DocsPage = () => {
                                 <h2 className="text-2xl font-semibold text-white">Free AI Model Credits</h2>
                             </div>
                             <p className="text-gray-300 mb-4">
-                                AutoGen Labs IDE users receive <strong className="text-emerald-400">$10 in OpenRouter credits</strong> to experiment with premium AI models.
+                                Codemurf IDE users receive <strong className="text-emerald-400">$10 in OpenRouter credits</strong> to experiment with premium AI models.
                             </p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                 <div>
@@ -364,7 +364,7 @@ const DocsPage = () => {
                                     <p className="text-gray-300 mb-2">Link your OpenRouter account to access AI models:</p>
                                     <div className="bg-gray-900/50 border border-gray-600 rounded-lg p-4">
                                         <code className="text-green-400 text-sm">
-                                            AutoGen Labs Settings → AI Assistant → OpenRouter → Connect Account
+                                            Codemurf Settings → AI Assistant → OpenRouter → Connect Account
                                         </code>
                                     </div>
                                 </div>
@@ -491,7 +491,7 @@ const DocsPage = () => {
                                         <span className="text-white font-bold text-lg">1</span>
                                     </div>
                                     <h3 className="text-lg font-semibold text-white mb-2">Create Account</h3>
-                                    <p className="text-gray-300 text-sm">Sign up for AutoGen Labs IDE and verify your email address</p>
+                                    <p className="text-gray-300 text-sm">Sign up for Codemurf IDE and verify your email address</p>
                                 </div>
                                 <div className="text-center">
                                     <div className="bg-blue-600 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
@@ -513,7 +513,7 @@ const DocsPage = () => {
                         <div className="bg-yellow-900/20 border border-yellow-600 rounded-xl p-6">
                             <h3 className="text-lg font-semibold text-yellow-200 mb-2">Terms & Conditions</h3>
                             <ul className="text-yellow-100 text-sm space-y-1">
-                                <li>• Free credits are available for new AutoGen Labs IDE accounts only</li>
+                                <li>• Free credits are available for new Codemurf IDE accounts only</li>
                                 <li>• Credits expire 90 days after activation</li>
                                 <li>• One free credit package per user/organization</li>
                                 <li>• Credits cannot be transferred or refunded</li>
@@ -528,7 +528,7 @@ const DocsPage = () => {
                     <div className="space-y-8">
                         <div>
                             <h1 className="text-4xl font-bold text-white mb-4">AI Code Assistant</h1>
-                            <p className="text-gray-300 text-lg mb-8">Experience the power of AI-driven development with AutoGen Labs IDE's intelligent coding assistant.</p>
+                            <p className="text-gray-300 text-lg mb-8">Experience the power of AI-driven development with Codemurf IDE's intelligent coding assistant.</p>
                         </div>
 
                         <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-600 rounded-xl p-6 mb-8">
@@ -624,7 +624,7 @@ const DocsPage = () => {
                     <div className="space-y-8">
                         <div>
                             <h1 className="text-4xl font-bold text-white mb-4">Troubleshooting</h1>
-                            <p className="text-gray-300 text-lg mb-8">Common issues and solutions for AutoGen Labs IDE.</p>
+                            <p className="text-gray-300 text-lg mb-8">Common issues and solutions for Codemurf IDE.</p>
                         </div>
 
                         <div className="space-y-6">
@@ -665,7 +665,7 @@ const DocsPage = () => {
                                             <li>1. Check AI Assistant is enabled in Settings</li>
                                             <li>2. Verify your API key is valid</li>
                                             <li>3. Check internet connectivity</li>
-                                            <li>4. Restart AutoGen Labs IDE</li>
+                                            <li>4. Restart Codemurf IDE</li>
                                             <li>5. Clear AI cache in Settings → AI → Clear Cache</li>
                                         </ol>
                                     </div>
@@ -709,12 +709,12 @@ const DocsPage = () => {
                     <div className="space-y-8">
                         <div>
                             <h1 className="text-4xl font-bold text-white mb-4">Your First Project</h1>
-                            <p className="text-gray-300 text-lg mb-8">Create your first project with AutoGen Labs IDE's powerful AI-assisted development.</p>
+                            <p className="text-gray-300 text-lg mb-8">Create your first project with Codemurf IDE's powerful AI-assisted development.</p>
                         </div>
 
                         <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6">
                             <h2 className="text-2xl font-semibold text-white mb-4">Project Creation Wizard</h2>
-                            <p className="text-gray-300 mb-4">AutoGen Labs IDE offers intelligent project templates for popular frameworks:</p>
+                            <p className="text-gray-300 mb-4">Codemurf IDE offers intelligent project templates for popular frameworks:</p>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                                 <div className="bg-gray-700/30 border border-gray-600 rounded-lg p-4 hover:bg-gray-700/50 transition-colors cursor-pointer">
@@ -800,7 +800,7 @@ const DocsPage = () => {
                                 <h2 className="text-2xl font-semibold text-white">Intelligent Completions</h2>
                             </div>
                             <p className="text-gray-300 mb-4">
-                                AutoGen Labs IDE's smart completion goes beyond simple word matching - it understands context, patterns, and intent.
+                                Codemurf IDE's smart completion goes beyond simple word matching - it understands context, patterns, and intent.
                             </p>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div className="bg-gray-700/30 border border-gray-600 rounded-lg p-4">
@@ -946,7 +946,7 @@ const DocsPage = () => {
                     <div className="space-y-8">
                         <div>
                             <h1 className="text-4xl font-bold text-white mb-4">Keyboard Shortcuts</h1>
-                            <p className="text-gray-300 text-lg mb-8">Master AutoGen Labs IDE with these essential keyboard shortcuts for faster development.</p>
+                            <p className="text-gray-300 text-lg mb-8">Master Codemurf IDE with these essential keyboard shortcuts for faster development.</p>
                         </div>
 
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -1088,7 +1088,7 @@ const DocsPage = () => {
                     <div className="space-y-8">
                         <div>
                             <h1 className="text-4xl font-bold text-white mb-4">Frequently Asked Questions</h1>
-                            <p className="text-gray-300 text-lg mb-8">Find answers to common questions about AutoGen Labs IDE.</p>
+                            <p className="text-gray-300 text-lg mb-8">Find answers to common questions about Codemurf IDE.</p>
                         </div>
 
                         <div className="space-y-6">
@@ -1097,11 +1097,11 @@ const DocsPage = () => {
                                 <div className="space-y-4">
                                     <details className="bg-gray-700/30 border border-gray-600 rounded-lg">
                                         <summary className="p-4 cursor-pointer text-white font-semibold hover:bg-gray-700/50">
-                                            What makes AutoGen Labs IDE different from other code editors?
+                                            What makes Codemurf IDE different from other code editors?
                                         </summary>
                                         <div className="p-4 pt-0">
                                             <p className="text-gray-300 text-sm">
-                                                AutoGen Labs IDE is built AI-first with integrated API testing (Requesty), access to 400+ AI models (OpenRouter),
+                                                Codemurf IDE is built AI-first with integrated API testing (Requesty), access to 400+ AI models (OpenRouter),
                                                 and intelligent code assistance. Unlike other editors, we provide a complete development ecosystem with built-in
                                                 collaboration tools, free credits for premium features, and seamless integration with modern development workflows.
                                             </p>
@@ -1110,11 +1110,11 @@ const DocsPage = () => {
 
                                     <details className="bg-gray-700/30 border border-gray-600 rounded-lg">
                                         <summary className="p-4 cursor-pointer text-white font-semibold hover:bg-gray-700/50">
-                                            Is AutoGen Labs IDE free to use?
+                                            Is Codemurf IDE free to use?
                                         </summary>
                                         <div className="p-4 pt-0">
                                             <p className="text-gray-300 text-sm">
-                                                Yes! AutoGen Labs IDE is free to download and use. We also provide $15 in free credits ($5 for Requesty API testing + $10 for OpenRouter AI models)
+                                                Yes! Codemurf IDE is free to download and use. We also provide $15 in free credits ($5 for Requesty API testing + $10 for OpenRouter AI models)
                                                 for new users. Additional premium features and higher usage limits are available with paid plans starting at $9/month.
                                             </p>
                                         </div>
@@ -1126,7 +1126,7 @@ const DocsPage = () => {
                                         </summary>
                                         <div className="p-4 pt-0">
                                             <p className="text-gray-300 text-sm">
-                                                Absolutely! AutoGen Labs IDE supports importing settings, themes, keybindings, and compatible extensions from VS Code,
+                                                Absolutely! Codemurf IDE supports importing settings, themes, keybindings, and compatible extensions from VS Code,
                                                 Cursor, and other popular editors. Use the import wizard during setup or access it later via Settings → Import Configuration.
                                             </p>
                                         </div>
@@ -1227,7 +1227,7 @@ const DocsPage = () => {
                                         </summary>
                                         <div className="p-4 pt-0">
                                             <p className="text-gray-300 text-sm">
-                                                AutoGen Labs IDE supports 50+ programming languages with first-class support for JavaScript/TypeScript, Python, Java,
+                                                Codemurf IDE supports 50+ programming languages with first-class support for JavaScript/TypeScript, Python, Java,
                                                 C/C++, Go, Rust, PHP, Ruby, Swift, Kotlin, and more. AI assistance quality is best for popular languages.
                                             </p>
                                         </div>
@@ -1235,7 +1235,7 @@ const DocsPage = () => {
 
                                     <details className="bg-gray-700/30 border border-gray-600 rounded-lg">
                                         <summary className="p-4 cursor-pointer text-white font-semibold hover:bg-gray-700/50">
-                                            Can I use AutoGen Labs IDE offline?
+                                            Can I use Codemurf IDE offline?
                                         </summary>
                                         <div className="p-4 pt-0">
                                             <p className="text-gray-300 text-sm">
@@ -1251,7 +1251,7 @@ const DocsPage = () => {
                                         </summary>
                                         <div className="p-4 pt-0">
                                             <p className="text-gray-300 text-sm">
-                                                Use Help → Report Issue in the IDE, visit our GitHub repository, or contact support@AutoGen Labs.dev.
+                                                Use Help → Report Issue in the IDE, visit our GitHub repository, or contact support@Codemurf.dev.
                                                 For feature requests, use our community forum where you can vote on proposals and discuss with other users.
                                             </p>
                                         </div>
@@ -1266,8 +1266,8 @@ const DocsPage = () => {
                 return (
                     <div className="space-y-8">
                         <div>
-                            <h1 className="text-4xl font-bold text-white mb-4">Getting Started with AutoGen Labs IDE</h1>              <p className="text-gray-300 text-lg mb-8">
-                                Welcome to AutoGen Labs IDE - the next-generation development environment powered by AI.
+                            <h1 className="text-4xl font-bold text-white mb-4">Getting Started with Codemurf IDE</h1>              <p className="text-gray-300 text-lg mb-8">
+                                Welcome to Codemurf IDE - the next-generation development environment powered by AI.
                                 Get productive faster with intelligent code assistance, integrated API testing, and seamless collaboration tools.
                             </p>
                         </div>
@@ -1278,7 +1278,7 @@ const DocsPage = () => {
                                 onClick={() => setActiveSection('installation')}
                             >
                                 <RocketLaunchIcon className="w-12 h-12 text-blue-400 mb-4" />                <h3 className="text-xl font-semibold text-white mb-2">Quick Installation</h3>
-                                <p className="text-gray-300 text-sm mb-4">Get AutoGen Labs IDE up and running in minutes across Windows, macOS, and Linux.</p>
+                                <p className="text-gray-300 text-sm mb-4">Get Codemurf IDE up and running in minutes across Windows, macOS, and Linux.</p>
                                 <span className="text-blue-400 text-sm font-medium">Start Installation →</span>
                             </div>
 
@@ -1307,13 +1307,13 @@ const DocsPage = () => {
                                 onClick={() => setActiveSection('setup')}
                             >
                                 <CogIcon className="w-12 h-12 text-orange-400 mb-4" />                <h3 className="text-xl font-semibold text-white mb-2">Configure IDE</h3>
-                                <p className="text-gray-300 text-sm mb-4">Customize AutoGen Labs IDE with themes, extensions, and integrations.</p>
+                                <p className="text-gray-300 text-sm mb-4">Customize Codemurf IDE with themes, extensions, and integrations.</p>
                                 <span className="text-orange-400 text-sm font-medium">Setup Guide →</span>
                             </div>
                         </div>
 
                         <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-600 rounded-xl p-8">
-                            <h2 className="text-2xl font-semibold text-white mb-4">🚀 What Makes AutoGen Labs IDE Special?</h2>
+                            <h2 className="text-2xl font-semibold text-white mb-4">🚀 What Makes Codemurf IDE Special?</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <h4 className="text-lg font-semibold text-white mb-2">AI-First Development</h4>
@@ -1345,7 +1345,7 @@ const DocsPage = () => {
             <div className="flex">
                 {/* Sidebar */}        <div className="w-80 bg-gray-900/50 backdrop-blur-sm border-r border-gray-700 min-h-screen sticky top-16">          <div className="p-6 pt-8 border-b border-gray-700">              <h1 className="text-2xl font-bold text-white flex items-center">
                     <BookOpenIcon className="w-8 h-8 mr-3 text-blue-400" />
-                    AutoGen Labs Docs
+                    Codemurf Docs
                 </h1>
                 </div>
                     <nav className="p-4">
