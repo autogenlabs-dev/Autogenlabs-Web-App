@@ -13,7 +13,7 @@ import {
 
 // 1. Chatbot - Least critical, load last
 export const DynamicChatbot = dynamic(
-  () => import('../ui/AutoGenChatBot'),
+  () => import('../ui/CodeMurfChatBot'),
   { 
     ssr: false,
     loading: () => <ChatbotSkeleton />

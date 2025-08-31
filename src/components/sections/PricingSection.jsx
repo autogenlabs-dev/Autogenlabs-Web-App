@@ -81,7 +81,7 @@ const PricingSection = () => {
   const handlePlanSelect = async (plan) => {
     if (plan.id === 'free') {
       // Open VS Code extension marketplace for free plan users
-      window.open('https://marketplace.visualstudio.com/items?itemName=AutoGenCodeBuilder.auto-gen-code-builder', '_blank');
+      window.open('https://marketplace.visualstudio.com/items?itemName=CodeMurf.codemurf-tools', '_blank');
       // Also redirect to signup/dashboard for account creation
       setTimeout(() => {
         window.location.href = '/auth';

@@ -130,7 +130,7 @@ export default function ThreeSteps() {
                       onClick={() => {
                         if (step.id === 1 || step.id === 2) {
                           // Download and Get Started buttons open VS Code extension
-                          window.open('https://marketplace.visualstudio.com/items?itemName=AutoGenCodeBuilder.auto-gen-code-builder', '_blank');
+                          window.open('https://marketplace.visualstudio.com/items?itemName=CodeMurf.codemurf-tools', '_blank');
                         } else if (step.id === 3) {
                           // Learn more button opens docs
                           window.open('/docs', '_blank');

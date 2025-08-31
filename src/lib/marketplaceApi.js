@@ -1,6 +1,7 @@
 /**
  * Marketplace API Service
- * Comprehensive API integration for AutogenLabs marketplace
+ /**
+ * Comprehensive API integration for CodeMurf marketplace
  */
 
 import { tokenUtils, ApiError } from './api';

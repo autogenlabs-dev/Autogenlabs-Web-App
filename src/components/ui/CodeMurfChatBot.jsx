@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send } from 'lucide-react';
 import LazySpline from './LazySpline';
 
-const AutoGenChatbot = () => {
+const CodeMurfChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
@@ -288,4 +288,4 @@ const AutoGenChatbot = () => {
   );
 };
 
-export default AutoGenChatbot;
+export default CodeMurfChatbot;

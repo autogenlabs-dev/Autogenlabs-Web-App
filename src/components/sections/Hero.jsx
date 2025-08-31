@@ -72,7 +72,7 @@ const CopilotUIComponent = () => {
           </div>
           <button 
             className="inline-flex items-center gap-2 rounded-xl bg-amber-400 px-4 py-2 text-sm font-semibold text-black hover:bg-amber-300 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
-            onClick={() => window.open('https://marketplace.visualstudio.com/items?itemName=AutoGenCodeBuilder.auto-gen-code-builder', '_blank')}
+            onClick={() => window.open('https://marketplace.visualstudio.com/items?itemName=CodeMurf.codemurf-tools', '_blank')}
           >
             Get now
           </button>
@@ -146,7 +146,7 @@ const CopilotUIComponent = () => {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: isLoaded ? 1 : 0, x: isLoaded ? 0 : -20 }}
           transition={{ duration: 0.6, delay: 1.2 }}
-          onClick={() => window.open('https://marketplace.visualstudio.com/items?itemName=AutoGenCodeBuilder.auto-gen-code-builder', '_blank')}
+          onClick={() => window.open('https://marketplace.visualstudio.com/items?itemName=CodeMurf.codemurf-tools', '_blank')}
         >
           Download in Visual Studio
         </motion.button>
@@ -157,7 +157,7 @@ const CopilotUIComponent = () => {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: isLoaded ? 1 : 0, x: isLoaded ? 0 : 20 }}
           transition={{ duration: 0.6, delay: 1.4 }}
-          onClick={() => window.open('https://marketplace.visualstudio.com/items?itemName=AutoGenCodeBuilder.auto-gen-code-builder', '_blank')}
+          onClick={() => window.open('https://marketplace.visualstudio.com/items?itemName=CodeMurf.codemurf-tools', '_blank')}
         >
           Get Started
         </motion.button>

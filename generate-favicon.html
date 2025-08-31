@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate Favicon</title>
+</head>
+<body>
+    <canvas id="canvas" width="32" height="32"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set background
+        ctx.fillStyle = '#1F2937';
+        ctx.fillRect(0, 0, 32, 32);
+        
+        // Draw logo dots
+        // Top dot - purple
+        ctx.fillStyle = '#8B5CF6';
+        ctx.beginPath();
+        ctx.arc(16, 6, 3, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        // Left dot - cyan
+        ctx.fillStyle = '#06B6D4';
+        ctx.beginPath();
+        ctx.arc(6, 16, 3, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        // Bottom dot - pink
+        ctx.fillStyle = '#EC4899';
+        ctx.beginPath();
+        ctx.arc(16, 26, 3, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        // Right dot - green
+        ctx.fillStyle = '#10B981';
+        ctx.beginPath();
+        ctx.arc(26, 16, 3, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        // Convert to data URL
+        const dataURL = canvas.toDataURL('image/png');
+        console.log('Favicon data URL:', dataURL);
+    </script>
+</body>
+</html>

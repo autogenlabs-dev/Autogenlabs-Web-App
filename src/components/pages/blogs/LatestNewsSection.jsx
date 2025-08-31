@@ -48,7 +48,7 @@ const LatestNewsSection = ({ posts }) => {
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-full">
                 <Newspaper size={16} className="text-blue-400" />
-                <span className="text-blue-400 text-sm font-medium">LATEST AUTOGEN NEWS</span>
+                <span className="text-blue-400 text-sm font-medium">LATEST CODEMURF NEWS</span>
               </div>
             </div>
             <Link href="/blogs?category=platform-updates">

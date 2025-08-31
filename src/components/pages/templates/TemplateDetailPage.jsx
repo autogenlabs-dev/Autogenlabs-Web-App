@@ -414,7 +414,7 @@ const TemplateDetailPage = ({ templateId }) => {
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
                                     onClick={() => window.open(
-                                        'https://marketplace.visualstudio.com/items?itemName=AutoGenCodeBuilder.auto-gen-code-builder',
+                                        'https://marketplace.visualstudio.com/items?itemName=CodeMurf.codemurf-tools',
                                         '_blank'
                                     )}
                                 >

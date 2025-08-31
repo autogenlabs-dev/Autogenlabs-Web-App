@@ -203,7 +203,7 @@ export const paymentApi = {
                 key: orderData.razorpay_key_id,
                 amount: orderData.amount,
                 currency: orderData.currency,
-                name: 'AutogenLabs',
+                name: 'CodeMurf',
                 description: `Purchase ${itemData.item_type}: ${itemData.title || 'Item'}`,
                 order_id: orderData.order_id,
                 handler: async (response) => {
@@ -310,7 +310,7 @@ export const paymentApi = {
                 key: orderData.razorpay_key_id,
                 amount: orderData.amount,
                 currency: orderData.currency,
-                name: 'AutogenLabs',
+                name: 'CodeMurf',
                 description: `Cart Purchase: ${cartData.items?.length || 1} items`,
                 order_id: orderData.order_id,
                 prefill: {
