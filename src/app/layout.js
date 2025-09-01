@@ -68,17 +68,7 @@ export const metadata = {
       'max-snippet': -1,
     },
   },
-  icons: {
-    icon: [
-      { url: '/favicon.ico', sizes: '16x16', type: 'image/x-icon' },
-      { url: '/favicon.svg', type: 'image/svg+xml' },
-      { url: '/favicon-48x48.svg', sizes: '48x48', type: 'image/svg+xml' },
-    ],
-    shortcut: '/favicon.ico',
-    apple: [
-      { url: '/apple-touch-icon.svg', sizes: '180x180', type: 'image/svg+xml' },
-    ],
-  },
+
   manifest: '/site.webmanifest',
 };
 
@@ -86,6 +76,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
+        {/* Google Site Verification */}
+       
+        <meta name="google-site-verification" content="szzwdNXXmtQxzUKy4qTmO6Pk8IM51TAQcdnA9j_ZsqU" />
         {/* Standard favicon */}
         <link rel="icon" type="image/x-icon" href="/favicon.ico" />
         <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
@@ -106,8 +99,6 @@ export default function RootLayout({ children }) {
         
         {/* Theme color for browser UI */}
         <meta name="theme-color" content="#000000" />
-        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
-        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" />
         <meta name="msapplication-TileColor" content="#000000" />
       </head>
       <body

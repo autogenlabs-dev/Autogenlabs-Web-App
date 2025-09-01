@@ -96,7 +96,21 @@ const Navbar = () => {
     const publicRoutes = [
       '/',
       '/auth',
-      '/blogs'
+      '/blogs',
+      '/about',
+      '/about-us',
+      '/careers',
+      '/security',
+      '/partnerships',
+      '/contact',
+      '/community',
+      '/feature-requests',
+      '/changelog',
+      '/events',
+      '/docs',
+      '/pricing',
+      '/templates',
+      '/components'
     ];
 
     // Check if the route is public (allowed without authentication)

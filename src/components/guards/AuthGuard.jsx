@@ -8,10 +8,24 @@ const AuthGuard = ({ children }) => {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Protected routes - these require authentication
+  // Protected routes - only these require authentication
   const protectedRoutes = useMemo(() => [
+    '/dashboard',
+    '/profile',
+    '/templates/create',
+    '/templates/*/edit',
+    '/components/create', 
+    '/components/*/edit'
+  ], []);
+
+  // Public routes that don't require authentication
+  const publicRoutes = useMemo(() => [
+    '/',
+    '/auth',
+    '/blogs',
     '/about',
-    '/careers', 
+    '/about-us',
+    '/careers',
     '/security',
     '/partnerships',
     '/contact',
@@ -23,20 +37,25 @@ const AuthGuard = ({ children }) => {
     '/pricing',
     '/templates',
     '/components',
-    '/dashboard',
-    '/profile'
-  ], []);
-
-  // Public routes that don't require authentication
-  const publicRoutes = useMemo(() => [
-    '/',
-    '/auth',
-    '/blogs'
+    '/test-page',
+    '/test-routing',
+    '/template-test'
   ], []);
 
   // Calculate if current route is protected - always call this hook
   const isProtectedRoute = useMemo(() => {
-    return protectedRoutes.some(route => pathname?.startsWith(route));
+    // Check exact matches first
+    if (protectedRoutes.includes(pathname)) {
+      return true;
+    }
+    
+    // Check pattern matches for dynamic routes
+    const dynamicProtectedPatterns = [
+      /^\/templates\/[^\/]+\/edit$/,  // /templates/[id]/edit
+      /^\/components\/[^\/]+\/edit$/  // /components/[id]/edit
+    ];
+    
+    return dynamicProtectedPatterns.some(pattern => pattern.test(pathname));
   }, [protectedRoutes, pathname]);
 
   // Always call useEffect - don't conditionally call hooks
