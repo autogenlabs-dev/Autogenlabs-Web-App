@@ -3,6 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Instagram, Music, Twitter, MessageCircle, Linkedin, Bot, Youtube } from 'lucide-react';
 import LazySpline from '../ui/LazySpline';
+import AnimatedLogo from '../ui/AnimatedLogo';
 
 const Footer = () => {
   const socialLinks = [
@@ -200,15 +201,7 @@ const Footer = () => {
           >
             {/* Logo & Brand */}
             <div className="space-y-4">
-              <div className="flex items-center">
-                <svg width="30" height="30" viewBox="0 0 40 40">
-                  <circle cx="20" cy="8" r="4" fill="#fff" />
-                  <circle cx="8" cy="20" r="4" fill="#fff" />
-                  <circle cx="20" cy="32" r="4" fill="#fff" />
-                  <circle cx="32" cy="20" r="4" fill="#fff" />
-                </svg>
-                <span className="text-2xl font-bold text-white ml-2">CodeMurf</span>
-              </div>
+              <AnimatedLogo size={30} />
               <p className="text-gray-400 text-sm leading-relaxed">
                 Built to keep your infrastructure in perfect state.
               </p>
