@@ -22,11 +22,11 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: {
-    default: "CodeMurf - AI-Powered Development Platform",
-    template: "%s | CodeMurf"
+    default: "CodeMurf - AI Code Editor & Online Compiler | Java, Python, JavaScript",
+    template: "%s | CodeMurf - AI Development Platform"
   },
-  description: "Transform your development workflow with CodeMurf's AI-powered tools. Build, deploy, and scale applications faster with intelligent code generation and automation.",
-  keywords: "AI development, code generation, automation, software development, programming tools, CodeMurf, web development, app development, AI coding assistant",
+  description: "CodeMurf: Free online code compiler supporting Java, Python, JavaScript & 50+ languages. AI-powered code editor like Cursor & Windsurf with intelligent completion, debugging tools, and real-time collaboration.",
+  keywords: "online code compiler, java online code compiler, cursor ai code editor, windsurf ai code editor, ai tools for software development, python compiler online, javascript online compiler, ai coding assistant, code editor with ai, programming tools, software development, web development, ai development platform, CodeMurf, free online compiler, real-time code collaboration, debugging tools, code generation, intelligent code completion",
   authors: [{ name: "CodeMurf Team", url: "https://codemurf.com" }],
   creator: "CodeMurf",
   publisher: "CodeMurf",
@@ -42,8 +42,8 @@ export const metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: "CodeMurf - AI-Powered Development Platform",
-    description: "Transform your development workflow with CodeMurf's AI-powered tools. Build, deploy, and scale applications faster.",
+    title: "CodeMurf - AI Code Editor & Online Compiler | Java, Python, JavaScript",
+    description: "Free online code compiler supporting 50+ languages with AI-powered features like Cursor & Windsurf. Intelligent code completion, debugging, and real-time collaboration.",
     url: 'https://codemurf.com',
     siteName: 'CodeMurf',
     images: [
@@ -51,7 +51,7 @@ export const metadata = {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'CodeMurf - AI-Powered Development Platform',
+        alt: 'CodeMurf - AI Code Editor & Online Compiler with Java, Python support',
         type: 'image/png',
       },
     ],
@@ -60,8 +60,8 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "CodeMurf - AI-Powered Development Platform",
-    description: "Transform your development workflow with CodeMurf's AI-powered tools.",
+    title: "CodeMurf - AI Code Editor & Online Compiler | Java, Python, JavaScript",
+    description: "Free online code compiler supporting 50+ languages with AI-powered features like Cursor & Windsurf.",
     images: ['/og-image.png'],
     creator: '@codemurf',
     site: '@codemurf',
