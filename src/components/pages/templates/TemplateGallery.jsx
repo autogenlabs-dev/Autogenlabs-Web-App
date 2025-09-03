@@ -4,9 +4,9 @@ import { motion } from 'framer-motion';
 import { Search, Grid3X3, List, Star, Download, Eye, Code, Trash2, Edit } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { marketplaceApi } from '@/lib/marketplaceApi';
-import { useAuth } from '@/contexts/AuthContext';
-import { useNotification } from '@/contexts/NotificationContext';
+import { marketplaceApi } from '../../../lib/marketplaceApi';
+import { useAuth } from '../../../contexts/AuthContext';
+import { useNotification } from '../../../contexts/NotificationContext';
 
 const TemplateGallery = () => {
   const { user } = useAuth();
@@ -567,3 +567,4 @@ const TemplateGallery = () => {
 };
 
 export default TemplateGallery;
+

@@ -135,3 +135,4 @@ export const FastLoader = ({ children, className = "" }) => {
 };
 
 export default OptimizedComponent;
+

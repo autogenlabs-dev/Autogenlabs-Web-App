@@ -4,10 +4,10 @@ import { motion } from 'framer-motion';
 import { Search, Grid3X3, List, Star, Download, Eye, Heart, Code, Filter, Trash2, Edit, MessageSquare } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { marketplaceApi } from '@/lib/marketplaceApi';
-import { useAuth } from '@/contexts/AuthContext';
-import { useNotification } from '@/contexts/NotificationContext';
-import LiveComponentPreview from '@/components/ui/LiveComponentPreview';
+import { marketplaceApi } from '../../../lib/marketplaceApi.js';
+import { useAuth } from '../../../contexts/AuthContext';
+import { useNotification } from '../../../contexts/NotificationContext';
+import LiveComponentPreview from '../../ui/LiveComponentPreview';
 
 const ComponentGallery = () => {
   const { user } = useAuth();
@@ -775,3 +775,4 @@ const ComponentGallery = () => {
 };
 
 export default ComponentGallery;
+

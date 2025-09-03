@@ -39,3 +39,4 @@ const SimpleModal = ({ isOpen, onClose, title, children }) => {
 };
 
 export default SimpleModal;
+

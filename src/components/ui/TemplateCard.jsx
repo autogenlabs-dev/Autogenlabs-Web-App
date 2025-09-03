@@ -277,3 +277,4 @@ const TemplateCard = ({ template, user = null, cardHeight = 450 }) => {
 };
 
 export default TemplateCard;
+

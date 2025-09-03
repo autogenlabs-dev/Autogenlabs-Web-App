@@ -69,3 +69,4 @@ const AnimatedLogo = ({ className = "", size = 40 }) => {
 };
 
 export default AnimatedLogo;
+

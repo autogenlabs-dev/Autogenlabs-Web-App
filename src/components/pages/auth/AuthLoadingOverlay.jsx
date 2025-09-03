@@ -141,3 +141,4 @@ const AuthLoadingOverlay = ({ isVisible, isSignIn }) => {
 };
 
 export default AuthLoadingOverlay;
+

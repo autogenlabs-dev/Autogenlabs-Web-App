@@ -86,3 +86,4 @@ const SafeRatingSection = ({ template, user = null }) => {
 };
 
 export default SafeRatingSection;
+

@@ -2,7 +2,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Clock, TrendingUp, ArrowRight } from 'lucide-react';
-import { formatDate, blogCategories } from '@/lib/blogData';
+import { formatDate, blogCategories } from '../../../lib/blogData.js';
 import Link from 'next/link';
 
 const TrendingSection = ({ posts }) => {

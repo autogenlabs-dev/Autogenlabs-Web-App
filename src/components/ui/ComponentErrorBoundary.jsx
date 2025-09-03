@@ -43,3 +43,4 @@ class ComponentErrorBoundary extends React.Component {
 }
 
 export default ComponentErrorBoundary;
+

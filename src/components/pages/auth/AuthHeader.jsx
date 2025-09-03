@@ -23,3 +23,4 @@ const AuthHeader = ({ isSignIn }) => {
 };
 
 export default AuthHeader;
+

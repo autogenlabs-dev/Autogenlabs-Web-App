@@ -296,3 +296,4 @@ const RatingSection = ({ template, user = null }) => {
 };
 
 export default RatingSection;
+

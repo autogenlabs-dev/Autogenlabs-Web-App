@@ -1,6 +1,6 @@
 // src/app/page.jsx (Optimized for Fast Initial Load)
-import Hero from "@/components/sections/Hero";
-import LogoScrollSection from "@/components/sections/LogoScrollSection";
+import Hero from "../components/sections/Hero";
+import LogoScrollSection from "../components/sections/LogoScrollSection";
 
 // Lazy-loaded components
 import {
@@ -18,10 +18,10 @@ import {
   DynamicAboutUsSection,
   DynamicFAQSection,
   DynamicChatbot
-} from "@/components/dynamic/DynamicComponents";
+} from "../components/dynamic/DynamicComponents";
 
-import { LazyComponent } from "@/components/ui/LazyLoader";
-import { OptimizedComponent, StaggeredContainer, StaggeredItem, PreloadedComponent } from "@/components/ui/OptimizedLoader";
+import { LazyComponent } from "../components/ui/LazyLoader";
+import { OptimizedComponent, StaggeredContainer, StaggeredItem, PreloadedComponent } from "../components/ui/OptimizedLoader";
 
 export default function Home() {
   return (

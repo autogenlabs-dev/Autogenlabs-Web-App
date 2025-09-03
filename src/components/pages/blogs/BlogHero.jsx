@@ -2,7 +2,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Clock, User, Eye, Heart } from 'lucide-react';
-import { formatDate, formatViews, blogCategories } from '@/lib/blogData';
+import { formatDate, formatViews, blogCategories } from '../../../lib/blogData.js';
 import Link from 'next/link';
 
 const BlogHero = ({ post }) => {

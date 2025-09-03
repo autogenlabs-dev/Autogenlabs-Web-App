@@ -6,7 +6,7 @@
 'use client';
 import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { useNotification } from '@/contexts/NotificationContext';
+import { useNotification } from '../contexts/NotificationContext';
 import { 
     Upload, 
     FileText, 
@@ -22,8 +22,8 @@ import {
     Smartphone,
     Tablet
 } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { developerApi } from '@/lib/developerApi';
+import { useAuth } from '../contexts/AuthContext';
+import { developerApi } from '../lib/developerApi';
 
 const TemplateUploadForm = ({ onSuccess, onCancel }) => {
     const { user } = useAuth();
@@ -733,3 +733,4 @@ const TemplateUploadForm = ({ onSuccess, onCancel }) => {
 };
 
 export default TemplateUploadForm;
+

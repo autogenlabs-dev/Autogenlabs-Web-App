@@ -308,3 +308,4 @@ export const generateComponentTypePreview = (component) => {
         }
     });
 };
+

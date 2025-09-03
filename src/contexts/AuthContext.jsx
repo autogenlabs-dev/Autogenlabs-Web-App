@@ -25,7 +25,16 @@ export const AuthProvider = ({ children }) => {
                 
                 if (accessToken && !tokenUtils.isTokenExpired(accessToken)) {
                     try {
-                        const userData = await authApi.getCurrentUser(accessToken);
+                        // Add timeout to prevent infinite loading
+                        const timeoutPromise = new Promise((_, reject) => 
+                            setTimeout(() => reject(new Error('Auth timeout')), 10000)
+                        );
+                        
+                        const userData = await Promise.race([
+                            authApi.getCurrentUser(accessToken),
+                            timeoutPromise
+                        ]);
+                        
                         setUser({
                             id: userData.id,
                             name: userData.full_name || userData.name || userData.email.split('@')[0],
@@ -274,3 +283,4 @@ export const AuthProvider = ({ children }) => {
         </AuthContext.Provider>
     );
 };
+

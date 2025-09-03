@@ -281,3 +281,4 @@ export const getFeaturedComponents = () => {
 export const getPopularComponents = () => {
   return sampleComponents.filter(component => component.popular);
 };
+

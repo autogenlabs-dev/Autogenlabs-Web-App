@@ -62,3 +62,4 @@ const EnhancedImage = ({ src, alt, onError, ...props }) => {
 };
 
 export default EnhancedImage;
+

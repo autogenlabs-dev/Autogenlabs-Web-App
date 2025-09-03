@@ -267,3 +267,4 @@ const AuthBackground = ({ isMounted }) => {
 };
 
 export default AuthBackground;
+

@@ -3,7 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Play, Star, Plus, Code, Zap, Globe, Shield } from 'lucide-react';
 import Link from 'next/link';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '../../../contexts/AuthContext';
 
 const TemplateLibraryHero = () => {
   const { user, isAuthenticated } = useAuth();

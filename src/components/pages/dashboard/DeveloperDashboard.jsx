@@ -24,11 +24,11 @@ import {
     Award,
     Clock
 } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { developerApi } from '@/lib/developerApi';
-import { marketplaceApi } from '@/lib/marketplaceApi';
-import ProtectedRoute from '@/components/shared/ProtectedRoute';
-import AnalyticsDashboard from '@/components/analytics/AnalyticsDashboard';
+import { useAuth } from '../../../contexts/AuthContext';
+import { developerApi } from '../../../lib/developerApi';
+import { marketplaceApi } from '../../../lib/marketplaceApi';
+import ProtectedRoute from '../../shared/ProtectedRoute';
+import AnalyticsDashboard from '../../analytics/AnalyticsDashboard';
 
 const DeveloperDashboard = () => {
     const { user } = useAuth();
@@ -56,9 +56,9 @@ const DeveloperDashboard = () => {
             setLoading(true);
             
             // Load actual user dashboard data
-            const { paymentApi } = await import('@/lib/paymentApi');
-            const { templateApi } = await import('@/lib/apiTemplates');
-            const { componentApi } = await import('@/lib/componentApi');
+            const { paymentApi } = await import('../../../lib/paymentApi');
+            const { templateApi } = await import('../../../lib/apiTemplates');
+            const { componentApi } = await import('../../../lib/componentApi');
             
             // Get user dashboard data
             let dashboardResponse = null;
@@ -819,4 +819,5 @@ const DeveloperDashboard = () => {
 };
 
 export default DeveloperDashboard;
+
 

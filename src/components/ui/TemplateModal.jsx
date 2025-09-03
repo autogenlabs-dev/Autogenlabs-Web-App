@@ -2,8 +2,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Save, AlertTriangle } from 'lucide-react';
-import TemplateForm from '@/components/forms/TemplateForm';
-import { useTemplate } from '@/contexts/TemplateContext';
+import TemplateForm from '../forms/TemplateForm';
+import { useTemplate } from '../../contexts/TemplateContext';
 
 const TemplateModal = ({ isOpen, onClose, template = null, mode = 'create' }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -196,3 +196,4 @@ const TemplateModal = ({ isOpen, onClose, template = null, mode = 'create' }) =>
 };
 
 export default TemplateModal;
+

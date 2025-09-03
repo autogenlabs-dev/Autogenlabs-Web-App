@@ -1,6 +1,6 @@
 'use client';
-import ComponentLibraryHero from '@/components/pages/components/ComponentLibraryHero';
-import ComponentGallery from '@/components/pages/components/ComponentGallery';
+import ComponentLibraryHero from '../../components/pages/components/ComponentLibraryHero';
+import ComponentGallery from '../../components/pages/components/ComponentGallery';
 
 export default function ComponentsPage() {
   return (
@@ -10,3 +10,4 @@ export default function ComponentsPage() {
     </div>
   );
 }
+

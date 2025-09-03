@@ -56,3 +56,4 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
   // Also run after a delay to catch dynamically loaded images
   setTimeout(fixImagePositioning, 1000);
 }
+

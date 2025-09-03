@@ -4,13 +4,12 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Star, Eye, Download, Clock, Code, User, Globe, Github, Heart, ExternalLink, ChevronLeft, ChevronRight, Layers, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { mockUser } from '@/lib/componentData';
-import { componentApi } from '@/lib/componentApi';
-import { marketplaceApi } from '@/lib/marketplaceApi';
-import { useAuth } from '@/contexts/AuthContext';
-import CodeViewerModal from '@/components/ui/CodeViewerModal';
-import LiveComponentPreview from '@/components/ui/LiveComponentPreview';
-import CommentSystem from '@/components/ui/CommentSystem';
+import { componentApi } from '../../../lib/componentApi.js';
+import { marketplaceApi } from '../../../lib/marketplaceApi.js';
+import { useAuth } from '../../../contexts/AuthContext.jsx';
+import CodeViewerModal from '../../ui/CodeViewerModal';
+import LiveComponentPreview from '../../ui/LiveComponentPreview';
+import CommentSystem from '../../ui/CommentSystem';
 
 const ComponentDetailPage = ({ componentId }) => {
     const [component, setComponent] = useState(null);
@@ -611,3 +610,4 @@ const ComponentDetailPage = ({ componentId }) => {
 };
 
 export default ComponentDetailPage;
+

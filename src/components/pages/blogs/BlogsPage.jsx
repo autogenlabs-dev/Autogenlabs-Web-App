@@ -12,7 +12,7 @@ import {
   blogCategories,
   getPostsByCategory,
   searchPosts 
-} from '@/lib/blogData';
+} from '../../../lib/blogData.js';
 import BlogHero from './BlogHero';
 import TrendingSection from './TrendingSection';
 import LatestNewsSection from './LatestNewsSection';

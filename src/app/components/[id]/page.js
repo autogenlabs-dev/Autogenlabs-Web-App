@@ -1,7 +1,7 @@
 'use client';
 import { use } from 'react';
-import ComponentDetailPage from '@/components/pages/components/ComponentDetailPage';
-import ComponentErrorBoundary from '@/components/ui/ComponentErrorBoundary';
+import ComponentDetailPage from '../../../components/pages/components/ComponentDetailPage';
+import ComponentErrorBoundary from '../../../components/ui/ComponentErrorBoundary';
 
 export default function ComponentDetail({ params }) {
     const resolvedParams = use(params);

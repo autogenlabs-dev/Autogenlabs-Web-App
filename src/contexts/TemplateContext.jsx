@@ -1,6 +1,6 @@
 'use client';
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
-import { templateApi } from '@/lib/apiTemplates';
+import { templateApi } from '../lib/apiTemplates';
 import { useAuth } from './AuthContext';
 
 const TemplateContext = createContext();

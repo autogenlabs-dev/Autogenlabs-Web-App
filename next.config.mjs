@@ -1,8 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // SEO Optimizations
+  trailingSlash: false, // Consistent URL structure
+  generateEtags: false, // Better caching control
+  
   // Performance optimizations
   experimental: {
     // optimizeCss: true, // Temporarily disabled to fix build issues
+    optimizePackageImports: ['lucide-react', 'framer-motion'],
   },
 
   // Turbopack configuration (moved from experimental)
@@ -110,9 +115,30 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === 'production',
   },
 
-  // Headers for better caching
+  // Headers for better caching and SEO
   async headers() {
     return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+        ],
+      },
       {
         source: '/_next/image(.*)',
         headers: [
@@ -131,6 +157,34 @@ const nextConfig = {
           },
         ],
       },
+      {
+        source: '/favicon.ico',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400',
+          },
+        ],
+      },
+    ];
+  },
+
+  // SEO redirects and rewrites
+  async redirects() {
+    return [
+      {
+        source: '/home',
+        destination: '/',
+        permanent: true,
+      },
+      // Add more SEO-friendly redirects as needed
+    ];
+  },
+
+  // SEO rewrites for clean URLs
+  async rewrites() {
+    return [
+      // Add any URL rewrites for better SEO structure
     ];
   },
 };

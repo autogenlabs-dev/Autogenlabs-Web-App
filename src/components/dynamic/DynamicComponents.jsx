@@ -268,19 +268,19 @@ export const useProgressiveLoading = () => {
 };
 
 export default {
-  DynamicChatbot,
-  DynamicVideoSection,
-  DynamicFeatureSection,
+  DynamicThreeSteps,
   DynamicTipOne,
   DynamicTipTwo,
   DynamicTipThree,
   DynamicTipFour,
   DynamicTipFive,
-  DynamicThreeSteps,
   DynamicTrainSectionTwo,
-  DynamicTestimonialSection,
+  DynamicFeatureSection,
   DynamicPricingSection,
+  DynamicTestimonialSection,
   DynamicContactSection,
   DynamicAboutUsSection,
   DynamicFAQSection,
+  DynamicChatbot,
+  DynamicVideoSection,
 };

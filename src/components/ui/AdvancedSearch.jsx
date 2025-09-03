@@ -7,7 +7,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, Filter, X, SlidersHorizontal, ChevronDown, Star, Download, IndianRupee, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { marketplaceApi } from '@/lib/marketplaceApi';
+import { marketplaceApi } from '../lib/marketplaceApi';
 import { useRouter } from 'next/navigation';
 
 const AdvancedSearch = ({ onResults, placeholder = "Search templates and components...", initialType = 'all' }) => {
@@ -499,3 +499,4 @@ const AdvancedSearch = ({ onResults, placeholder = "Search templates and compone
 };
 
 export default AdvancedSearch;
+

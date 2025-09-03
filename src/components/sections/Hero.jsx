@@ -1,8 +1,8 @@
 'use client'
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
-import { DynamicVideoSection } from '@/components/dynamic/DynamicComponents';
-import { FastLoader } from '@/components/ui/OptimizedLoader';
+import { DynamicVideoSection } from '../dynamic/DynamicComponents';
+import { FastLoader } from '../ui/OptimizedLoader';
 
 const CopilotUIComponent = () => {
   const [userName, setUserName] = useState('Akarsh'); // Dynamic user name

@@ -3,10 +3,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Play, Star, Code, Layers, Puzzle, Sparkles } from 'lucide-react';
 import Link from 'next/link';
-import { mockUser } from '@/lib/componentData';
 
 const ComponentLibraryHero = () => {
-  const user = mockUser;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -294,3 +292,4 @@ const ComponentLibraryHero = () => {
 };
 
 export default ComponentLibraryHero;
+

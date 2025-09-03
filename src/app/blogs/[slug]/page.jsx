@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
-import { getPostBySlug, getBlogPosts } from '@/lib/blogData';
-import BlogPostPage from '@/components/pages/blogs/BlogPostPage';
+import { getPostBySlug, getBlogPosts } from '../../../lib/blogData';
+import BlogPostPage from '../../../components/pages/blogs/BlogPostPage';
 
 export async function generateStaticParams() {
   const posts = getBlogPosts();

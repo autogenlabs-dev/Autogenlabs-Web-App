@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Flame, ArrowRight, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
-import { formatDate, formatViews, blogCategories } from '@/lib/blogData';
+import { formatDate, formatViews, blogCategories } from '../../../lib/blogData.js';
 import Link from 'next/link';
 
 const PopularNewsSection = ({ posts }) => {

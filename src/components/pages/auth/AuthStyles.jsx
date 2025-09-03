@@ -43,3 +43,4 @@ const AuthStyles = () => {
 };
 
 export default AuthStyles;
+

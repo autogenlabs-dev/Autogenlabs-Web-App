@@ -17,11 +17,11 @@ import {
     Search,
     Filter
 } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { paymentApi } from '@/lib/paymentApi';
-import { marketplaceApi } from '@/lib/marketplaceApi';
-import ProtectedRoute from '@/components/shared/ProtectedRoute';
-import AnalyticsDashboard from '@/components/analytics/AnalyticsDashboard';
+import { useAuth } from '../../../contexts/AuthContext';
+import { paymentApi } from '../../../lib/paymentApi';
+import { marketplaceApi } from '../../../lib/marketplaceApi';
+import ProtectedRoute from '../../shared/ProtectedRoute';
+import AnalyticsDashboard from '../../analytics/AnalyticsDashboard';
 
 const EnhancedUserDashboard = () => {
     const { user } = useAuth();
@@ -385,3 +385,4 @@ const EnhancedUserDashboard = () => {
 };
 
 export default EnhancedUserDashboard;
+

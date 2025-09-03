@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect } from 'react';
-import { useTemplate } from '@/contexts/TemplateContext';
-import { useAuth } from '@/contexts/AuthContext';
+import { useTemplate } from '../contexts/TemplateContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const TemplateDebugger = () => {
   const { templates, myTemplates, loading, error } = useTemplate();
@@ -26,3 +26,4 @@ const TemplateDebugger = () => {
 };
 
 export default TemplateDebugger;
+

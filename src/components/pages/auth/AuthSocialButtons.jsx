@@ -35,3 +35,4 @@ const AuthSocialButtons = ({ handleGoogleAuth, handleGitHubAuth, isLoading }) =>
 };
 
 export default AuthSocialButtons;
+

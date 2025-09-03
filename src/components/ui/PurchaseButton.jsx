@@ -6,9 +6,9 @@
 'use client';
 import React, { useState } from 'react';
 import { ShoppingCart, CreditCard, Loader, CheckCircle, AlertCircle, IndianRupee } from 'lucide-react';
-import { paymentApi } from '@/lib/paymentApi';
-import { useAuth } from '@/contexts/AuthContext';
-import { useCart } from '@/contexts/CartContext';
+import { paymentApi } from '../lib/paymentApi';
+import { useAuth } from '../contexts/AuthContext';
+import { useCart } from '../contexts/CartContext';
 import { useRouter } from 'next/navigation';
 
 const PurchaseButton = ({ 
@@ -236,3 +236,4 @@ const PurchaseButton = ({
 };
 
 export default PurchaseButton;
+

@@ -205,3 +205,4 @@ const VideoPreviewModal = ({ isOpen, onClose, template }) => {
 };
 
 export default VideoPreviewModal;
+

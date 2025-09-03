@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { Save } from 'lucide-react';
-import { useTemplate } from '@/contexts/TemplateContext';
+import { useTemplate } from '../contexts/TemplateContext';
 
 const TemplateForm = ({ template = null, onSubmit, onCancel, isEditing = false }) => {
     const { categories, loading } = useTemplate();

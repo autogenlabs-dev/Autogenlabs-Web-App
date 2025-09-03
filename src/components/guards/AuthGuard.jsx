@@ -87,13 +87,14 @@ const AuthGuard = ({ children }) => {
   // For auth page, always return children immediately
   if (pathname === '/auth') {
     return children;
-  } 
-  // For auth page, always return children immediately
-  if (pathname === '/auth') {
+  }
+
+  // For public routes, show children immediately without waiting for auth
+  if (!isProtectedRoute) {
     return children;
   }
 
-  // Show loading spinner while checking authentication
+  // Show loading spinner only for protected routes while checking authentication
   if (loading) {
     return (
       <div className="min-h-screen bg-[linear-gradient(180deg,#0D0B12_0%,#040406_100%)] text-white flex items-center justify-center">
@@ -134,3 +135,4 @@ const AuthGuard = ({ children }) => {
 };
 
 export default AuthGuard;
+

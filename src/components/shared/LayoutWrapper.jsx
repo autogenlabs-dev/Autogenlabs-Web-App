@@ -1,8 +1,8 @@
 'use client';
 import { usePathname } from 'next/navigation';
 import { useMemo } from 'react';
-import Navbar from "@/components/shared/Navbar";
-import Footer from "@/components/shared/Footer";
+import Navbar from "./Navbar";
+import Footer from "./Footer";
 import { AuthProvider } from '../../contexts/AuthContext';
 import { TemplateProvider } from '../../contexts/TemplateContext';
 import { CartProvider } from '../../contexts/CartContext';
@@ -77,3 +77,4 @@ const LayoutWrapper = ({ children }) => {
 };
 
 export default LayoutWrapper;
+

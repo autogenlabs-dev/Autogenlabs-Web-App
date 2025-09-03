@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect } from 'react';
-import { useTemplate } from '@/contexts/TemplateContext';
+import { useTemplate } from '../contexts/TemplateContext';
 
 export default function TemplateTestPage() {
   const { templates, loading, error, loadTemplates } = useTemplate();
@@ -48,3 +48,4 @@ export default function TemplateTestPage() {
     </div>
   );
 }
+

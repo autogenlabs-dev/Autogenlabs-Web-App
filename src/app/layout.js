@@ -1,7 +1,9 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import LayoutWrapper from "@/components/shared/LayoutWrapper";
+import LayoutWrapper from "../components/shared/LayoutWrapper";
 import { Analytics } from '@vercel/analytics/next';
+import { OrganizationSchema, WebsiteSchema, SoftwareApplicationSchema } from "../components/seo/StructuredData.jsx";
+import Script from 'next/script';
 
 // Development helper for image positioning issues
 if (process.env.NODE_ENV === "development") {
@@ -19,12 +21,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "CodeMurf - AI-Powered Development Platform",
+  title: {
+    default: "CodeMurf - AI-Powered Development Platform",
+    template: "%s | CodeMurf"
+  },
   description: "Transform your development workflow with CodeMurf's AI-powered tools. Build, deploy, and scale applications faster with intelligent code generation and automation.",
-  keywords: "AI development, code generation, automation, software development, programming tools, CodeMurf",
-  authors: [{ name: "CodeMurf Team" }],
+  keywords: "AI development, code generation, automation, software development, programming tools, CodeMurf, web development, app development, AI coding assistant",
+  authors: [{ name: "CodeMurf Team", url: "https://codemurf.com" }],
   creator: "CodeMurf",
   publisher: "CodeMurf",
+  category: "Technology",
+  applicationName: "CodeMurf",
   formatDetection: {
     email: false,
     address: false,
@@ -45,6 +52,7 @@ export const metadata = {
         width: 1200,
         height: 630,
         alt: 'CodeMurf - AI-Powered Development Platform',
+        type: 'image/png',
       },
     ],
     locale: 'en_US',
@@ -56,29 +64,40 @@ export const metadata = {
     description: "Transform your development workflow with CodeMurf's AI-powered tools.",
     images: ['/og-image.png'],
     creator: '@codemurf',
+    site: '@codemurf',
   },
   robots: {
     index: true,
     follow: true,
+    nocache: false,
     googleBot: {
       index: true,
       follow: true,
+      noimageindex: false,
       'max-video-preview': -1,
       'max-image-preview': 'large',
       'max-snippet': -1,
     },
   },
-
+  verification: {
+    google: 'szzwdNXXmtQxzUKy4qTmO6Pk8IM51TAQcdnA9j_ZsqU',
+  },
   manifest: '/site.webmanifest',
+  icons: {
+    icon: [
+      { url: '/favicon-16x16.svg', sizes: '16x16', type: 'image/svg+xml' },
+      { url: '/favicon.svg', sizes: '32x32', type: 'image/svg+xml' },
+      { url: '/favicon-48x48.svg', sizes: '48x48', type: 'image/svg+xml' },
+    ],
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.svg',
+  },
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        {/* Google Site Verification */}
-       
-        <meta name="google-site-verification" content="szzwdNXXmtQxzUKy4qTmO6Pk8IM51TAQcdnA9j_ZsqU" />
         {/* Standard favicon */}
         <link rel="icon" type="image/x-icon" href="/favicon.ico" />
         <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
@@ -104,9 +123,24 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <OrganizationSchema />
+        <WebsiteSchema />
+        <SoftwareApplicationSchema />
         <LayoutWrapper>{children}</LayoutWrapper>
         <Analytics />
+        
+        {/* SEO Monitoring Script */}
+        <Script id="seo-monitoring" strategy="afterInteractive">
+          {`
+            if (typeof window !== 'undefined' && '${process.env.NODE_ENV}' === 'development') {
+              import('/src/lib/seo-monitor.js').then(({ initSEOMonitoring }) => {
+                initSEOMonitoring();
+              });
+            }
+          `}
+        </Script>
       </body>
     </html>
   );
 }
+

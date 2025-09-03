@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { CreditCard, Shield, Lock, IndianRupee, DollarSign, X } from 'lucide-react';
-import { useNotification } from '@/contexts/NotificationContext';
+import { useNotification } from '../contexts/NotificationContext';
 
 const PaymentModal = ({ isOpen, onClose, template, selectedCurrency = 'inr' }) => {
     const { showSuccess, showError } = useNotification();
@@ -273,3 +273,4 @@ const PaymentModal = ({ isOpen, onClose, template, selectedCurrency = 'inr' }) =
 };
 
 export default PaymentModal;
+
