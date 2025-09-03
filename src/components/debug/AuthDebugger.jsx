@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { tokenUtils } from '../lib/api';
+import { useAuth } from '../../contexts/AuthContext';
+import { tokenUtils } from '../../lib/api';
 import { usePathname } from 'next/navigation';
 
 const AuthDebugger = () => {

@@ -2,7 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import LayoutWrapper from "../components/shared/LayoutWrapper";
 import { Analytics } from '@vercel/analytics/next';
-import { OrganizationSchema, WebsiteSchema, SoftwareApplicationSchema } from "../components/seo/StructuredData.jsx";
+import { OrganizationSchema, WebsiteSchema, SoftwareApplicationSchema } from "../components/seo/StructuredData";
 import Script from 'next/script';
 
 // Development helper for image positioning issues

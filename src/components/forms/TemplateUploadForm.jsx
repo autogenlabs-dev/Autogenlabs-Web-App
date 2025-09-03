@@ -22,8 +22,8 @@ import {
     Smartphone,
     Tablet
 } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { developerApi } from '../lib/developerApi';
+import { useAuth } from '../../contexts/AuthContext';
+import { developerApi } from '../../lib/developerApi';
 
 const TemplateUploadForm = ({ onSuccess, onCancel }) => {
     const { user } = useAuth();

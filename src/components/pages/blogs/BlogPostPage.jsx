@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Clock, Eye, Heart, Share2, Calendar, User, Tag, Twitter, Facebook, Linkedin, Copy, Check } from 'lucide-react';
-import { getPostBySlug, getBlogPosts, formatDate, formatViews, blogCategories } from '../../../lib/blogData.js';
+import { getPostBySlug, getBlogPosts, formatDate, formatViews, blogCategories } from '../../../lib/blogData';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 

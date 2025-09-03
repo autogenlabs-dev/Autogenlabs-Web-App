@@ -2,7 +2,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Clock, Newspaper, ArrowRight } from 'lucide-react';
-import { formatDate, blogCategories } from '../../../lib/blogData.js';
+import { formatDate, blogCategories } from '../../../lib/blogData';
 import Link from 'next/link';
 
 const LatestNewsSection = ({ posts }) => {

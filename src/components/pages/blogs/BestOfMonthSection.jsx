@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Award, ArrowRight, ChevronLeft, ChevronRight, Heart, Star } from 'lucide-react';
-import { formatDate, formatViews, blogCategories } from '../../../lib/blogData.js';
+import { formatDate, formatViews, blogCategories } from '../../../lib/blogData';
 import Link from 'next/link';
 
 const BestOfMonthSection = ({ posts }) => {

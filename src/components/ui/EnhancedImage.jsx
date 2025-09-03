@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Image from 'next/image';
-import { enhanceImageProps } from '../lib/imageHelpers';
+import { enhanceImageProps } from '../../lib/imageHelpers';
 
 /**
  * Enhanced Image component with better error handling for external images

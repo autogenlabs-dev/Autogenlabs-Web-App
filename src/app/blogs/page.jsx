@@ -1,4 +1,4 @@
-import BlogsPage from '../../components/pages/blogs/BlogsPage.jsx';
+import BlogsPage from '../../components/pages/blogs/BlogsPage';
 
 export const metadata = {
   title: 'Codemurf Blog - Infrastructure Insights & Tutorials',

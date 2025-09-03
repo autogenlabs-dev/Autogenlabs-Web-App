@@ -6,9 +6,9 @@
 'use client';
 import React, { useState } from 'react';
 import { X, ShoppingCart, Trash2, CreditCard, IndianRupee, Loader, AlertCircle } from 'lucide-react';
-import { useCart } from '../../contexts/CartContext.jsx';
-import { useAuth } from '../../contexts/AuthContext.jsx';
-import { paymentApi } from '../../lib/paymentApi.js';
+import { useCart } from '../../contexts/CartContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { paymentApi } from '../../lib/paymentApi';
 
 const ShoppingCartModal = ({ isOpen, onClose }) => {
     const [checkoutLoading, setCheckoutLoading] = useState(false);

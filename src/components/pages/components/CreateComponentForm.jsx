@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Palette, Code, Eye, Save, CheckCircle, AlertCircle, Plus, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { componentApi } from '../lib/componentApi';
+import { componentApi } from '../../../lib/componentApi';
 import CodeEditor from '../../ui/CodeEditor';
 import DualCodeEditor from '../../ui/DualCodeEditor';
 

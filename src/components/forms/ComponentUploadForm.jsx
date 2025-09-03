@@ -21,8 +21,8 @@ import {
     Eye,
     Download
 } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { developerApi } from '../lib/developerApi';
+import { useAuth } from '../../contexts/AuthContext';
+import { developerApi } from '../../lib/developerApi';
 
 const ComponentUploadForm = ({ onSuccess, onCancel }) => {
     const { user } = useAuth();

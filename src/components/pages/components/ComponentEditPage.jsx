@@ -4,8 +4,8 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Save, X, Upload, Code, Eye, AlertCircle, Copy, IndianRupee } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { marketplaceApi } from '../lib/marketplaceApi';
-import { useAuth } from '../contexts/AuthContext';
+import { marketplaceApi } from '../../../lib/marketplaceApi';
+import { useAuth } from '../../../contexts/AuthContext';
 import CodeEditor from '../../ui/CodeEditor';
 
 const ComponentEditPage = ({ componentId }) => {

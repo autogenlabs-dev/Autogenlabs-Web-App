@@ -3,9 +3,9 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, X, Plus, Github, Globe, IndianRupee, DollarSign, Save, Eye } from 'lucide-react';
 import Link from 'next/link';
-import { templateCategories, difficultyLevels, templateTypes, planTypes } from '../lib/templateData';
-import { useTemplate } from '../contexts/TemplateContext';
-import { useAuth } from '../contexts/AuthContext';
+import { templateCategories, difficultyLevels, templateTypes, planTypes } from '../../../lib/templateData';
+import { useTemplate } from '../../../contexts/TemplateContext';
+import { useAuth } from '../../../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 
 const CreateTemplateForm = () => {

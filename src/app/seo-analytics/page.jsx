@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ChartBarIcon, MagnifyingGlassIcon, LinkIcon, TrendingUpIcon } from '@heroicons/react/24/outline';
+import { ChartBarIcon, MagnifyingGlassIcon, LinkIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
 
 export default function SEOAnalytics() {
   const [activeTab, setActiveTab] = useState('keywords');
@@ -14,7 +14,7 @@ export default function SEOAnalytics() {
     { id: 'keywords', name: 'Keyword Research', icon: MagnifyingGlassIcon },
     { id: 'backlinks', name: 'Backlink Analysis', icon: LinkIcon },
     { id: 'competitors', name: 'Competitor Analysis', icon: ChartBarIcon },
-    { id: 'trends', name: 'SEO Trends', icon: TrendingUpIcon },
+    { id: 'trends', name: 'SEO Trends', icon: ArrowTrendingUpIcon },
   ];
 
   const handleKeywordAnalysis = async () => {

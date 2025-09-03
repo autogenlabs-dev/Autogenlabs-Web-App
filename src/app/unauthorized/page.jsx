@@ -2,7 +2,7 @@
 import React from 'react';
 import { Shield, ArrowLeft, Home } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 const UnauthorizedPage = () => {
     const router = useRouter();

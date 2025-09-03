@@ -4,9 +4,9 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Star, Eye, Download, Clock, Code, User, Globe, Github, Play, Heart, ExternalLink, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useAuth } from '../contexts/AuthContext';
-import { generateMultipleScreenshots, getBestPreviewImage } from '../utils/livePreviewUtils';
-import { useTemplate } from '../contexts/TemplateContext';
+import { useAuth } from '../../../contexts/AuthContext';
+import { generateMultipleScreenshots, getBestPreviewImage } from '../../../utils/livePreviewUtils';
+import { useTemplate } from '../../../contexts/TemplateContext';
 import ComponentErrorBoundary from '../../ui/ComponentErrorBoundary';
 import CommentSystem from '../../ui/CommentSystem';
 

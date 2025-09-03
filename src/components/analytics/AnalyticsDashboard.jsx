@@ -28,9 +28,9 @@ import {
     Star,
     Award
 } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext.jsx';
-import { adminApi } from '../../lib/adminApi.js';
-import { developerApi } from '../../lib/developerApi.js';
+import { useAuth } from '../../contexts/AuthContext';
+import { adminApi } from '../../lib/adminApi';
+import { developerApi } from '../../lib/developerApi';
 
 const AnalyticsDashboard = ({ userRole = 'user', period = '7d' }) => {
     const { user } = useAuth();

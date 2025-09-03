@@ -34,8 +34,8 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import { Star, MessageSquare, Send, ThumbsUp, ThumbsDown, MoreVertical, Edit, Trash2, Reply, Flag } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { marketplaceApi } from '../lib/marketplaceApi';
+import { useAuth } from '../../contexts/AuthContext';
+import { marketplaceApi } from '../../lib/marketplaceApi';
 
 const CommentSystem = ({ itemId, itemType, itemTitle }) => {
     const [comments, setComments] = useState([]);

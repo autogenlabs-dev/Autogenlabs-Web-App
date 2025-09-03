@@ -1,6 +1,6 @@
 'use client';
-import TemplateLibraryHero from '../../components/pages/templates/TemplateLibraryHero.jsx';
-import TemplateGallery from '../../components/pages/templates/TemplateGallery.jsx';
+import TemplateLibraryHero from '../../components/pages/templates/TemplateLibraryHero';
+import TemplateGallery from '../../components/pages/templates/TemplateGallery';
 
 export default function TemplatesPage() {
   return (
