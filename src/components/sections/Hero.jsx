@@ -11,12 +11,12 @@ const CopilotUIComponent = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const placeholderTexts = [
-    "Build me a React component for user authentication...",
-    "Create an API endpoint for user management...", 
-    "Generate a responsive dashboard layout...",
-    "Help me optimize this React application...",
-    "Write unit tests for my components...",
-    "Build a real-time chat application..."
+    "Create a secure login system with JWT authentication...",
+    "Build a real-time code collaboration platform...", 
+    "Generate a modern React dashboard with TypeScript...",
+    "Design an AI-powered code review assistant...",
+    "Create automated testing pipelines for my app...",
+    "Build a microservices architecture with Docker..."
   ];
 
   useEffect(() => {

@@ -7,8 +7,8 @@ export default function SEOAnalytics() {
   const [activeTab, setActiveTab] = useState('keywords');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({});
-  const [domain, setDomain] = useState('autogenlabs.com');
-  const [keywords, setKeywords] = useState(['AI automation', 'workflow automation', 'business automation']);
+  const [domain, setDomain] = useState('codemurf.com');
+  const [keywords, setKeywords] = useState(['codemurf', 'code development', 'programming services', 'software development', 'coding platform']);
 
   const tabs = [
     { id: 'keywords', name: 'Keyword Research', icon: MagnifyingGlassIcon },
@@ -185,37 +185,103 @@ function KeywordAnalysis({ data, loading, onAnalyze }) {
       </div>
 
       {data && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-medium mb-2">Search Volume</h3>
-            <p className="text-2xl font-bold text-blue-600">
-              {data.totalSearchVolume?.toLocaleString() || '0'}
-            </p>
+        <div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h3 className="font-medium mb-2">Total Search Volume</h3>
+              <p className="text-2xl font-bold text-blue-600">
+                {data.totalSearchVolume?.toLocaleString() || '0'}
+              </p>
+              <p className="text-sm text-gray-500 mt-1">Monthly searches</p>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h3 className="font-medium mb-2">Avg. CPC</h3>
+              <p className="text-2xl font-bold text-green-600">
+                ${data.avgCPC?.toFixed(2) || '0.00'}
+              </p>
+              <p className="text-sm text-gray-500 mt-1">Cost per click</p>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h3 className="font-medium mb-2">Competition</h3>
+              <p className="text-2xl font-bold text-orange-600">
+                {data.avgCompetition || 'Low'}
+              </p>
+              <p className="text-sm text-gray-500 mt-1">Average level</p>
+            </div>
           </div>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-medium mb-2">Avg. CPC</h3>
-            <p className="text-2xl font-bold text-green-600">
-              ${data.avgCPC?.toFixed(2) || '0.00'}
+
+          {/* Detailed keyword breakdown */}
+          {data.keywords && data.keywords.length > 0 && (
+            <div className="bg-white border rounded-lg overflow-hidden">
+              <div className="px-4 py-3 bg-gray-50 border-b">
+                <h3 className="font-medium">Keyword Details</h3>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Keyword</th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Search Volume</th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">CPC</th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Competition</th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Difficulty</th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Intent</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {data.keywords.map((keyword, index) => (
+                      <tr key={index} className="hover:bg-gray-50">
+                        <td className="px-4 py-2 text-sm font-medium">{keyword.keyword}</td>
+                        <td className="px-4 py-2 text-sm">{keyword.search_volume?.toLocaleString() || 'N/A'}</td>
+                        <td className="px-4 py-2 text-sm">${keyword.cpc?.toFixed(2) || '0.00'}</td>
+                        <td className="px-4 py-2 text-sm">
+                          <span className={`px-2 py-1 rounded-full text-xs ${
+                            keyword.competition_level === 'HIGH' ? 'bg-red-100 text-red-800' :
+                            keyword.competition_level === 'MEDIUM' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-green-100 text-green-800'
+                          }`}>
+                            {keyword.competition_level || 'Low'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-2 text-sm">{keyword.keyword_difficulty || 'N/A'}</td>
+                        <td className="px-4 py-2 text-sm capitalize">{keyword.search_intent || 'N/A'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Keyword suggestions */}
+          {data.suggestions && data.suggestions.length > 0 && (
+            <div className="mt-6">
+              <h3 className="font-medium mb-4">Keyword Suggestions</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                {data.suggestions.map((suggestion, index) => (
+                  <div key={index} className="bg-blue-50 px-3 py-2 rounded-lg text-sm">
+                    {suggestion}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {!data && (
+        <div className="mt-6">
+          <h3 className="font-medium mb-4">Ready to Analyze</h3>
+          <div className="bg-gray-50 p-6 rounded-lg text-center">
+            <p className="text-gray-600 mb-4">
+              Click "Analyze Keywords" to get detailed SEO insights using DataForSEO tools.
             </p>
-          </div>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-medium mb-2">Competition</h3>
-            <p className="text-2xl font-bold text-orange-600">
-              {data.avgCompetition || 'Low'}
+            <p className="text-sm text-gray-500">
+              We'll analyze search volume, competition, CPC, and provide keyword suggestions.
             </p>
           </div>
         </div>
       )}
-
-      <div className="mt-6">
-        <h3 className="font-medium mb-4">Keyword Opportunities</h3>
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <p className="text-gray-600">
-            Use the DataForSEO keyword tools to discover high-volume, low-competition keywords
-            for your content strategy.
-          </p>
-        </div>
-      </div>
     </div>
   );
 }
