@@ -31,7 +31,7 @@ export const DynamicVideoSection = dynamic(
 
 // 3. [Removed - InteractiveBentoGrid not used in project]
 
-// 3. Feature Section - Heavy network diagrams
+// 3. Feature Section - Heavy network diagrams  
 export const DynamicFeatureSection = dynamic(
   () => import('../sections/FeatureSection'),
   { 
