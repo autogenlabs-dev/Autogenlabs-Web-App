@@ -22,11 +22,11 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: {
-    default: "CodeMurf - AI Code Editor & Online Compiler | Java, Python, JavaScript",
-    template: "%s | CodeMurf - AI Development Platform"
+    default: "Codemurf – AI Coding Assistant | Online Code Editor & Compiler",
+    template: "%s | Codemurf – AI Coding Assistant"
   },
-  description: "CodeMurf: Free online code compiler supporting Java, Python, JavaScript & 50+ languages. AI-powered code editor like Cursor & Windsurf with intelligent completion, debugging tools, and real-time collaboration.",
-  keywords: "online code compiler, java online code compiler, cursor ai code editor, windsurf ai code editor, ai tools for software development, python compiler online, javascript online compiler, ai coding assistant, code editor with ai, programming tools, software development, web development, ai development platform, CodeMurf, free online compiler, real-time code collaboration, debugging tools, code generation, intelligent code completion",
+  description: "Codemurf: AI-powered coding assistant with online code editor and compiler. Support for 50+ programming languages including Java, Python, JavaScript. Smart code completion, debugging tools, and real-time collaboration like Cursor & Windsurf IDE.",
+  keywords: "ai coding assistant, codemurf, online code editor, code compiler, cursor alternative, windsurf alternative, ai code completion, java compiler online, python online ide, javascript editor, ai programming tools, smart code editor, real-time coding collaboration, ai development assistant, code generation ai",
   authors: [{ name: "CodeMurf Team", url: "https://codemurf.com" }],
   creator: "CodeMurf",
   publisher: "CodeMurf",
@@ -42,16 +42,16 @@ export const metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: "CodeMurf - AI Code Editor & Online Compiler | Java, Python, JavaScript",
-    description: "Free online code compiler supporting 50+ languages with AI-powered features like Cursor & Windsurf. Intelligent code completion, debugging, and real-time collaboration.",
+    title: "Codemurf – AI Coding Assistant | Smart Online Code Editor",
+    description: "AI-powered coding assistant with intelligent code completion, debugging, and collaboration. Support for 50+ languages. Better than traditional IDEs with smart AI features.",
     url: 'https://codemurf.com',
-    siteName: 'CodeMurf',
+    siteName: 'Codemurf',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'CodeMurf - AI Code Editor & Online Compiler with Java, Python support',
+        alt: 'Codemurf – AI Coding Assistant with Smart Code Editor',
         type: 'image/png',
       },
     ],
@@ -60,8 +60,8 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "CodeMurf - AI Code Editor & Online Compiler | Java, Python, JavaScript",
-    description: "Free online code compiler supporting 50+ languages with AI-powered features like Cursor & Windsurf.",
+    title: "Codemurf – AI Coding Assistant | Smart Online Code Editor",
+    description: "AI-powered coding assistant with intelligent code completion and collaboration. Support for 50+ programming languages.",
     images: ['/og-image.png'],
     creator: '@codemurf',
     site: '@codemurf',

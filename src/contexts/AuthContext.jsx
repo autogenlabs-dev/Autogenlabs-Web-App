@@ -23,11 +23,31 @@ export const AuthProvider = ({ children }) => {
             try {
                 const accessToken = tokenUtils.getAccessToken();
                 
+                // If no access token, skip API calls and set loading to false immediately
+                if (!accessToken) {
+                    tokenUtils.clearTokens();
+                    setUser(null);
+                    setLoading(false);
+                    return;
+                }
+                
+                if (tokenUtils.isTokenExpired(accessToken)) {
+                    // If token is expired, try refresh immediately or clear tokens
+                    const refreshToken = tokenUtils.getRefreshToken();
+                    if (!refreshToken) {
+                        tokenUtils.clearTokens();
+                        setUser(null);
+                        setLoading(false);
+                        return;
+                    }
+                }
+                
                 if (accessToken && !tokenUtils.isTokenExpired(accessToken)) {
                     try {
-                        // Add timeout to prevent infinite loading
+                        // Add shorter timeout to prevent infinite loading - especially for production
+                        const timeoutMs = process.env.NODE_ENV === 'production' ? 3000 : 5000;
                         const timeoutPromise = new Promise((_, reject) => 
-                            setTimeout(() => reject(new Error('Auth timeout')), 10000)
+                            setTimeout(() => reject(new Error('Auth timeout')), timeoutMs)
                         );
                         
                         const userData = await Promise.race([
