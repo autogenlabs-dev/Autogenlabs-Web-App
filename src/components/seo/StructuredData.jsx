@@ -7,25 +7,24 @@ export const OrganizationSchema = () => {
   const organizationData = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "AutogenLabs",
-    "description": "AI-powered automation and workflow solutions for modern businesses",
-    "url": "https://autogenlabs.vercel.app",
+    "name": "CodeMurf",
+    "description": "AI-powered development platform with online code compiler supporting Java, Python, JavaScript and 50+ languages",
+    "url": "https://codemurf.com",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://autogenlabs.vercel.app/logo.svg",
+      "url": "https://codemurf.com/logo.svg",
       "width": "200",
       "height": "60"
     },
     "contactPoint": {
       "@type": "ContactPoint",
-      "telephone": "+1-555-0123",
       "contactType": "customer service",
       "availableLanguage": "English"
     },
     "sameAs": [
-      "https://twitter.com/autogenlabs",
-      "https://linkedin.com/company/autogenlabs",
-      "https://github.com/autogenlabs"
+      "https://twitter.com/codemurf",
+      "https://linkedin.com/company/codemurf",
+      "https://github.com/codemurf"
     ]
   };
 
@@ -41,14 +40,14 @@ export const WebsiteSchema = () => {
   const websiteData = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "AutogenLabs",
-    "description": "AI-powered automation and workflow solutions for modern businesses",
-    "url": "https://autogenlabs.vercel.app",
+    "name": "CodeMurf",
+    "description": "AI-powered code editor and online compiler supporting Java, Python, JavaScript and 50+ programming languages",
+    "url": "https://codemurf.com",
     "potentialAction": {
       "@type": "SearchAction",
       "target": {
         "@type": "EntryPoint",
-        "urlTemplate": "https://autogenlabs.vercel.app/search?q={search_term_string}"
+        "urlTemplate": "https://codemurf.com/search?q={search_term_string}"
       },
       "query-input": "required name=search_term_string"
     }
@@ -66,20 +65,20 @@ export const SoftwareApplicationSchema = () => {
   const softwareData = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    "name": "AutogenLabs Platform",
-    "description": "Comprehensive AI automation platform for businesses of all sizes",
-    "url": "https://autogenlabs.vercel.app",
-    "applicationCategory": "BusinessApplication",
+    "name": "CodeMurf AI Code Editor",
+    "description": "AI-powered online code compiler and editor supporting Java, Python, JavaScript and 50+ programming languages with intelligent code completion",
+    "url": "https://codemurf.com",
+    "applicationCategory": "DeveloperApplication",
     "operatingSystem": "Web Browser",
     "offers": {
       "@type": "Offer",
       "price": "0",
       "priceCurrency": "USD",
-      "description": "Free tier available with premium features"
+      "description": "Free online compiler with premium AI features"
     },
     "creator": {
       "@type": "Organization",
-      "name": "AutogenLabs"
+      "name": "CodeMurf"
     },
     "aggregateRating": {
       "@type": "AggregateRating",
