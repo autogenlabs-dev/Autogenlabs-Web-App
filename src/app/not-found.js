@@ -1,7 +1,5 @@
-'use client';
 import React from 'react';
-import { motion } from 'framer-motion';
-import { FileQuestion, ArrowLeft, Search, Home } from 'lucide-react';
+import { FileQuestion, Home, Search } from 'lucide-react';
 import Link from 'next/link';
 
 const NotFound = () => {
@@ -23,19 +21,9 @@ const NotFound = () => {
       </div>
 
       <div className="relative z-10 text-center px-6 max-w-lg mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="space-y-8"
-        >
+        <div className="space-y-8">
           {/* 404 Icon */}
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex justify-center"
-          >
+          <div className="flex justify-center">
             <div
               className="w-24 h-24 rounded-3xl border border-white/20 flex items-center justify-center"
               style={{
@@ -45,15 +33,10 @@ const NotFound = () => {
             >
               <FileQuestion size={48} className="text-purple-400" />
             </div>
-          </motion.div>
+          </div>
 
           {/* Error Message */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="space-y-4"
-          >
+          <div className="space-y-4">
             <h1 className="text-4xl md:text-5xl font-bold text-white">
               Page Not Found
             </h1>
@@ -61,37 +44,25 @@ const NotFound = () => {
               The page you&apos;re looking for doesn&apos;t exist or may have been moved. 
               Let&apos;s get you back on track.
             </p>
-          </motion.div>
+          </div>
 
           {/* Action Buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
-          >
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/">
-              <motion.button
-                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 rounded-xl font-semibold transition-all duration-300"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
+              <button className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 rounded-xl font-semibold transition-all duration-300">
                 <Home size={16} />
                 Go Home
-              </motion.button>
+              </button>
             </Link>
 
             <Link href="/blogs">
-              <motion.button
-                className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/20 rounded-lg text-gray-300 hover:text-white transition-all duration-300 mx-auto"
-                whileHover={{ scale: 1.02 }}
-              >
+              <button className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/20 rounded-lg text-gray-300 hover:text-white transition-all duration-300 mx-auto">
                 <Search size={16} />
                 Browse Content
-              </motion.button>
+              </button>
             </Link>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
     </div>
   );
