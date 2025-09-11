@@ -22,16 +22,23 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: {
-    default: "CodeMurf - AI Code Editor & Online Compiler | Java, Python, JavaScript",
-    template: "%s | CodeMurf - AI Development Platform"
+    default: "AI Code Builder | Codemurf",
+    template: "%s | Codemurf"
   },
-  description: "CodeMurf: Free online code compiler supporting Java, Python, JavaScript & 50+ languages. AI-powered code editor like Cursor & Windsurf with intelligent completion, debugging tools, and real-time collaboration.",
-  keywords: "online code compiler, java online code compiler, cursor ai code editor, windsurf ai code editor, ai tools for software development, python compiler online, javascript online compiler, ai coding assistant, code editor with ai, programming tools, software development, web development, ai development platform, CodeMurf, free online compiler, real-time code collaboration, debugging tools, code generation, intelligent code completion",
-  authors: [{ name: "CodeMurf Team", url: "https://codemurf.com" }],
-  creator: "CodeMurf",
-  publisher: "CodeMurf",
+  description: "AI Code Builder by Codemurf lets you instantly generate websites and apps using AI. No coding required — build faster, smarter, and easier.",
+  keywords: [
+    "AI website builder",
+    "AI code generator",
+    "AI Code Builder",
+    "Codemurf",
+    "no code website builder",
+    "AI app builder",
+  ],
+  authors: [{ name: "Codemurf Team", url: "https://codemurf.com" }],
+  creator: "Codemurf",
+  publisher: "Codemurf",
   category: "Technology",
-  applicationName: "CodeMurf",
+  applicationName: "Codemurf",
   formatDetection: {
     email: false,
     address: false,
@@ -39,19 +46,19 @@ export const metadata = {
   },
   metadataBase: new URL('https://codemurf.com'),
   alternates: {
-    canonical: '/',
+    canonical: "https://codemurf.com",
   },
   openGraph: {
-    title: "CodeMurf - AI Code Editor & Online Compiler | Java, Python, JavaScript",
-    description: "Free online code compiler supporting 50+ languages with AI-powered features like Cursor & Windsurf. Intelligent code completion, debugging, and real-time collaboration.",
+    title: "AI Code Builder | Codemurf",
+    description: "Create websites instantly with AI Code Builder. Just describe it, and Codemurf builds your live site.",
     url: 'https://codemurf.com',
-    siteName: 'CodeMurf',
+    siteName: 'Codemurf',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'CodeMurf - AI Code Editor & Online Compiler with Java, Python support',
+        alt: 'AI Code Builder - Codemurf',
         type: 'image/png',
       },
     ],
@@ -60,8 +67,8 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "CodeMurf - AI Code Editor & Online Compiler | Java, Python, JavaScript",
-    description: "Free online code compiler supporting 50+ languages with AI-powered features like Cursor & Windsurf.",
+    title: "AI Code Builder | Codemurf",
+    description: "Build websites instantly with Codemurf's AI Code Builder. No coding required — go live in seconds.",
     images: ['/og-image.png'],
     creator: '@codemurf',
     site: '@codemurf',
@@ -69,14 +76,12 @@ export const metadata = {
   robots: {
     index: true,
     follow: true,
-    nocache: false,
     googleBot: {
       index: true,
       follow: true,
-      noimageindex: false,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      maxSnippet: -1,
+      maxImagePreview: "large",
+      maxVideoPreview: -1,
     },
   },
   verification: {
@@ -84,13 +89,9 @@ export const metadata = {
   },
   manifest: '/site.webmanifest',
   icons: {
-    icon: [
-      { url: '/favicon-16x16.svg', sizes: '16x16', type: 'image/svg+xml' },
-      { url: '/favicon.svg', sizes: '32x32', type: 'image/svg+xml' },
-      { url: '/favicon-48x48.svg', sizes: '48x48', type: 'image/svg+xml' },
-    ],
-    shortcut: '/favicon.ico',
-    apple: '/apple-touch-icon.svg',
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
 };
 
