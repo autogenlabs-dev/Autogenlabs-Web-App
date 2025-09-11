@@ -1,4 +1,3 @@
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import LayoutWrapper from "../components/shared/LayoutWrapper";
 import { Analytics } from '@vercel/analytics/next';
@@ -10,15 +9,16 @@ if (process.env.NODE_ENV === "development") {
   import("../lib/devImageFix.js");
 }
 
-const geistSans = Geist({
+// Fallback font configuration to prevent build failures
+const fontConfig = {
   variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+  className: "font-sans",
+};
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const monoFontConfig = {
+  variable: "--font-geist-mono", 
+  className: "font-mono",
+};
 
 export const metadata = {
   title: {
@@ -170,7 +170,7 @@ export default function RootLayout({ children }) {
         <meta name="msapplication-TileColor" content="#000000" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${fontConfig.variable} ${monoFontConfig.variable} antialiased font-sans`}
       >
         <OrganizationSchema />
         <WebsiteSchema />
