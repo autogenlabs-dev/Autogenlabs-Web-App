@@ -18,8 +18,27 @@ const Navbar = () => {
   const timeoutRef = useRef(null);
   const router = useRouter();
   const pathname = usePathname();
-  const { user, isAuthenticated, logout, loading } = useAuth();
-  const { cartCount } = useCart();
+  
+  // Handle auth context gracefully for SSR
+  let user = null, isAuthenticated = false, logout = () => {}, loading = false;
+  try {
+    const auth = useAuth();
+    user = auth.user;
+    isAuthenticated = auth.isAuthenticated;
+    logout = auth.logout;
+    loading = auth.loading;
+  } catch (error) {
+    // During SSR or when AuthProvider is not available, use defaults
+  }
+  
+  // Handle cart context gracefully for SSR
+  let cartCount = 0;
+  try {
+    const cart = useCart();
+    cartCount = cart.cartCount;
+  } catch (error) {
+    // During SSR or when CartProvider is not available, use defaults
+  }
 
   useEffect(() => {
     setMounted(true);

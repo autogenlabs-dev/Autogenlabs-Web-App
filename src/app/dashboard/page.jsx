@@ -7,6 +7,9 @@ import EnhancedUserDashboard from '../../components/pages/dashboard/EnhancedUser
 import DeveloperDashboard from '../../components/pages/dashboard/DeveloperDashboard';
 import AdminDashboard from '../../components/pages/dashboard/AdminDashboard';
 
+// Disable prerendering for this authenticated page
+export const dynamic = 'force-dynamic';
+
 const Dashboard = () => {
     const { user, loading } = useAuth();
     const router = useRouter();

@@ -3,12 +3,30 @@
 import { useState, useEffect } from 'react';
 import { ChartBarIcon, MagnifyingGlassIcon, LinkIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
 
+// Disable prerendering for this page
+export const dynamic = 'force-dynamic';
+
 export default function SEOAnalytics() {
   const [activeTab, setActiveTab] = useState('keywords');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({});
   const [domain, setDomain] = useState('codemurf.com');
   const [keywords, setKeywords] = useState(['codemurf', 'code development', 'programming services', 'software development', 'coding platform']);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Ensure component only renders on client-side
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Don't render anything during SSR
+  if (!isMounted) {
+    return <div className="min-h-screen bg-[linear-gradient(180deg,#040406_50%,#09080D_100%)] text-white flex items-center justify-center">
+      <div className="text-center">
+        <p className="text-gray-400">Loading SEO Analytics...</p>
+      </div>
+    </div>;
+  }
 
   const tabs = [
     { id: 'keywords', name: 'Keyword Research', icon: MagnifyingGlassIcon },

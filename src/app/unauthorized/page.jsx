@@ -4,6 +4,9 @@ import { Shield, ArrowLeft, Home } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../contexts/AuthContext';
 
+// Disable prerendering for this page that uses auth context
+export const dynamic = 'force-dynamic';
+
 const UnauthorizedPage = () => {
     const router = useRouter();
     const { user } = useAuth();
