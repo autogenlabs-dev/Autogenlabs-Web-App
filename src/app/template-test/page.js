@@ -1,3 +1,6 @@
+// Disable prerendering for this test page
+export const dynamic = 'force-dynamic';
+
 export default function TemplateTestPage() {
   return (
     <div className="p-8 text-white">

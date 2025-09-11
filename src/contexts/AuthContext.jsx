@@ -14,7 +14,8 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+    // Start with loading false during SSR, will be updated in useEffect
+    const [loading, setLoading] = useState(typeof window === 'undefined' ? false : true);
     const [error, setError] = useState(null);
 
     // Load user from stored tokens on app initialization

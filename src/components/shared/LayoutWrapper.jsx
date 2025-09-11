@@ -1,6 +1,6 @@
 'use client';
 import { usePathname } from 'next/navigation';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { AuthProvider } from '../../contexts/AuthContext';
@@ -11,6 +11,12 @@ import AuthGuard from '../guards/AuthGuard';
 
 const LayoutWrapper = ({ children }) => {
     const pathname = usePathname();
+    const [isClient, setIsClient] = useState(false);
+
+    // Ensure we're on the client side before rendering context providers
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
 
     // Use consistent hook calling pattern
     const isAuthPage = useMemo(() => {
@@ -59,6 +65,11 @@ const LayoutWrapper = ({ children }) => {
             );
         }
     }, [isAuthPage, shouldHideFooter, children]);
+
+    // During SSR or before client hydration, render without context providers and auth guard
+    if (!isClient) {
+        return content;
+    }
 
     return (
         <NotificationProvider>

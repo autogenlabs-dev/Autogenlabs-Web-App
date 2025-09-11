@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import { ChartBarIcon, MagnifyingGlassIcon, LinkIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
 
+// Disable prerendering for this page
+export const dynamic = 'force-dynamic';
+
 export default function SEOAnalytics() {
   const [activeTab, setActiveTab] = useState('keywords');
   const [loading, setLoading] = useState(false);

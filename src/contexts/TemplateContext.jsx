@@ -14,7 +14,17 @@ export const useTemplate = () => {
 };
 
 export const TemplateProvider = ({ children }) => {
-  const { user, isAuthenticated } = useAuth();
+  // Handle SSR gracefully by checking if AuthProvider is available
+  let user = null, isAuthenticated = false;
+  try {
+    const authContext = useAuth();
+    user = authContext.user;
+    isAuthenticated = authContext.isAuthenticated;
+  } catch (error) {
+    // During SSR or if AuthProvider is not available, use defaults
+    user = null;
+    isAuthenticated = false;
+  }
   const [templates, setTemplates] = useState([]);
   const [myTemplates, setMyTemplates] = useState([]);
   const [loading, setLoading] = useState(false);
