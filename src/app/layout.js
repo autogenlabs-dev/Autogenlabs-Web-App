@@ -22,78 +22,126 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: {
-    default: "AI Code Builder | Codemurf",
-    template: "%s | Codemurf"
+    default: "AI Code Builder - Next-Gen VS Code AI Agent | Write Code 10x Faster",
+    template: "%s | Codemurf AI Code Builder - Your Intelligent Coding Partner",
   },
-  description: "AI Code Builder by Codemurf lets you instantly generate websites and apps using AI. No coding required — build faster, smarter, and easier.",
-  keywords: [
-    "AI website builder",
-    "AI code generator",
-    "AI Code Builder",
-    "Codemurf",
-    "no code website builder",
-    "AI app builder",
-  ],
-  authors: [{ name: "Codemurf Team", url: "https://codemurf.com" }],
-  creator: "Codemurf",
-  publisher: "Codemurf",
-  category: "Technology",
-  applicationName: "Codemurf",
+  description:
+    "Transform your coding workflow with AI Code Builder - the most advanced VS Code AI agent that writes, debugs, and optimizes code in real-time. Join 50,000+ developers using Codemurf to ship code faster than Cursor or Windsurf. Experience intelligent code generation, automated refactoring, and context-aware suggestions powered by cutting-edge AI.",
+  keywords:
+    "AI code builder, VS Code AI agent, Codemurf extension, AI pair programming, intelligent code generation, automated code refactoring, AI debugging assistant, code optimization AI, Cursor alternative 2025, Windsurf competitor, GitHub Copilot alternative, AI software development tools, machine learning code assistant, smart code completion, AI-powered IDE, developer productivity tools, code automation, AI coding companion, real-time code suggestions, context-aware programming assistant",
+  authors: [{ name: "Codemurf Engineering", url: "https://codemurf.com/team" }],
+  creator: "Codemurf AI",
+  publisher: "Codemurf Technologies",
+  category: "AI Development Tools",
+  applicationName: "Codemurf AI Code Builder",
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://codemurf.com'),
+  metadataBase: new URL("https://codemurf.com"),
   alternates: {
     canonical: "https://codemurf.com",
+    languages: {
+      'en-US': 'https://codemurf.com/en-US',
+      'es-ES': 'https://codemurf.com/es',
+    },
   },
+
+  // ✅ Enhanced Open Graph for maximum social engagement
   openGraph: {
-    title: "AI Code Builder | Codemurf",
-    description: "Create websites instantly with AI Code Builder. Just describe it, and Codemurf builds your live site.",
-    url: 'https://codemurf.com',
-    siteName: 'Codemurf',
+    title: "AI Code Builder by Codemurf | Ship Code 10x Faster with AI",
+    description:
+      "Experience the future of coding with Codemurf's AI Code Builder. Generate production-ready code, fix bugs instantly, and accelerate your development workflow - all within VS Code. Trusted by 50,000+ developers worldwide.",
+    url: "https://marketplace.visualstudio.com/items?itemName=codemurf.codemurf",
+    siteName: "Codemurf - AI Code Builder",
     images: [
       {
-        url: '/og-image.png',
+        url: "/og-image-extension-hero.png",
         width: 1200,
         height: 630,
-        alt: 'AI Code Builder - Codemurf',
-        type: 'image/png',
+        alt: "Codemurf AI Code Builder - Transform Your VS Code Into an AI-Powered IDE",
+        type: "image/png",
+      },
+      {
+        url: "/og-image-extension-square.png",
+        width: 800,
+        height: 800,
+        alt: "AI Code Builder Logo",
+        type: "image/png",
       },
     ],
-    locale: 'en_US',
-    type: 'website',
+    locale: "en_US",
+    type: "software.application",
+    determiner: "the",
   },
+
+  // ✅ Optimized Twitter Cards for viral potential
   twitter: {
-    card: 'summary_large_image',
-    title: "AI Code Builder | Codemurf",
-    description: "Build websites instantly with Codemurf's AI Code Builder. No coding required — go live in seconds.",
-    images: ['/og-image.png'],
-    creator: '@codemurf',
-    site: '@codemurf',
+    card: "summary_large_image",
+    title: "🚀 AI Code Builder - Your AI Coding Superpower in VS Code",
+    description:
+      "Write code 10x faster with Codemurf's intelligent AI agent. Generate, debug, and optimize code with context-aware AI that understands your entire codebase. Better than Cursor & Windsurf.",
+    images: ["/twitter-card-hero.png"],
+    creator: "@codemurf",
+    site: "@codemurf",
   },
+
+  // ✅ Enhanced Robots for better crawling
   robots: {
     index: true,
     follow: true,
+    nocache: false,
     googleBot: {
       index: true,
       follow: true,
-      maxSnippet: -1,
-      maxImagePreview: "large",
-      maxVideoPreview: -1,
+      noimageindex: false,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": 320,
     },
   },
+
+  // ✅ Verification & Analytics
   verification: {
-    google: 'szzwdNXXmtQxzUKy4qTmO6Pk8IM51TAQcdnA9j_ZsqU',
+    google: "szzwdNXXmtQxzUKy4qTmO6Pk8IM51TAQcdnA9j_ZsqU",
+    yandex: "your-yandex-verification",
+    bing: "your-bing-verification",
   },
-  manifest: '/site.webmanifest',
+
+  manifest: "/site.webmanifest",
+
+  // ✅ Enhanced Favicons
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon-16x16.svg", sizes: "16x16", type: "image/svg+xml" },
+      { url: "/favicon-32x32.svg", sizes: "32x32", type: "image/svg+xml" },
+      { url: "/favicon-48x48.svg", sizes: "48x48", type: "image/svg+xml" },
+      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+    ],
     shortcut: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+      { url: "/apple-touch-icon-120x120.png", sizes: "120x120", type: "image/png" },
+    ],
+    other: [
+      {
+        rel: "mask-icon",
+        url: "/safari-pinned-tab.svg",
+        color: "#080c20ff",
+      },
+    ],
+  },
+
+  // ✅ Additional SEO enhancements
+  other: {
+    "msapplication-TileColor": "#2b5797",
+    "theme-color": "#ffffff",
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "black-translucent",
   },
 };
+
 
 export default function RootLayout({ children }) {
   return (
