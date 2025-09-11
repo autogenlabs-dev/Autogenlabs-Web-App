@@ -1,9 +1,0 @@
-User-agent: *
-Allow: /
-
-# Sitemap
-Sitemap: https://codemurf.com/sitemap.xml
-
-# Disallow development/test pages
-Disallow: /test-*
-Disallow: /template-test

@@ -1,6 +1,7 @@
 // src/app/page.jsx (Optimized for Fast Initial Load)
 import Hero from "../components/sections/Hero";
 import LogoScrollSection from "../components/sections/LogoScrollSection";
+import { generateMetadata as generateSEOMetadata } from "../lib/seo";
 
 // Lazy-loaded components
 import {
@@ -22,6 +23,14 @@ import {
 
 import { LazyComponent } from "../components/ui/LazyLoader";
 import { OptimizedComponent, StaggeredContainer, StaggeredItem, PreloadedComponent } from "../components/ui/OptimizedLoader";
+
+export const metadata = generateSEOMetadata({
+  title: "AI Code Editor & Online Compiler",
+  description: "Free online code compiler supporting Java, Python, JavaScript & 50+ languages. AI-powered code editor like Cursor & Windsurf with intelligent completion, debugging tools, and real-time collaboration.",
+  keywords: ["online code compiler", "java online code compiler", "cursor ai code editor", "windsurf ai code editor", "ai tools for software development", "python compiler online", "javascript online compiler", "ai coding assistant", "code editor with ai", "programming tools"],
+  path: "/",
+  type: "website"
+});
 
 export default function Home() {
   return (

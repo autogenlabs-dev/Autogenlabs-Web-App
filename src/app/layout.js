@@ -48,11 +48,11 @@ export const metadata = {
     siteName: 'CodeMurf',
     images: [
       {
-        url: '/og-image.png',
+        url: '/og-image.svg',
         width: 1200,
         height: 630,
         alt: 'CodeMurf - AI Code Editor & Online Compiler with Java, Python support',
-        type: 'image/png',
+        type: 'image/svg+xml',
       },
     ],
     locale: 'en_US',
@@ -62,7 +62,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: "CodeMurf - AI Code Editor & Online Compiler | Java, Python, JavaScript",
     description: "Free online code compiler supporting 50+ languages with AI-powered features like Cursor & Windsurf.",
-    images: ['/og-image.png'],
+    images: ['/og-image.svg'],
     creator: '@codemurf',
     site: '@codemurf',
   },

@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next'
+import { getBlogPosts } from '../lib/blogData'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://codemurf.com'
@@ -104,8 +105,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ]
 
-  // TODO: Add dynamic routes from database
-  // const dynamicRoutes = await generateDynamicRoutes()
+  // Dynamic blog post routes
+  const blogPosts = getBlogPosts()
+  const blogRoutes = blogPosts.map(post => ({
+    url: `${baseUrl}/blogs/${post.slug}`,
+    lastModified: post.publishedAt ? new Date(post.publishedAt).toISOString().split('T')[0] : currentDate,
+    changeFrequency: 'monthly' as const,
+    priority: post.featured ? 0.9 : 0.7,
+  }))
 
-  return staticRoutes
+  return [...staticRoutes, ...blogRoutes]
 }

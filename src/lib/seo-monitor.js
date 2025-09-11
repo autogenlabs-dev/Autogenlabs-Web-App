@@ -29,11 +29,17 @@ export function logSEOMetrics() {
     const metaDescription = document.querySelector('meta[name="description"]');
     if (!metaDescription) {
       console.warn('🚨 SEO Warning: Missing meta description');
+    } else if (metaDescription.content.length < 120) {
+      console.warn('🚨 SEO Warning: Meta description too short (should be 120-160 chars):', metaDescription.content.length);
+    } else if (metaDescription.content.length > 160) {
+      console.warn('🚨 SEO Warning: Meta description too long (should be 120-160 chars):', metaDescription.content.length);
     }
 
     // Check for missing title
     if (!document.title || document.title.length < 10) {
       console.warn('🚨 SEO Warning: Title too short or missing');
+    } else if (document.title.length > 60) {
+      console.warn('🚨 SEO Warning: Title too long (should be under 60 chars):', document.title.length);
     }
 
     // Check for missing h1
@@ -47,6 +53,37 @@ export function logSEOMetrics() {
     if (h1s.length > 1) {
       console.warn('🚨 SEO Warning: Multiple H1 tags found');
     }
+
+    // Check for structured data
+    const structuredData = document.querySelectorAll('script[type="application/ld+json"]');
+    if (structuredData.length === 0) {
+      console.warn('🚨 SEO Warning: No structured data found');
+    } else {
+      console.log('✅ SEO: Found', structuredData.length, 'structured data blocks');
+    }
+
+    // Check canonical URL
+    const canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      console.warn('🚨 SEO Warning: Missing canonical URL');
+    } else {
+      console.log('✅ SEO: Canonical URL set to', canonical.href);
+    }
+
+    // Check robots meta
+    const robots = document.querySelector('meta[name="robots"]');
+    if (!robots) {
+      console.warn('🚨 SEO Warning: Missing robots meta tag');
+    }
+
+    // Check Open Graph tags
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    const ogImage = document.querySelector('meta[property="og:image"]');
+    
+    if (!ogTitle) console.warn('🚨 SEO Warning: Missing Open Graph title');
+    if (!ogDesc) console.warn('🚨 SEO Warning: Missing Open Graph description');
+    if (!ogImage) console.warn('🚨 SEO Warning: Missing Open Graph image');
 
     console.log('✅ SEO metrics checked');
   }

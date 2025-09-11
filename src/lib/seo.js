@@ -9,7 +9,7 @@ const DEFAULT_METADATA = {
   defaultDescription: 'Transform your development workflow with CodeMurf\'s AI-powered tools. Build, deploy, and scale applications faster with intelligent code generation and automation.',
   defaultKeywords: 'AI development, code generation, automation, software development, programming tools, CodeMurf',
   twitterHandle: '@codemurf',
-  defaultImage: '/og-image.png',
+  defaultImage: '/og-image.svg',
 };
 
 /**
@@ -53,7 +53,7 @@ export function generateMetadata({
           width: 1200,
           height: 630,
           alt: fullTitle,
-          type: 'image/png',
+          type: 'image/svg+xml',
         },
       ],
       locale: 'en_US',
@@ -87,7 +87,7 @@ export function generateMetadata({
     
     // Canonical URL
     alternates: {
-      canonical: path || '/',
+      canonical: fullUrl,
     },
     
     // Custom metadata
