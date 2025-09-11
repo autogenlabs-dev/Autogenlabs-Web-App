@@ -57,22 +57,16 @@ export const metadata = {
     siteName: "Codemurf - AI Code Builder",
     images: [
       {
-        url: "/og-image-extension-hero.png",
+        url: "/og-image.svg",
         width: 1200,
         height: 630,
         alt: "Codemurf AI Code Builder - Transform Your VS Code Into an AI-Powered IDE",
-        type: "image/png",
-      },
-      {
-        url: "/og-image-extension-square.png",
-        width: 800,
-        height: 800,
-        alt: "AI Code Builder Logo",
-        type: "image/png",
-      },
+        type: "image/svg+xml",
+      }
     ],
     locale: "en_US",
-    type: "software.application",
+  // OpenGraph "type" must be a valid enum like 'website', 'article', 'profile', etc.
+  type: "website",
     determiner: "the",
   },
 
@@ -82,7 +76,7 @@ export const metadata = {
     title: "🚀 AI Code Builder - Your AI Coding Superpower in VS Code",
     description:
       "Write code 10x faster with Codemurf's intelligent AI agent. Generate, debug, and optimize code with context-aware AI that understands your entire codebase. Better than Cursor & Windsurf.",
-    images: ["/twitter-card-hero.png"],
+    images: ["/og-image.svg"],
     creator: "@codemurf",
     site: "@codemurf",
   },
@@ -114,22 +108,13 @@ export const metadata = {
   // ✅ Enhanced Favicons
   icons: {
     icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
       { url: "/favicon-16x16.svg", sizes: "16x16", type: "image/svg+xml" },
-      { url: "/favicon-32x32.svg", sizes: "32x32", type: "image/svg+xml" },
       { url: "/favicon-48x48.svg", sizes: "48x48", type: "image/svg+xml" },
-      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
     ],
     shortcut: "/favicon.ico",
     apple: [
-      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
-      { url: "/apple-touch-icon-120x120.png", sizes: "120x120", type: "image/png" },
-    ],
-    other: [
-      {
-        rel: "mask-icon",
-        url: "/safari-pinned-tab.svg",
-        color: "#080c20ff",
-      },
+      { url: "/apple-touch-icon.svg", sizes: "180x180", type: "image/svg+xml" },
     ],
   },
 
