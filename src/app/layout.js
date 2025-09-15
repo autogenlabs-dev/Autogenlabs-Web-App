@@ -4,6 +4,7 @@ import LayoutWrapper from "../components/shared/LayoutWrapper";
 import { Analytics } from '@vercel/analytics/next';
 import { OrganizationSchema, WebsiteSchema, SoftwareApplicationSchema } from "../components/seo/StructuredData";
 import Script from 'next/script';
+import SEOMonitor from "../components/SEOMonitor";
 
 // Development helper for image positioning issues
 if (process.env.NODE_ENV === "development") {
@@ -163,16 +164,8 @@ export default function RootLayout({ children }) {
         <LayoutWrapper>{children}</LayoutWrapper>
         <Analytics />
         
-        {/* SEO Monitoring Script */}
-        <Script id="seo-monitoring" strategy="afterInteractive">
-          {`
-            if (typeof window !== 'undefined' && '${process.env.NODE_ENV}' === 'development') {
-              import('/src/lib/seo-monitor.js').then(({ initSEOMonitoring }) => {
-                initSEOMonitoring();
-              });
-            }
-          `}
-        </Script>
+        {/* SEO Monitoring Component */}
+        <SEOMonitor />
       </body>
     </html>
   );
