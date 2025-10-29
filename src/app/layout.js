@@ -123,7 +123,7 @@ export const metadata = {
   other: {
     "msapplication-TileColor": "#2b5797",
     "theme-color": "#ffffff",
-    "apple-mobile-web-app-capable": "yes",
+    "mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "black-translucent",
   },
 };
@@ -157,6 +157,7 @@ export default function RootLayout({ children }) {
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning={true}
       >
         <OrganizationSchema />
         <WebsiteSchema />

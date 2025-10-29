@@ -26,14 +26,23 @@ export const AuthProvider = ({ children }) => {
                 if (accessToken && !tokenUtils.isTokenExpired(accessToken)) {
                     try {
                         // Add timeout to prevent infinite loading
-                        const timeoutPromise = new Promise((_, reject) => 
-                            setTimeout(() => reject(new Error('Auth timeout')), 10000)
+                        const timeoutPromise = new Promise((_, reject) =>
+                            setTimeout(() => reject(new Error('Auth timeout')), 3000)
                         );
                         
-                        const userData = await Promise.race([
-                            authApi.getCurrentUser(accessToken),
-                            timeoutPromise
-                        ]);
+                        let userData;
+                        try {
+                            userData = await Promise.race([
+                                authApi.getCurrentUser(accessToken),
+                                timeoutPromise
+                            ]);
+                        } catch (error) {
+                            console.warn('Auth request timed out or failed, continuing without user data:', error.message);
+                            // Don't throw error, just continue without user data
+                            tokenUtils.clearTokens();
+                            setUser(null);
+                            return;
+                        }
                         
                         setUser({
                             id: userData.id,
@@ -46,7 +55,7 @@ export const AuthProvider = ({ children }) => {
                             ...userData
                         });
                     } catch (userError) {
-                        console.error('❌ InitializeAuth - Failed to fetch user data:', userError);
+                        console.warn('❌ InitializeAuth - Failed to fetch user data:', userError);
                         // Token might be invalid, try refresh
                         const refreshToken = tokenUtils.getRefreshToken();
                         if (refreshToken) {
@@ -65,7 +74,7 @@ export const AuthProvider = ({ children }) => {
                                     ...userData
                                 });
                             } catch (refreshError) {
-                                console.error('❌ InitializeAuth - Refresh failed:', refreshError);
+                                console.warn('❌ InitializeAuth - Refresh failed:', refreshError);
                                 tokenUtils.clearTokens();
                                 setUser(null);
                             }
@@ -79,7 +88,7 @@ export const AuthProvider = ({ children }) => {
                     setUser(null);
                 }
             } catch (error) {
-                console.error('❌ Failed to initialize auth:', error);
+                console.warn('❌ Failed to initialize auth:', error);
                 tokenUtils.clearTokens();
                 setUser(null);
             } finally {

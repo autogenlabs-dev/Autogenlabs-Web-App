@@ -1,19 +1,45 @@
 'use client';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { useRef } from 'react';
+import { motion } from 'framer-motion';
+import { useRef, useState, useEffect } from 'react';
 import { Play } from 'lucide-react';
 import Image from 'next/image';
 
 export default function TipOne() {
   const containerRef = useRef(null);
+  const [isClient, setIsClient] = useState(false);
+  const [trainY, setTrainY] = useState(0);
   
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start center', 'end end'],
-  });
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
   
-  // Train movement - reaches near end with smooth progression
-  const trainY = useTransform(scrollYProgress, [0, 1], [100, 600]);
+  useEffect(() => {
+    if (isClient && containerRef.current) {
+      const handleScroll = () => {
+        if (containerRef.current) {
+          const rect = containerRef.current.getBoundingClientRect();
+          const scrollHeight = containerRef.current.scrollHeight;
+          const viewportHeight = window.innerHeight;
+          
+          const progress = Math.max(0, Math.min(1,
+            (viewportHeight - rect.top) / (scrollHeight + viewportHeight)
+          ));
+          
+          setTrainY(100 + (progress * 500));
+        }
+      };
+      
+      handleScroll();
+      
+      window.addEventListener('scroll', handleScroll);
+      window.addEventListener('resize', handleScroll);
+      
+      return () => {
+        window.removeEventListener('scroll', handleScroll);
+        window.removeEventListener('resize', handleScroll);
+      };
+    }
+  }, [isClient]);
 
   return (
     <section ref={containerRef} className="relative min-h-[120vh] bg-black overflow-hidden">

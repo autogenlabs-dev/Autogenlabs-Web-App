@@ -1,20 +1,46 @@
 'use client';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { useRef } from 'react';
+import { motion } from 'framer-motion';
+import { useRef, useState, useEffect } from 'react';
 import { Play } from 'lucide-react';
 import Image from 'next/image';
 
 // Main Component Showcase with train and track
 export default function TipTwo() {
   const containerRef = useRef(null);
+  const [isClient, setIsClient] = useState(false);
+  const [trainY, setTrainY] = useState(0);
   
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start center', 'end end'],
-  });
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
   
-  // Train movement - continues from previous section
-  const trainY = useTransform(scrollYProgress, [0, 1], [100, 450]);
+  useEffect(() => {
+    if (isClient && containerRef.current) {
+      const handleScroll = () => {
+        if (containerRef.current) {
+          const rect = containerRef.current.getBoundingClientRect();
+          const scrollHeight = containerRef.current.scrollHeight;
+          const viewportHeight = window.innerHeight;
+          
+          const progress = Math.max(0, Math.min(1,
+            (viewportHeight - rect.top) / (scrollHeight + viewportHeight)
+          ));
+          
+          setTrainY(100 + (progress * 350));
+        }
+      };
+      
+      handleScroll();
+      
+      window.addEventListener('scroll', handleScroll);
+      window.addEventListener('resize', handleScroll);
+      
+      return () => {
+        window.removeEventListener('scroll', handleScroll);
+        window.removeEventListener('resize', handleScroll);
+      };
+    }
+  }, [isClient]);
   
 
   return (

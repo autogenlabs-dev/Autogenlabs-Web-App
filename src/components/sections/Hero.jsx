@@ -183,18 +183,53 @@ const CopilotUIComponent = () => {
 export default function Hero() {
   const containerRef = useRef(null);
   const [isLoaded, setIsLoaded] = useState(false);
-
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start start', 'end start']
-  });
-
-  // Scale animation - starts small and scales up as you scroll
-  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.8, 1, 1.1]);
-  // Optional: Add some opacity fade-in effect
-  const opacity = useTransform(scrollYProgress, [0, 0.3], [0.6, 1]);
-  // Optional: Add Y movement for parallax effect - starts higher up
-  const y = useTransform(scrollYProgress, [0, 1], [-100, -50]);
+  const [isClient, setIsClient] = useState(false);
+  const [scale, setScale] = useState(0.8);
+  const [opacity, setOpacity] = useState(0.6);
+  const [y, setY] = useState(-50);
+  
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+  
+  useEffect(() => {
+    if (isClient && containerRef.current) {
+      const handleScroll = () => {
+        if (containerRef.current) {
+          const rect = containerRef.current.getBoundingClientRect();
+          const scrollHeight = containerRef.current.scrollHeight;
+          const viewportHeight = window.innerHeight;
+          
+          const progress = Math.max(0, Math.min(1,
+            (viewportHeight - rect.top) / (scrollHeight + viewportHeight)
+          ));
+          
+          // Scale animation - starts small and scales up as you scroll
+          if (progress <= 0.5) {
+            setScale(0.8 + (progress * 0.4)); // 0.8 to 1.0
+          } else {
+            setScale(1.0 + ((progress - 0.5) * 0.2)); // 1.0 to 1.1
+          }
+          
+          // Opacity fade-in effect
+          setOpacity(0.6 + (progress * 0.4)); // 0.6 to 1.0
+          
+          // Y movement for parallax effect
+          setY(-100 + (progress * 50)); // -100 to -50
+        }
+      };
+      
+      handleScroll();
+      
+      window.addEventListener('scroll', handleScroll);
+      window.addEventListener('resize', handleScroll);
+      
+      return () => {
+        window.removeEventListener('scroll', handleScroll);
+        window.removeEventListener('resize', handleScroll);
+      };
+    }
+  }, [isClient]);
 
   // Trigger initial animations on mount
   useEffect(() => {

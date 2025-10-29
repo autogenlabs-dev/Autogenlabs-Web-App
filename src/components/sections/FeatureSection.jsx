@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 
 const FeatureSection = () => {
@@ -11,13 +11,42 @@ const FeatureSection = () => {
   const [debugInfo, setDebugInfo] = useState({}); // Debug information
   const containerRef = useRef(null);
   
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start center', 'end end'],
-  });
+  // Only initialize scroll hooks after component is hydrated
+  const [scrollYProgress, setScrollYProgress] = useState(null);
+  const [trainY, setTrainY] = useState(0);
   
-  // Train movement
-  const trainY = useTransform(scrollYProgress, [0, 1], [100, 400]);
+  useEffect(() => {
+    if (isClient && containerRef.current) {
+      // Create a simple scroll listener instead of useScroll to avoid hydration issues
+      const handleScroll = () => {
+        if (containerRef.current) {
+          const rect = containerRef.current.getBoundingClientRect();
+          const scrollHeight = containerRef.current.scrollHeight;
+          const viewportHeight = window.innerHeight;
+          
+          // Calculate scroll progress (0 to 1)
+          const progress = Math.max(0, Math.min(1,
+            (viewportHeight - rect.top) / (scrollHeight + viewportHeight)
+          ));
+          
+          setScrollYProgress(progress);
+          setTrainY(100 + (progress * 300)); // Map progress to train movement
+        }
+      };
+      
+      // Initial calculation
+      handleScroll();
+      
+      // Add scroll listener
+      window.addEventListener('scroll', handleScroll);
+      window.addEventListener('resize', handleScroll);
+      
+      return () => {
+        window.removeEventListener('scroll', handleScroll);
+        window.removeEventListener('resize', handleScroll);
+      };
+    }
+  }, [isClient]);
 
   // Screen size detection with multiple methods
   useEffect(() => {

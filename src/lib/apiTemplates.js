@@ -4,7 +4,7 @@
 
 import { tokenUtils, ApiError } from './api';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 const handleApiResponse = async (response) => {
     
@@ -36,7 +36,7 @@ const refreshAccessToken = async () => {
         throw new ApiError('No refresh token available', 401);
     }
 
-    const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+    const response = await fetch(`/api/auth/refresh`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -97,7 +97,7 @@ export const templateApi = {
         try {
             const headers = await getAuthHeadersWithRefresh();
 
-            const response = await fetch(`${API_BASE_URL}/templates`, {
+            const response = await fetch(`/api/templates`, {
                 method: 'POST',
                 headers,
                 body: JSON.stringify(templateData),
@@ -130,7 +130,7 @@ export const templateApi = {
         if (params.popular === false) queryParams.append('popular', 'false');
         if (params.search && params.search.trim()) queryParams.append('search', params.search.trim());
 
-        const finalUrl = `${API_BASE_URL}/templates?${queryParams}`;
+        const finalUrl = `/api/templates?${queryParams}`;
 
         const response = await fetch(finalUrl, {
             method: 'GET',
@@ -146,7 +146,7 @@ export const templateApi = {
      * Get a specific template by ID
      */
     async getTemplate(templateId) {
-        const url = `${API_BASE_URL}/templates/${templateId}`;
+        const url = `/api/templates/${templateId}`;
         
         const response = await fetch(url, {
             method: 'GET',
@@ -172,7 +172,7 @@ export const templateApi = {
         try {
             const headers = await getAuthHeadersWithRefresh();
 
-            const response = await fetch(`${API_BASE_URL}/templates/${templateId}`, {
+            const response = await fetch(`/api/templates/${templateId}`, {
                 method: 'PUT',
                 headers,
                 body: JSON.stringify(templateData),
@@ -191,7 +191,7 @@ export const templateApi = {
         try {
             const headers = await getAuthHeadersWithRefresh();
 
-            const response = await fetch(`${API_BASE_URL}/templates/${templateId}`, {
+            const response = await fetch(`/api/templates/${templateId}`, {
                 method: 'DELETE',
                 headers,
             });
@@ -218,7 +218,7 @@ export const templateApi = {
                 queryParams.append('page', page);
             }
 
-            const response = await fetch(`${API_BASE_URL}/templates/user/my-templates?${queryParams}`, {
+            const response = await fetch(`/api/templates/user/my-templates?${queryParams}`, {
                 method: 'GET',
                 headers,
             });
@@ -236,7 +236,7 @@ export const templateApi = {
         try {
             const headers = await getAuthHeadersWithRefresh();
 
-            const response = await fetch(`${API_BASE_URL}/templates/${templateId}/like`, {
+            const response = await fetch(`/api/templates/${templateId}/like`, {
                 method: 'POST',
                 headers,
             });
@@ -254,7 +254,7 @@ export const templateApi = {
         try {
             const headers = await getAuthHeadersWithRefresh();
 
-            const response = await fetch(`${API_BASE_URL}/templates/${templateId}/download`, {
+            const response = await fetch(`/api/templates/${templateId}/download`, {
                 method: 'POST',
                 headers,
             });
@@ -327,7 +327,7 @@ export const templateApi = {
      * Get template categories
      */
     async getTemplateCategories() {
-        const response = await fetch(`${API_BASE_URL}/templates/categories`, {
+        const response = await fetch(`/api/templates/categories`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -431,7 +431,7 @@ export const templateApi = {
      * Get template statistics
      */
     async getTemplateStats() {
-        const response = await fetch(`${API_BASE_URL}/templates/stats`, {
+        const response = await fetch(`/api/templates/stats`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

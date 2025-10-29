@@ -2,7 +2,7 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import SafeImage from '../ui/SafeImage';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 const MasonryImageCard = ({ src, alt, className = "", height = "h-64", delay = 0, priority = false }) => {
   const [imageError, setImageError] = useState(false);
@@ -81,13 +81,40 @@ const MasonryImageCard = ({ src, alt, className = "", height = "h-64", delay = 0
 // Main Component
 export default function TrainSectionTwo() {
   const containerRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start center', 'end end'],
-  });
-
-  // Train movement
-  const trainY = useTransform(scrollYProgress, [0, 1], [20, 250]);
+  const [isClient, setIsClient] = useState(false);
+  const [trainY, setTrainY] = useState(0);
+  
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+  
+  useEffect(() => {
+    if (isClient && containerRef.current) {
+      const handleScroll = () => {
+        if (containerRef.current) {
+          const rect = containerRef.current.getBoundingClientRect();
+          const scrollHeight = containerRef.current.scrollHeight;
+          const viewportHeight = window.innerHeight;
+          
+          const progress = Math.max(0, Math.min(1,
+            (viewportHeight - rect.top) / (scrollHeight + viewportHeight)
+          ));
+          
+          setTrainY(20 + (progress * 230));
+        }
+      };
+      
+      handleScroll();
+      
+      window.addEventListener('scroll', handleScroll);
+      window.addEventListener('resize', handleScroll);
+      
+      return () => {
+        window.removeEventListener('scroll', handleScroll);
+        window.removeEventListener('resize', handleScroll);
+      };
+    }
+  }, [isClient]);
 
   const masonryItems = [
     { 

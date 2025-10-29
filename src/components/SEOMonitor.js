@@ -11,7 +11,7 @@ export default function SEOMonitor() {
           initSEOMonitoring();
         })
         .catch((error) => {
-          console.error('Failed to load SEO monitoring:', error);
+          console.warn('Failed to load SEO monitoring (non-critical):', error);
         });
     }
   }, []);

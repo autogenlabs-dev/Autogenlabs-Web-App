@@ -49,11 +49,27 @@ export const fixImagePositioning = () => {
   return () => observer.disconnect();
 };
 
-// Auto-run in development
+// Auto-run in development with error handling
 if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-  document.addEventListener('DOMContentLoaded', fixImagePositioning);
-  
-  // Also run after a delay to catch dynamically loaded images
-  setTimeout(fixImagePositioning, 1000);
+  try {
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        fixImagePositioning();
+      } catch (error) {
+        console.warn('Image positioning fix failed (non-critical):', error);
+      }
+    });
+    
+    // Also run after a delay to catch dynamically loaded images
+    setTimeout(() => {
+      try {
+        fixImagePositioning();
+      } catch (error) {
+        console.warn('Delayed image positioning fix failed (non-critical):', error);
+      }
+    }, 1000);
+  } catch (error) {
+    console.warn('Development image fix initialization failed (non-critical):', error);
+  }
 }
 

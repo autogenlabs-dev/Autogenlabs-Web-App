@@ -8,6 +8,7 @@ const VideoSection = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showPlayButton, setShowPlayButton] = useState(true);
+  const [hasError, setHasError] = useState(false);
   const videoRef = useRef(null);
   const containerRef = useRef(null);
 
@@ -20,6 +21,14 @@ const VideoSection = () => {
   // Handle video loaded
   const handleVideoLoaded = () => {
     setIsLoaded(true);
+    setHasError(false);
+  };
+
+  // Handle video error
+  const handleVideoError = () => {
+    console.warn('Video failed to load, showing fallback');
+    setHasError(true);
+    setIsLoaded(true); // Still consider it "loaded" to show fallback
   };
 
   // Handle video play
@@ -94,6 +103,24 @@ const VideoSection = () => {
         </div>
       )}
 
+      {/* Error fallback */}
+      {hasError && (
+        <div className="w-full h-full bg-gradient-to-br from-purple-900/20 to-cyan-900/20 rounded-3xl flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-full flex items-center justify-center mb-4 mx-auto">
+              <Play size={24} className="text-white ml-1" fill="currentColor" />
+            </div>
+            <p className="text-gray-400 text-sm">Video demo available</p>
+            <button
+              className="mt-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm"
+              onClick={() => window.open('https://marketplace.visualstudio.com/items?itemName=CodeMurf.codemurf-tools', '_blank')}
+            >
+              Try VS Code Extension
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Lazy-loaded Video */}
       {isInView && (
         <motion.div
@@ -102,27 +129,30 @@ const VideoSection = () => {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          <video 
-            ref={videoRef}
-            loop 
-            muted 
-            playsInline 
-            preload="metadata" // Only load metadata initially
-            className={`w-full h-full object-cover rounded-3xl transition-opacity duration-500 ${
-              isLoaded ? 'opacity-100' : 'opacity-0'
-            }`}
-            onLoadedData={handleVideoLoaded}
-            onCanPlay={() => setIsLoaded(true)}
-          >
-            <source 
-              src="https://cdn.builder.io/o/assets%2FYJIGb4i01jvw0SRdL5Bt%2F1f879747f3c14418917a193e0f9b2de8%2Fcompressed?apiKey=YJIGb4i01jvw0SRdL5Bt&token=1f879747f3c14418917a193e0f9b2de8&alt=media&optimized=true"
-              type="video/mp4"
-            />
-            {/* Fallback for browsers that don't support video */}
-            <div className="w-full h-full bg-gray-800 rounded-3xl flex items-center justify-center">
-              <p className="text-white">Your browser doesn't support video playback.</p>
-            </div>
-          </video>
+          {!hasError && (
+            <video
+              ref={videoRef}
+              loop
+              muted
+              playsInline
+              preload="metadata" // Only load metadata initially
+              className={`w-full h-full object-cover rounded-3xl transition-opacity duration-500 ${
+                isLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
+              onLoadedData={handleVideoLoaded}
+              onCanPlay={() => setIsLoaded(true)}
+              onError={handleVideoError}
+            >
+              <source
+                src="https://cdn.builder.io/o/assets%2FYJIGb4i01jvw0SRdL5Bt%2F1f879747f3c14418917a193e0f9b2de8%2Fcompressed?apiKey=YJIGb4i01jvw0SRdL5Bt&token=1f879747f3c14418917a193e0f9b2de8&alt=media&optimized=true"
+                type="video/mp4"
+              />
+              {/* Fallback for browsers that don't support video */}
+              <div className="w-full h-full bg-gray-800 rounded-3xl flex items-center justify-center">
+                <p className="text-white">Your browser doesn't support video playback.</p>
+              </div>
+            </video>
+          )}
 
           {/* Manual Play Button - shows if autoplay fails */}
           {showPlayButton && isLoaded && (
