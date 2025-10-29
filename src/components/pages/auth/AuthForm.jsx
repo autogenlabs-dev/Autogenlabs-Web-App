@@ -10,8 +10,8 @@ const AuthForm = ({
 }) => {
     // Get the API base URL from environment or use localhost for development
     const getApiBaseUrl = () => {
-        // Always use the environment variable for consistency
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+        // Use the environment variable if set, otherwise use the current origin for Next.js API routes
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
         console.log('OAuth Debug - API URL:', apiUrl);
         return apiUrl;
     };

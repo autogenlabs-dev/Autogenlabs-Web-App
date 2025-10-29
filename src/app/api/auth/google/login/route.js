@@ -7,6 +7,18 @@ import { google } from 'googleapis';
  */
 export async function GET(request) {
   try {
+    // Check if Google OAuth credentials are configured
+    if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+      console.error('Google OAuth credentials not configured');
+      return NextResponse.json(
+        {
+          detail: 'Google OAuth is not configured. Please set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables.',
+          error: 'Missing OAuth configuration'
+        },
+        { status: 500 }
+      );
+    }
+
     // Get the base URL from environment or use default
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
     
