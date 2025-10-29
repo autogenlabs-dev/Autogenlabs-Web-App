@@ -18,8 +18,9 @@ const AuthForm = ({
 
     const handleOAuthLogin = (provider) => {
         const baseUrl = getApiBaseUrl();
-        console.log(`OAuth Debug - Redirecting to: ${baseUrl}/auth/${provider}/login`);
-        window.location.href = `${baseUrl}/auth/${provider}/login`;
+        const oauthUrl = `${baseUrl}/api/auth/${provider}/login`;
+        console.log(`OAuth Debug - Redirecting to: ${oauthUrl}`);
+        window.location.href = oauthUrl;
     };
     return (
         <form onSubmit={handleSubmit} className="space-y-3">
