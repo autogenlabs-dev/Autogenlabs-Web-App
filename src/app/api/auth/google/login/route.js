@@ -1,53 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { google } from 'googleapis';
 
 /**
  * Google OAuth Login Endpoint
- * Initiates the Google OAuth flow by redirecting user to Google's consent screen
+ * Redirects to backend Google OAuth handler
  */
 export async function GET(request) {
   try {
-    // Check if Google OAuth credentials are configured
-    if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
-      console.error('Google OAuth credentials not configured');
-      return NextResponse.json(
-        {
-          detail: 'Google OAuth is not configured. Please set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables.',
-          error: 'Missing OAuth configuration'
-        },
-        { status: 500 }
-      );
-    }
-
-    // Get the base URL from environment or use default
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+    // Redirect directly to backend's Google OAuth endpoint
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    const backendOAuthUrl = `${backendUrl}/auth/google/login`;
     
-    // Google OAuth configuration
-    const oauth2Client = new google.auth.OAuth2(
-      process.env.GOOGLE_CLIENT_ID,
-      process.env.GOOGLE_CLIENT_SECRET,
-      `${baseUrl}/api/auth/google/callback`
-    );
-
-    // Generate the authorization URL
-    const authUrl = oauth2Client.generateAuthUrl({
-      access_type: 'offline',
-      scope: [
-        'https://www.googleapis.com/auth/userinfo.email',
-        'https://www.googleapis.com/auth/userinfo.profile'
-      ],
-      prompt: 'consent',
-      state: Math.random().toString(36).substring(2, 15) // CSRF protection
-    });
-
-    // Redirect user to Google's consent screen
-    return NextResponse.redirect(authUrl);
+    return NextResponse.redirect(backendOAuthUrl);
     
   } catch (error) {
     console.error('Google OAuth Login Error:', error);
     return NextResponse.json(
       { 
-        detail: 'Failed to initiate Google OAuth login',
+        detail: 'Failed to redirect to backend OAuth',
         error: error.message 
       },
       { status: 500 }
