@@ -62,16 +62,16 @@ export const AuthProvider = ({ children }) => {
                             try {
                                 const refreshResponse = await authApi.refreshToken(refreshToken);
                                 tokenUtils.setTokens(refreshResponse.access_token, refreshResponse.refresh_token || refreshToken);
-                                const userData = await authApi.getCurrentUser(refreshResponse.access_token);
+                                const refreshedUserData = await authApi.getCurrentUser(refreshResponse.access_token);
                                 setUser({
-                                    id: userData.id,
-                                    name: userData.full_name || userData.name || userData.email.split('@')[0],
-                                    firstName: userData.full_name ? userData.full_name.split(' ')[0] : (userData.name ? userData.name.split(' ')[0] : userData.email.split('@')[0]),
-                                    lastName: userData.full_name ? userData.full_name.split(' ').slice(1).join(' ') : (userData.name ? userData.name.split(' ').slice(1).join(' ') : ''),
-                                    email: userData.email,
-                                    role: userData.role || 'user',
+                                    id: refreshedUserData.id,
+                                    name: refreshedUserData.full_name || refreshedUserData.name || refreshedUserData.email.split('@')[0],
+                                    firstName: refreshedUserData.full_name ? refreshedUserData.full_name.split(' ')[0] : (refreshedUserData.name ? refreshedUserData.name.split(' ')[0] : refreshedUserData.email.split('@')[0]),
+                                    lastName: refreshedUserData.full_name ? refreshedUserData.full_name.split(' ').slice(1).join(' ') : (refreshedUserData.name ? refreshedUserData.name.split(' ').slice(1).join(' ') : ''),
+                                    email: refreshedUserData.email,
+                                    role: refreshedUserData.role || 'user',
                                     avatar: '/public/logoAuto.webp',
-                                    ...userData
+                                    ...refreshedUserData
                                 });
                             } catch (refreshError) {
                                 console.warn('❌ InitializeAuth - Refresh failed:', refreshError);
@@ -292,4 +292,3 @@ export const AuthProvider = ({ children }) => {
         </AuthContext.Provider>
     );
 };
-

@@ -105,7 +105,7 @@ export const authApi = {
     /**
      * Get current user profile
      */    async getCurrentUser(accessToken) {
-        const response = await fetch(`${API_BASE_URL}/users/me`, {
+        const response = await fetch(`${API_BASE_URL}/auth/me`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
