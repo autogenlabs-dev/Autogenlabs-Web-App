@@ -5,13 +5,19 @@
 // Web Vitals tracking for SEO
 export function trackWebVitals() {
   if (typeof window !== 'undefined') {
-    // Track Core Web Vitals
-    import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
-      getCLS(console.log);
-      getFID(console.log);
-      getFCP(console.log);
-      getLCP(console.log);
-      getTTFB(console.log);
+    // Track Core Web Vitals - using dynamic import to avoid build errors
+    import('web-vitals').then((module) => {
+      if (module && module.getCLS && module.getFID && module.getFCP && module.getLCP && module.getTTFB) {
+        module.getCLS(console.log);
+        module.getFID(console.log);
+        module.getFCP(console.log);
+        module.getLCP(console.log);
+        module.getTTFB(console.log);
+      } else {
+        console.warn('Web vitals module not fully available');
+      }
+    }).catch((error) => {
+      console.warn('Failed to load web-vitals:', error);
     });
   }
 }

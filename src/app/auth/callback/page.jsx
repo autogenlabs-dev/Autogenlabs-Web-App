@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function AuthCallback() {
   const router = useRouter();
+  const searchParams = useSearchParams(); // Move hook to component level
   const [error, setError] = useState(null);
   
   useEffect(() => {
@@ -12,14 +13,18 @@ export default function AuthCallback() {
     if (typeof window === 'undefined') return;
     
     try {
-      // Get URL parameters using Next.js useSearchParams hook
-      const searchParams = useSearchParams();
+      // Get URL parameters using the hook at component level
       const accessToken = searchParams.get('access_token');
       const refreshToken = searchParams.get('refresh_token');
       const userId = searchParams.get('user_id');
       const callbackError = searchParams.get('error');
+      const code = searchParams.get('code');
+      const state = searchParams.get('state');
 
-      console.log('Callback params:', { accessToken, refreshToken, userId, error: callbackError });
+      // Add comprehensive debugging
+      console.log('🔍 DEBUG: Full URL:', window.location.href);
+      console.log('🔍 DEBUG: All URL parameters:', Object.fromEntries(searchParams));
+      console.log('Callback params:', { accessToken, refreshToken, userId, error: callbackError, code, state });
 
       if (callbackError) {
         console.error('OAuth callback error:', callbackError);
@@ -41,9 +46,51 @@ export default function AuthCallback() {
         
         // Redirect to dashboard or home page
         router.push('/dashboard');
+      } else if (code) {
+        // We have an authorization code, need to exchange it for tokens
+        console.log('Received authorization code, exchanging for tokens...');
+        
+        // Exchange code for tokens immediately
+        const exchangeCodeForTokens = async () => {
+          try {
+            console.log('Exchanging code for tokens...');
+            
+            // Call backend to exchange code for tokens
+            const response = await fetch('/api/auth/exchange-code', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                code,
+                state,
+                provider: 'google' // Default to google, could be extracted from URL or stored
+              })
+            });
+            
+            if (!response.ok) {
+              throw new Error('Failed to exchange code for tokens');
+            }
+            
+            const data = await response.json();
+            
+            if (data.redirect_url) {
+              // Redirect to the URL with tokens
+              window.location.href = data.redirect_url;
+            } else {
+              throw new Error('No redirect URL received');
+            }
+          } catch (error) {
+            console.error('Error exchanging code for tokens:', error);
+            setError('token_exchange_failed');
+            router.push('/auth?error=token_exchange_failed');
+          }
+        };
+        
+        exchangeCodeForTokens();
       } else {
         // Missing required parameters
-        console.error('Missing tokens:', { accessToken, refreshToken, userId });
+        console.error('Missing tokens or authorization code:', { accessToken, refreshToken, userId, code });
         setError('missing_tokens');
         router.push('/auth?error=missing_tokens');
       }
@@ -52,7 +99,7 @@ export default function AuthCallback() {
       setError('callback_error');
       router.push('/auth?error=callback_error');
     }
-  }, [router]);
+  }, [router, searchParams]);
 
   // Show error state if there is one
   if (error) {
