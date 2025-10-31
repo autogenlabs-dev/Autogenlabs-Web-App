@@ -6,9 +6,12 @@ import { NextRequest, NextResponse } from 'next/server';
  */
 export async function GET(request) {
   try {
-    // Redirect directly to backend's Google OAuth endpoint
+    // Redirect to backend's Google OAuth endpoint
+    // The backend will handle the OAuth flow and redirect back to frontend
     const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-    const backendOAuthUrl = `${backendUrl}/auth/google/login`;
+    const backendOAuthUrl = `${backendUrl}/api/auth/google/login`;
+    
+    console.log('Redirecting to backend OAuth:', backendOAuthUrl);
     
     return NextResponse.redirect(backendOAuthUrl);
     

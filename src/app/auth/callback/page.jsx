@@ -23,7 +23,14 @@ function AuthCallbackContent() {
 
       // Add comprehensive debugging
       console.log('🔍 DEBUG: Full URL:', window.location.href);
-      console.log('🔍 DEBUG: All URL parameters:', Object.fromEntries(searchParams));
+      console.log('🔍 DEBUG: All URL parameters:', {
+        access_token: searchParams.get('access_token'),
+        refresh_token: searchParams.get('refresh_token'),
+        user_id: searchParams.get('user_id'),
+        error: searchParams.get('error'),
+        code: searchParams.get('code'),
+        state: searchParams.get('state')
+      });
       console.log('Callback params:', { accessToken, refreshToken, userId, error: callbackError, code, state });
 
       if (callbackError) {
@@ -132,12 +139,15 @@ function AuthCallbackContent() {
 }
 
 export default function AuthCallback() {
+  // Add timestamp to prevent caching
+  const timestamp = Date.now();
+  
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-purple-900 to-pink-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p className="text-white text-lg">Loading...</p>
+          <p className="text-white text-lg">Loading... (t: {timestamp})</p>
         </div>
       </div>
     }>

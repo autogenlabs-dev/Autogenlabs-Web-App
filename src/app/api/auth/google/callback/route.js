@@ -2,56 +2,42 @@ import { NextRequest, NextResponse } from 'next/server';
 
 /**
  * Google OAuth Callback Handler
- * Receives OAuth callback from Google and forwards to backend for processing
+ * This route should NOT be called directly.
+ * The backend handles Google OAuth and redirects to frontend callback page.
  */
 export async function GET(request) {
   try {
     const url = new URL(request.url);
-    const code = url.searchParams.get('code');
-    const state = url.searchParams.get('state');
     const error = url.searchParams.get('error');
     
+    // Frontend domain
+    const frontendDomain = process.env.NODE_ENV === 'production' 
+      ? 'https://codemurf.com' 
+      : 'http://localhost:3000';
+    
+    // If there's an error, redirect to auth page with error
     if (error) {
-      // Forward error to frontend auth page
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/auth?error=${error}`
+        `${frontendDomain}/auth?error=${error}`
       );
     }
     
-    if (!code) {
-      return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/auth?error=missing_code`
-      );
-    }
+    // This route shouldn't be called directly in the new flow
+    // The backend redirects to /auth/callback page directly
+    console.warn('Frontend Google callback route called directly - this indicates incorrect OAuth flow configuration');
     
-    // Forward the OAuth callback to backend for processing
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-    const backendCallbackUrl = `${backendUrl}/api/auth/google/callback?code=${code}&state=${state}`;
-    
-    // Make request to backend to process OAuth callback
-    const response = await fetch(backendCallbackUrl);
-    
-    if (!response.ok) {
-      throw new Error('Backend OAuth processing failed');
-    }
-    
-    // Backend will handle token generation and redirect to frontend with tokens
-    // The backend response should be a redirect to the frontend callback with tokens
-    const responseData = await response.json();
-    
-    if (responseData.redirect_url) {
-      return NextResponse.redirect(responseData.redirect_url);
-    }
-    
-    // If no redirect URL, redirect to frontend callback with tokens
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/auth/callback?${url.searchParams.toString()}`
+      `${frontendDomain}/auth?error=incorrect_flow`
     );
     
   } catch (error) {
     console.error('Google OAuth callback error:', error);
+    const frontendDomain = process.env.NODE_ENV === 'production' 
+      ? 'https://codemurf.com' 
+      : 'http://localhost:3000';
+    
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/auth?error=callback_failed`
+      `${frontendDomain}/auth?error=callback_failed`
     );
   }
 }
