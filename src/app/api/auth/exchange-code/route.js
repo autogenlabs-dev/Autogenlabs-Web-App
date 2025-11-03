@@ -18,7 +18,11 @@ export async function POST(request) {
     
     // Forward to backend for token exchange
     const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-    const backendExchangeUrl = `${backendUrl}/api/auth/${provider}/callback?code=${code}&state=${state}`;
+    
+    // Production backend uses /auth instead of /api/auth
+    const isProduction = process.env.NODE_ENV === 'production';
+    const backendPath = isProduction ? `/auth/${provider}/callback` : `/api/auth/${provider}/callback`;
+    const backendExchangeUrl = `${backendUrl}${backendPath}?code=${code}&state=${state}`;
     
     console.log('Exchanging code with backend:', backendExchangeUrl);
     

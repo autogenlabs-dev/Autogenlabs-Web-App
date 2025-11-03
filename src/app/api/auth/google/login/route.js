@@ -9,7 +9,11 @@ export async function GET(request) {
     // Redirect to backend's Google OAuth endpoint
     // The backend will handle the OAuth flow and redirect back to frontend
     const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-    const backendOAuthUrl = `${backendUrl}/api/auth/google/login`;
+    
+    // Production backend uses /auth instead of /api/auth
+    const isProduction = process.env.NODE_ENV === 'production';
+    const backendPath = isProduction ? '/auth/google/login' : '/api/auth/google/login';
+    const backendOAuthUrl = `${backendUrl}${backendPath}`;
     
     console.log('Redirecting to backend OAuth:', backendOAuthUrl);
     

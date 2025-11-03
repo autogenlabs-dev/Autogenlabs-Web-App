@@ -14,6 +14,7 @@ Add these authorized redirect URIs in your Google OAuth Console:
    ```
    https://api.codemurf.com/auth/google/callback
    ```
+   ⚠️ **Note**: Production backend uses `/auth` not `/api/auth` path
 
 2. **Frontend Callback URL** (for direct redirects):
    ```
