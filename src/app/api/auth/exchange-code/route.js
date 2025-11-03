@@ -17,7 +17,10 @@ export async function POST(request) {
     }
     
     // Forward to backend for token exchange
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    // Use Vercel environment variables if available, fallback to defaults
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL ||
+                       process.env.VERCEL_API_URL ||
+                       'http://localhost:8000';
     
     // Production backend uses /auth instead of /api/auth
     const isProduction = process.env.NODE_ENV === 'production';
