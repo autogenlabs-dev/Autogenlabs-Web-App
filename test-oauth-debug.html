@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OAuth Debug Test</title>
+</head>
+<body>
+    <h1>OAuth Debug Test</h1>
+    
+    <h2>Test Google OAuth Flow</h2>
+    <button onclick="testGoogleLogin()">1. Test Google Login Initiation</button>
+    <button onclick="testBackendDirect()">2. Test Backend Direct</button>
+    <button onclick="testFrontendFlow()">3. Test Frontend Flow</button>
+    
+    <div id="results" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc;"></div>
+    
+    <script>
+        function log(message) {
+            const results = document.getElementById('results');
+            results.innerHTML += '<div>' + new Date().toISOString() + ': ' + message + '</div>';
+            console.log(message);
+        }
+        
+        async function testGoogleLogin() {
+            log('Testing Google OAuth login initiation...');
+            
+            try {
+                // Test frontend Google login route
+                const response = await fetch('/api/auth/google/login', {
+                    method: 'GET',
+                    redirect: 'manual' // Don't follow redirects automatically
+                });
+                
+                log('Frontend Google login response status: ' + response.status);
+                
+                if (response.status === 302) {
+                    const location = response.headers.get('location');
+                    log('Redirect location: ' + location);
+                    
+                    // Check if redirect goes to backend
+                    if (location && location.includes('localhost:8000')) {
+                        log('✅ Frontend correctly redirects to backend');
+                        
+                        // Now test backend directly
+                        const backendResponse = await fetch('http://localhost:8000/api/auth/google/login', {
+                            method: 'GET',
+                            redirect: 'manual'
+                        });
+                        
+                        log('Backend Google login response status: ' + backendResponse.status);
+                        
+                        if (backendResponse.status === 302) {
+                            const backendLocation = backendResponse.headers.get('location');
+                            log('Backend redirect location: ' + backendLocation);
+                            
+                            if (backendLocation && backendLocation.includes('accounts.google.com')) {
+                                log('✅ Backend correctly redirects to Google OAuth');
+                                
+                                // Extract redirect_uri from the Google URL
+                                const urlParams = new URLSearchParams(backendLocation.split('?')[1]);
+                                const redirectUri = urlParams.get('redirect_uri');
+                                log('Google OAuth redirect_uri: ' + redirectUri);
+                                
+                                if (redirectUri === 'http://localhost:8000/api/auth/google/callback') {
+                                    log('✅ Redirect URI matches expected backend callback');
+                                } else {
+                                    log('❌ Redirect URI mismatch! Expected: http://localhost:8000/api/auth/google/callback, Got: ' + redirectUri);
+                                }
+                            } else {
+                                log('❌ Backend does not redirect to Google OAuth');
+                            }
+                        } else {
+                            log('❌ Backend login failed with status: ' + backendResponse.status);
+                        }
+                    } else {
+                        log('❌ Frontend does not redirect to backend correctly');
+                    }
+                } else {
+                    log('❌ Frontend login failed with status: ' + response.status);
+                }
+            } catch (error) {
+                log('❌ Error testing OAuth flow: ' + error.message);
+            }
+        }
+        
+        async function testBackendDirect() {
+            log('Testing backend OAuth providers...');
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/auth/providers');
+                const data = await response.json();
+                
+                log('Backend OAuth providers: ' + JSON.stringify(data, null, 2));
+                
+                const googleProvider = data.providers.find(p => p.name === 'google');
+                if (googleProvider) {
+                    log('✅ Google provider is configured');
+                } else {
+                    log('❌ Google provider not found in backend configuration');
+                }
+            } catch (error) {
+                log('❌ Error testing backend: ' + error.message);
+            }
+        }
+        
+        async function testFrontendFlow() {
+            log('Testing complete frontend OAuth flow...');
+            
+            // Open Google OAuth in a new window for testing
+            const oauthWindow = window.open('/api/auth/google/login', 'oauth_test', 'width=500,height=600');
+            
+            // Listen for messages from the OAuth window
+            window.addEventListener('message', function(event) {
+                log('OAuth window message: ' + JSON.stringify(event.data));
+            });
+            
+            // Poll to check if window was closed
+            const checkClosed = setInterval(() => {
+                if (oauthWindow.closed) {
+                    log('OAuth window was closed by user');
+                    clearInterval(checkClosed);
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

@@ -7,10 +7,16 @@ function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams(); // Move hook to component level
   const [error, setError] = useState(null);
+  const [isClient, setIsClient] = useState(false);
   
   useEffect(() => {
-    // Only run on client side
-    if (typeof window === 'undefined') return;
+    // Ensure we're on client side before processing
+    setIsClient(true);
+  }, []);
+  
+  useEffect(() => {
+    // Only run on client side after hydration
+    if (!isClient || typeof window === 'undefined') return;
     
     try {
       // Get URL parameters using the hook at component level
@@ -32,6 +38,15 @@ function AuthCallbackContent() {
         state: searchParams.get('state')
       });
       console.log('Callback params:', { accessToken, refreshToken, userId, error: callbackError, code, state });
+      
+      // Check if we have the expected parameters from backend OAuth flow
+      if (!accessToken && !refreshToken && !callbackError && !code) {
+        console.error('🔍 DEBUG: No expected OAuth parameters found in URL');
+        console.error('🔍 DEBUG: This suggests the OAuth flow is not working correctly');
+        setError('no_oauth_params');
+        router.push('/auth?error=no_oauth_params');
+        return;
+      }
 
       if (callbackError) {
         console.error('OAuth callback error:', callbackError);
@@ -106,7 +121,19 @@ function AuthCallbackContent() {
       setError('callback_error');
       router.push('/auth?error=callback_error');
     }
-  }, [router, searchParams]);
+  }, [router, searchParams, isClient]);
+
+  // Show loading state during hydration
+  if (!isClient) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-purple-900 to-pink-900">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <p className="text-white text-lg">Initializing...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Show error state if there is one
   if (error) {
@@ -139,15 +166,12 @@ function AuthCallbackContent() {
 }
 
 export default function AuthCallback() {
-  // Add timestamp to prevent caching
-  const timestamp = Date.now();
-  
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-purple-900 to-pink-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p className="text-white text-lg">Loading... (t: {timestamp})</p>
+          <p className="text-white text-lg">Loading...</p>
         </div>
       </div>
     }>
