@@ -134,6 +134,67 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    // OAuth login method for handling tokens from backend OAuth flow
+    const loginWithOAuth = (oauthData) => {
+        setLoading(true);
+        setError(null);
+        
+        try {
+            const { id, accessToken, refreshToken } = oauthData;
+            
+            // Store tokens using tokenUtils
+            tokenUtils.setTokens(accessToken, refreshToken);
+            
+            // Set basic user data from OAuth data
+            // We'll fetch full user data later if needed
+            const userState = {
+                id,
+                accessToken,
+                refreshToken,
+                name: 'User', // Will be updated when we fetch user data
+                email: '', // Will be updated when we fetch user data
+                role: 'user',
+                avatar: '/public/logoAuto.webp'
+            };
+            
+            setUser(userState);
+            
+            // Optionally fetch full user data asynchronously
+            fetchUserDataAsync(accessToken);
+            
+            return { success: true, user: userState };
+        } catch (error) {
+            console.error('❌ OAuth login failed:', error);
+            setError(error.message || 'OAuth login failed');
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Helper function to fetch user data asynchronously
+    const fetchUserDataAsync = async (accessToken) => {
+        try {
+            const userData = await authApi.getCurrentUser(accessToken);
+            const fullUserState = {
+                id: userData.id,
+                name: userData.full_name || userData.name || userData.email.split('@')[0],
+                firstName: userData.full_name ? userData.full_name.split(' ')[0] : (userData.name ? userData.name.split(' ')[0] : userData.email.split('@')[0]),
+                lastName: userData.full_name ? userData.full_name.split(' ').slice(1).join(' ') : (userData.name ? userData.name.split(' ').slice(1).join(' ') : ''),
+                email: userData.email,
+                role: userData.role || 'user',
+                avatar: '/public/logoAuto.webp',
+                accessToken,
+                ...userData
+            };
+            
+            setUser(fullUserState);
+        } catch (error) {
+            console.warn('❌ Failed to fetch user data after OAuth login:', error);
+            // Don't fail the login, just continue with basic user data
+        }
+    };
+
     const signup = async (userData) => {
         setLoading(true);
         setError(null);
@@ -274,6 +335,7 @@ export const AuthProvider = ({ children }) => {
         loading,
         error,
         login,
+        loginWithOAuth,
         signup,
         logout,
         updateUser,

@@ -17,8 +17,9 @@ const AuthForm = ({
     };
 
     const handleOAuthLogin = (provider) => {
-        const baseUrl = getApiBaseUrl();
-        const oauthUrl = `${baseUrl}/api/auth/${provider}/login`;
+        // Redirect directly to backend OAuth login endpoint
+        const backendUrl = 'http://localhost:8000';
+        const oauthUrl = `${backendUrl}/api/auth/${provider}/login`;
         console.log(`OAuth Debug - Redirecting to: ${oauthUrl}`);
         window.location.href = oauthUrl;
     };
