@@ -29,6 +29,9 @@ export async function POST(request) {
                        process.env.VERCEL_API_URL ||
                        'http://localhost:8000';
     
+    // Check if we're in production
+    const isProduction = process.env.NODE_ENV === 'production';
+    
     // Backend always uses /auth (not /api/auth) based on backend code analysis
     const backendPath = `/auth/${provider}/callback`;
     const backendExchangeUrl = `${backendUrl}${backendPath}?code=${code}&state=${state}`;

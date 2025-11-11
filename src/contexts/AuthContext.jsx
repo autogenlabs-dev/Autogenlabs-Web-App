@@ -1,6 +1,7 @@
 'use client';
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { authApi, tokenUtils, ApiError } from '../lib/api';
+import { useAuth0 } from '@auth0/auth0-react';
 
 const AuthContext = createContext();
 
@@ -13,118 +14,60 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
+    const {
+        user: auth0User,
+        isAuthenticated: auth0IsAuthenticated,
+        isLoading: auth0Loading,
+        loginWithRedirect,
+        logout: auth0Logout,
+        getAccessTokenSilently
+    } = useAuth0();
+
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Load user from stored tokens on app initialization
+    // Sync Auth0 state with our context
     useEffect(() => {
-        const initializeAuth = async () => {
-            try {
-                const accessToken = tokenUtils.getAccessToken();
-                
-                if (accessToken && !tokenUtils.isTokenExpired(accessToken)) {
-                    try {
-                        // Add timeout to prevent infinite loading
-                        const timeoutPromise = new Promise((_, reject) =>
-                            setTimeout(() => reject(new Error('Auth timeout')), 3000)
-                        );
-                        
-                        let userData;
-                        try {
-                            userData = await Promise.race([
-                                authApi.getCurrentUser(accessToken),
-                                timeoutPromise
-                            ]);
-                        } catch (error) {
-                            console.warn('Auth request timed out or failed, continuing without user data:', error.message);
-                            // Don't throw error, just continue without user data
-                            tokenUtils.clearTokens();
-                            setUser(null);
-                            return;
-                        }
-                        
-                        setUser({
-                            id: userData.id,
-                            name: userData.full_name || userData.name || userData.email.split('@')[0],
-                            firstName: userData.full_name ? userData.full_name.split(' ')[0] : (userData.name ? userData.name.split(' ')[0] : userData.email.split('@')[0]),
-                            lastName: userData.full_name ? userData.full_name.split(' ').slice(1).join(' ') : (userData.name ? userData.name.split(' ').slice(1).join(' ') : ''),
-                            email: userData.email,
-                            role: userData.role || 'user',
-                            avatar: '/public/logoAuto.webp',
-                            ...userData
-                        });
-                    } catch (userError) {
-                        console.warn('❌ InitializeAuth - Failed to fetch user data:', userError);
-                        // Token might be invalid, try refresh
-                        const refreshToken = tokenUtils.getRefreshToken();
-                        if (refreshToken) {
-                            try {
-                                const refreshResponse = await authApi.refreshToken(refreshToken);
-                                tokenUtils.setTokens(refreshResponse.access_token, refreshResponse.refresh_token || refreshToken);
-                                const refreshedUserData = await authApi.getCurrentUser(refreshResponse.access_token);
-                                setUser({
-                                    id: refreshedUserData.id,
-                                    name: refreshedUserData.full_name || refreshedUserData.name || refreshedUserData.email.split('@')[0],
-                                    firstName: refreshedUserData.full_name ? refreshedUserData.full_name.split(' ')[0] : (refreshedUserData.name ? refreshedUserData.name.split(' ')[0] : refreshedUserData.email.split('@')[0]),
-                                    lastName: refreshedUserData.full_name ? refreshedUserData.full_name.split(' ').slice(1).join(' ') : (refreshedUserData.name ? refreshedUserData.name.split(' ').slice(1).join(' ') : ''),
-                                    email: refreshedUserData.email,
-                                    role: refreshedUserData.role || 'user',
-                                    avatar: '/public/logoAuto.webp',
-                                    ...refreshedUserData
-                                });
-                            } catch (refreshError) {
-                                console.warn('❌ InitializeAuth - Refresh failed:', refreshError);
-                                tokenUtils.clearTokens();
-                                setUser(null);
-                            }
-                        } else {
-                            tokenUtils.clearTokens();
-                            setUser(null);
-                        }
-                    }
-                } else {
-                    tokenUtils.clearTokens();
-                    setUser(null);
-                }
-            } catch (error) {
-                console.warn('❌ Failed to initialize auth:', error);
-                tokenUtils.clearTokens();
-                setUser(null);
-            } finally {
-                setLoading(false);
-            }
-        };
+        if (auth0Loading) {
+            setLoading(true);
+            return;
+        }
 
-        initializeAuth();
-    }, []);
+        if (auth0IsAuthenticated && auth0User) {
+            // Transform Auth0 user to our user format
+            const userState = {
+                id: auth0User.sub,
+                name: auth0User.name || auth0User.nickname || auth0User.email?.split('@')[0] || 'User',
+                firstName: auth0User.given_name || auth0User.name?.split(' ')[0] || auth0User.nickname || 'User',
+                lastName: auth0User.family_name || auth0User.name?.split(' ').slice(1).join(' ') || '',
+                email: auth0User.email,
+                role: 'user', // Default role, can be updated from backend
+                avatar: auth0User.picture || '/public/logoAuto.webp',
+                ...auth0User
+            };
+            
+            setUser(userState);
+            setLoading(false);
+        } else {
+            setUser(null);
+            setLoading(false);
+        }
+    }, [auth0User, auth0IsAuthenticated, auth0Loading]);
 
     const login = async (credentials) => {
         setLoading(true);
         setError(null);
         
         try {
-            const response = await authApi.login(credentials.email, credentials.password);
+            // For Auth0, we redirect to universal login
+            await loginWithRedirect({
+                authorizationParams: {
+                    login_hint: credentials.email
+                }
+            });
             
-            // Store tokens
-            tokenUtils.setTokens(response.access_token, response.refresh_token);
-            
-            // Set user data
-            const userData = response.user;
-            const userState = {
-                id: userData.id,
-                name: userData.full_name || userData.first_name || userData.name || userData.email.split('@')[0],
-                firstName: userData.first_name || (userData.full_name ? userData.full_name.split(' ')[0] : (userData.name ? userData.name.split(' ')[0] : userData.email.split('@')[0])),
-                lastName: userData.last_name || (userData.full_name ? userData.full_name.split(' ').slice(1).join(' ') : (userData.name ? userData.name.split(' ').slice(1).join(' ') : '')),
-                email: userData.email,
-                role: userData.role || 'user',
-                avatar: '/public/logoAuto.webp',
-                ...userData
-            };
-            
-            setUser(userState);
-            
-            return { success: true, user: userData };
+            return { success: true };
         } catch (error) {
             console.error('❌ Login failed:', error);
             setError(error.message || 'Login failed');
@@ -142,6 +85,12 @@ export const AuthProvider = ({ children }) => {
         try {
             const { id, accessToken, refreshToken } = oauthData;
             
+            console.log('🔍 AuthContext Debug - loginWithOAuth called with:', {
+                id: id ? '***' : null,
+                accessToken: accessToken ? '***' : null,
+                refreshToken: refreshToken ? '***' : null
+            });
+            
             // Store tokens using tokenUtils
             tokenUtils.setTokens(accessToken, refreshToken);
             
@@ -158,8 +107,9 @@ export const AuthProvider = ({ children }) => {
             };
             
             setUser(userState);
+            console.log('✅ AuthContext Debug - User state set:', userState);
             
-            // Optionally fetch full user data asynchronously
+            // Fetch full user data asynchronously
             fetchUserDataAsync(accessToken);
             
             return { success: true, user: userState };
@@ -236,26 +186,19 @@ export const AuthProvider = ({ children }) => {
         setError(null);
         
         try {
-            // Get access token before clearing it
-            const accessToken = tokenUtils.getAccessToken();
-            
-            // Call backend logout endpoint if we have a token
-            if (accessToken) {
-                try {
-                    await authApi.logout(accessToken);
-                } catch (error) {
-                    console.warn('⚠️ Backend logout failed, continuing with local cleanup:', error);
+            // Use Auth0 logout
+            await auth0Logout({
+                logoutParams: {
+                    returnTo: window.location.origin
                 }
-            }
+            });
             
-            // Clear tokens and user state
-            tokenUtils.clearTokens();
+            // Clear local state
             setUser(null);
             
         } catch (error) {
             console.error('❌ Logout error:', error);
             // Even if there's an error, clear local state
-            tokenUtils.clearTokens();
             setUser(null);
         } finally {
             setLoading(false);
@@ -342,7 +285,7 @@ export const AuthProvider = ({ children }) => {
         updateProfile,
         refreshUser,
         clearError,
-        isAuthenticated: !loading && !!user && !!tokenUtils.getAccessToken(),
+        isAuthenticated: auth0IsAuthenticated && !!user,
         isAdmin: user?.role === 'admin',
         isDeveloper: user?.role === 'developer',
         isUser: user?.role === 'user'

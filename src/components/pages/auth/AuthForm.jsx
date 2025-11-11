@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
 
 const AuthForm = ({
     isSignIn,
@@ -16,15 +17,30 @@ const AuthForm = ({
         return apiUrl;
     };
 
+    const { loginWithRedirect, isLoading: auth0Loading } = useAuth0();
+
     const handleOAuthLogin = (provider) => {
-        // Redirect directly to backend OAuth login endpoint
-        const backendUrl = 'http://localhost:8000';
-        const oauthUrl = `${backendUrl}/api/auth/${provider}/login`;
-        console.log(`OAuth Debug - Redirecting to: ${oauthUrl}`);
-        window.location.href = oauthUrl;
+        // For Auth0, we use the built-in loginWithRedirect
+        // The provider is handled by Auth0's universal login
+        console.log(`Auth0 Debug - Initiating login with redirect for provider: ${provider}`);
+        loginWithRedirect({
+            authorizationParams: {
+                connection: provider === 'google' ? 'google-oauth2' : 'github'
+            }
+        });
+    };
+
+    const handleEmailLogin = async (e) => {
+        e.preventDefault();
+        // For email/password, we'll use Auth0's loginWithRedirect
+        loginWithRedirect({
+            authorizationParams: {
+                login_hint: formData.email
+            }
+        });
     };
     return (
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={handleEmailLogin} className="space-y-3">
             {!isSignIn && (
                 <div className="transform transition-all duration-300 hover:translate-x-1">
                     <label htmlFor="name" className="block text-sm font-medium text-gray-200 mb-1">
@@ -123,7 +139,7 @@ const AuthForm = ({
                 <button
                     type="button"
                     onClick={() => handleOAuthLogin('google')}
-                    disabled={isLoading}
+                    disabled={isLoading || auth0Loading}
                     className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg shadow-sm text-sm font-medium bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
@@ -139,7 +155,7 @@ const AuthForm = ({
                 <button
                     type="button"
                     onClick={() => handleOAuthLogin('github')}
-                    disabled={isLoading}
+                    disabled={isLoading || auth0Loading}
                     className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg shadow-sm text-sm font-medium bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
@@ -151,14 +167,14 @@ const AuthForm = ({
             
             <button
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoading || auth0Loading}
                 className={`w-full text-white py-3 px-4 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-500 flex items-center justify-center transform hover:shadow-lg group relative overflow-hidden ${
-                    isLoading
+                    (isLoading || auth0Loading)
                         ? 'bg-gradient-to-r from-blue-500 to-purple-500 cursor-not-allowed'
                         : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 hover:scale-105'
                 }`}
             >
-                {isLoading ? (
+                {(isLoading || auth0Loading) ? (
                     <div className="flex items-center space-x-3">
                         {/* Animated spinner */}
                         <div className="relative">

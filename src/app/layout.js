@@ -5,6 +5,7 @@ import { Analytics } from '@vercel/analytics/next';
 import { OrganizationSchema, WebsiteSchema, SoftwareApplicationSchema } from "../components/seo/StructuredData";
 import Script from 'next/script';
 import SEOMonitor from "../components/SEOMonitor";
+import Auth0ProviderWrapper from "../components/auth/Auth0ProviderWrapper";
 
 // Development helper for image positioning issues
 if (process.env.NODE_ENV === "development") {
@@ -159,14 +160,16 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning={true}
       >
-        <OrganizationSchema />
-        <WebsiteSchema />
-        <SoftwareApplicationSchema />
-        <LayoutWrapper>{children}</LayoutWrapper>
-        <Analytics />
-        
-        {/* SEO Monitoring Component */}
-        <SEOMonitor />
+        <Auth0ProviderWrapper>
+          <OrganizationSchema />
+          <WebsiteSchema />
+          <SoftwareApplicationSchema />
+          <LayoutWrapper>{children}</LayoutWrapper>
+          <Analytics />
+          
+          {/* SEO Monitoring Component */}
+          <SEOMonitor />
+        </Auth0ProviderWrapper>
       </body>
     </html>
   );
