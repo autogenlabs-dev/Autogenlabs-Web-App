@@ -3,6 +3,8 @@
  * Tests Clerk authentication integration
  */
 
+'use client';
+
 import { useAuth } from '@clerk/nextjs';
 import { adminApi } from '../../lib/adminApi';
 import { componentApi } from '../../lib/componentApi';
