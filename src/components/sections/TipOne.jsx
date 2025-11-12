@@ -12,6 +12,17 @@ export default function TipOne() {
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  // Don't render anything on server side to avoid SSR/HMR conflicts
+  if (!isClient) {
+    return (
+      <section className="relative min-h-[120vh] bg-black overflow-hidden">
+        <div className="flex items-center justify-center h-full">
+          <div className="animate-pulse text-white">Loading...</div>
+        </div>
+      </section>
+    );
+  }
   
   useEffect(() => {
     if (isClient && containerRef.current) {

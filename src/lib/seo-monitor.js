@@ -7,7 +7,15 @@ export function trackWebVitals() {
   if (typeof window !== 'undefined') {
     // Track Core Web Vitals - using dynamic import to avoid build errors
     import('web-vitals').then((module) => {
-      if (module && module.getCLS && module.getFID && module.getFCP && module.getLCP && module.getTTFB) {
+      // Check for the correct function names in web-vitals v3+
+      if (module && module.onCLS && module.onFID && module.onFCP && module.onLCP && module.onTTFB) {
+        module.onCLS(console.log);
+        module.onFID(console.log);
+        module.onFCP(console.log);
+        module.onLCP(console.log);
+        module.onTTFB(console.log);
+      } else if (module && module.getCLS && module.getFID && module.getFCP && module.getLCP && module.getTTFB) {
+        // Fallback for older versions
         module.getCLS(console.log);
         module.getFID(console.log);
         module.getFCP(console.log);
