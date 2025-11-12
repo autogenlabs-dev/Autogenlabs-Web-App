@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
+import { useSignIn, useSignUp } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
 
 const AuthForm = ({
     isSignIn,
@@ -9,36 +10,73 @@ const AuthForm = ({
     handleSubmit,
     isLoading
 }) => {
-    // Get the API base URL from environment or use localhost for development
-    const getApiBaseUrl = () => {
-        // Use the environment variable if set, otherwise use the current origin for Next.js API routes
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
-        console.log('OAuth Debug - API URL:', apiUrl);
-        return apiUrl;
-    };
+    const { signIn, isLoaded: signInLoaded } = useSignIn();
+    const { signUp, isLoaded: signUpLoaded } = useSignUp();
+    const router = useRouter();
+    const [clerkLoading, setClerkLoading] = React.useState(false);
 
-    const { loginWithRedirect, isLoading: auth0Loading } = useAuth0();
-
-    const handleOAuthLogin = (provider) => {
-        // For Auth0, we use the built-in loginWithRedirect
-        // The provider is handled by Auth0's universal login
-        console.log(`Auth0 Debug - Initiating login with redirect for provider: ${provider}`);
-        loginWithRedirect({
-            authorizationParams: {
-                connection: provider === 'google' ? 'google-oauth2' : 'github'
+    const handleOAuthLogin = async (provider) => {
+        try {
+            setClerkLoading(true);
+            console.log(`Clerk Debug - Initiating ${provider} OAuth login`);
+            
+            if (isSignIn && signInLoaded) {
+                await signIn.authenticateWithRedirect({
+                    strategy: provider === 'google' ? 'oauth_google' : 'oauth_github',
+                    redirectUrl: '/sso-callback',
+                    redirectUrlComplete: '/dashboard'
+                });
+            } else if (signUpLoaded) {
+                await signUp.authenticateWithRedirect({
+                    strategy: provider === 'google' ? 'oauth_google' : 'oauth_github',
+                    redirectUrl: '/sso-callback',
+                    redirectUrlComplete: '/dashboard'
+                });
             }
-        });
+        } catch (error) {
+            console.error('Clerk OAuth error:', error);
+            setClerkLoading(false);
+        }
     };
 
     const handleEmailLogin = async (e) => {
         e.preventDefault();
-        // For email/password, we'll use Auth0's loginWithRedirect
-        loginWithRedirect({
-            authorizationParams: {
-                login_hint: formData.email
+        try {
+            setClerkLoading(true);
+            
+            if (isSignIn && signInLoaded) {
+                const result = await signIn.create({
+                    identifier: formData.email,
+                    password: formData.password
+                });
+
+                if (result.status === 'complete') {
+                    router.push('/dashboard');
+                }
+            } else if (signUpLoaded) {
+                const result = await signUp.create({
+                    emailAddress: formData.email,
+                    password: formData.password,
+                    firstName: formData.name?.split(' ')[0] || '',
+                    lastName: formData.name?.split(' ').slice(1).join(' ') || ''
+                });
+
+                if (result.status === 'complete') {
+                    router.push('/dashboard');
+                } else {
+                    // Handle email verification if needed
+                    await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
+                    router.push('/verify-email');
+                }
             }
-        });
+        } catch (error) {
+            console.error('Clerk email auth error:', error);
+            setClerkLoading(false);
+        }
     };
+
+    const isClerkLoading = !signInLoaded || !signUpLoaded || clerkLoading;
+
     return (
         <form onSubmit={handleEmailLogin} className="space-y-3">
             {!isSignIn && (
@@ -139,7 +177,7 @@ const AuthForm = ({
                 <button
                     type="button"
                     onClick={() => handleOAuthLogin('google')}
-                    disabled={isLoading || auth0Loading}
+                    disabled={isLoading || isClerkLoading}
                     className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg shadow-sm text-sm font-medium bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
@@ -155,7 +193,7 @@ const AuthForm = ({
                 <button
                     type="button"
                     onClick={() => handleOAuthLogin('github')}
-                    disabled={isLoading || auth0Loading}
+                    disabled={isLoading || isClerkLoading}
                     className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg shadow-sm text-sm font-medium bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
@@ -167,14 +205,14 @@ const AuthForm = ({
             
             <button
                 type="submit"
-                disabled={isLoading || auth0Loading}
+                disabled={isLoading || isClerkLoading}
                 className={`w-full text-white py-3 px-4 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-500 flex items-center justify-center transform hover:shadow-lg group relative overflow-hidden ${
-                    (isLoading || auth0Loading)
+                    (isLoading || isClerkLoading)
                         ? 'bg-gradient-to-r from-blue-500 to-purple-500 cursor-not-allowed'
                         : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 hover:scale-105'
                 }`}
             >
-                {(isLoading || auth0Loading) ? (
+                {(isLoading || isClerkLoading) ? (
                     <div className="flex items-center space-x-3">
                         {/* Animated spinner */}
                         <div className="relative">
@@ -211,4 +249,3 @@ const AuthForm = ({
 };
 
 export default AuthForm;
-

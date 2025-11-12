@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check, X, Star, Zap } from 'lucide-react';
-import { paymentApi, tokenUtils } from '../../lib/api';
+import { paymentApi } from '../../lib/api';
+import { useAuth } from '@clerk/nextjs';
 
 const PricingPage = () => {
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -114,8 +115,11 @@ const PricingPage = () => {
     }
 
     // Handle Pro and Ultra plan payments with Razorpay
-    const accessToken = tokenUtils.getAccessToken();
-    if (!accessToken) {
+    // Get Clerk session token
+    const { getToken } = useAuth();
+    const token = await getToken();
+    
+    if (!token) {
       // Redirect to login if not authenticated
       window.location.href = '/auth?redirect=/pricing';
       return;
@@ -125,7 +129,7 @@ const PricingPage = () => {
     setIsLoading(true);
 
     try {
-      await initializeRazorpay(plan, accessToken);
+      await initializeRazorpay(plan, token);
     } catch (error) {
       console.error('Payment initialization failed:', error);
       alert('Payment initialization failed. Please try again.');

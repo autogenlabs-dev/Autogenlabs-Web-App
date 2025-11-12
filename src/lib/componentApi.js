@@ -3,7 +3,7 @@
  * Handles all component-related API calls
  */
 
-import { tokenUtils, ApiError } from './api';
+import { ApiError } from './api';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -26,49 +26,12 @@ const handleApiResponse = async (response) => {
     return await response.json();
 };
 
-// Token refresh function
-const refreshAccessToken = async () => {
-    const refreshToken = tokenUtils.getRefreshToken();
-    if (!refreshToken) {
-        throw new ApiError('No refresh token available', 401);
-    }
-
-    const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            refresh_token: refreshToken,
-        }),
-    });
-
-    if (!response.ok) {
-        tokenUtils.clearTokens(); // Clear invalid tokens
-        throw new ApiError('Token refresh failed - please login again', 401);
-    }
-
-    const data = await response.json();
-    tokenUtils.setTokens(data.access_token, data.refresh_token);
-    return data.access_token;
-};
-
-// Enhanced auth headers with automatic token refresh
-const getAuthHeadersWithRefresh = async () => {
+// Enhanced auth headers with Clerk token
+const getAuthHeaders = (token) => {
     if (typeof window === 'undefined') return { 'Content-Type': 'application/json' };
     
-    let token = tokenUtils.getAccessToken();
-    
-    // Check if token is expired and refresh if needed
-    if (!token || tokenUtils.isTokenExpired(token)) {
-        const refreshToken = tokenUtils.getRefreshToken();
-        
-        try {
-            token = await refreshAccessToken();
-        } catch (error) {
-            tokenUtils.clearTokens();
-            throw new ApiError('Authentication required - please login again', 401);
-        }
+    if (!token) {
+        throw new ApiError('Authentication required - please login again', 401);
     }
     
     return {
@@ -142,10 +105,10 @@ export const componentApi = {
     /**
      * Create a new component
      */
-    async createComponent(componentData) {
+    async createComponent(componentData, token) {
         try {
             // Get authentication headers with auto-refresh
-            const headers = await getAuthHeadersWithRefresh();
+            const headers = await getAuthHeaders(token);
             
             // Ensure proper data types for required fields
             const sanitizedData = {
@@ -220,7 +183,7 @@ export const componentApi = {
     /**
      * Get a specific component by ID
      */
-    async getComponent(componentId) {
+    async getComponent(componentId, token) {
         try {
             const response = await fetch(`${API_BASE_URL}/components/${componentId}`, {
                 method: 'GET',
@@ -238,9 +201,9 @@ export const componentApi = {
     /**
      * Update an existing component
      */
-    async updateComponent(componentId, updateData) {
+    async updateComponent(componentId, updateData, token) {
         try {
-            const headers = await getAuthHeadersWithRefresh();
+            const headers = await getAuthHeaders(token);
             const response = await fetch(`${API_BASE_URL}/components/${componentId}`, {
                 method: 'PUT',
                 headers: headers,
@@ -258,9 +221,9 @@ export const componentApi = {
     /**
      * Delete a component
      */
-    async deleteComponent(componentId) {
+    async deleteComponent(componentId, token) {
         try {
-            const headers = await getAuthHeadersWithRefresh();
+            const headers = await getAuthHeaders(token);
             const response = await fetch(`${API_BASE_URL}/components/${componentId}`, {
                 method: 'DELETE',
                 headers: headers,
@@ -275,7 +238,7 @@ export const componentApi = {
     /**
      * Get user's components
      */
-    async getUserComponents({ skip = 0, limit = 100, page } = {}) {
+    async getUserComponents({ skip = 0, limit = 100, page } = {}, token) {
         try {
             const params = new URLSearchParams();
             
@@ -291,7 +254,7 @@ export const componentApi = {
 
             const response = await fetch(`${API_BASE_URL}/components/user/my-components?${params.toString()}`, {
                 method: 'GET',
-                headers: await getAuthHeadersWithRefresh(),
+                headers: await getAuthHeaders(token),
             });
 
             return await handleApiResponse(response);
@@ -304,7 +267,7 @@ export const componentApi = {
     /**
      * Get component categories (for dropdowns)
      */
-    async getComponentCategories() {
+    async getComponentCategories(token) {
         // Since this data is static, we can return it directly
         // But we could also make it dynamic by creating an endpoint
         return {
@@ -391,7 +354,7 @@ export const componentApi = {
     /**
      * Transform frontend form data to backend format
      */
-    async transformFormDataToBackend(formData) {
+    async transformFormDataToBackend(formData, token) {
         try {
             
             // Handle preview images - convert File objects to base64 or data URLs

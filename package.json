@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@auth0/auth0-react": "^2.8.0",
     "@clerk/nextjs": "^6.35.0",
     "@heroicons/react": "^2.2.0",
     "@lottiefiles/dotlottie-react": "^0.14.1",

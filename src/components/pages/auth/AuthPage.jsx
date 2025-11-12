@@ -23,7 +23,7 @@ const AuthPage = () => {
         name: ''
     });
 
-    const { login, signup, isAuthenticated, error: authError, clearError } = useAuth();
+    const { isAuthenticated, error: authError, clearError } = useAuth();
     const router = useRouter();
 
     // Update form mode based on URL parameter
@@ -34,9 +34,6 @@ const AuthPage = () => {
             setIsSignIn(true);
         }
     }, [mode]);
-
-    // Note: Redirect logic is handled by AuthGuard component
-    // No need for redirect logic here to avoid race conditions
 
     // Optimized input change handler with useCallback to prevent unnecessary re-renders
     const handleInputChange = useCallback((e) => {
@@ -60,7 +57,6 @@ const AuthPage = () => {
         if (!isMounted) return;
         
         if (isAuthenticated) {
-            
             let intendedUrl = null;
             if (typeof window !== 'undefined') {
                 intendedUrl = localStorage.getItem('intendedUrl');
@@ -101,13 +97,9 @@ const AuthPage = () => {
         return true;
     };
 
+    // Clerk handles the actual authentication, this is just for form validation
     const handleSubmit = useCallback(async (e) => {
         e.preventDefault();
-        
-        // Prevent multiple submissions
-        if (isLoading) {
-            return;
-        }
         
         if (!validateForm()) {
             return;
@@ -115,59 +107,9 @@ const AuthPage = () => {
 
         setIsLoading(true);
         setError('');
-
-        try {
-            
-            if (isSignIn) {
-                const result = await login({
-                    email: formData.email,
-                    password: formData.password
-                });
-                
-                // Show success state briefly before redirect
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                
-                // Handle redirect after successful login
-                let intendedUrl = null;
-                if (typeof window !== 'undefined') {
-                    intendedUrl = localStorage.getItem('intendedUrl');
-                }
-                
-                if (intendedUrl && intendedUrl !== '/auth') {
-                    if (typeof window !== 'undefined') {
-                        localStorage.removeItem('intendedUrl');
-                    }
-                    router.push(intendedUrl);
-                } else {
-                    router.push('/');
-                }
-            } else {
-                const result = await signup({
-                    email: formData.email,
-                    password: formData.password,
-                    name: formData.name
-                });
-                
-                // Show success state briefly before redirect
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                
-                // Keep loading state during redirect
-                // The finally block will not run as we're redirecting
-                
-                // Handle redirect after successful signup
-                router.push('/');
-            }
-            // Success - redirect handled above
-        } catch (error) {
-            console.error('❌ Form submission error:', error);
-            setError(error.message || (isSignIn ? 'Login failed' : 'Signup failed'));
-            // Always reset loading state on error
-            setIsLoading(false);
-        } finally {
-            // This will run after redirect, so we need to check if we're still on the page
-            // Don't reset loading if redirect was successful
-        }
-    }, [formData, isSignIn, login, signup, isLoading, validateForm, router]);
+        
+        // Form is valid, AuthForm will handle the Clerk authentication
+    }, [formData, isSignIn, validateForm]);
 
     // Don't render animations until component is mounted on client
     if (!isMounted) {

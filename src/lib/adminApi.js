@@ -3,7 +3,7 @@
  * Handles admin dashboard and management functionality
  */
 
-import { tokenUtils, ApiError } from './api';
+import { ApiError } from './api';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -26,13 +26,11 @@ const handleApiResponse = async (response) => {
     return await response.json();
 };
 
-// Enhanced auth headers with automatic token refresh
-const getAuthHeadersWithRefresh = async () => {
+// Enhanced auth headers with Clerk token
+const getAuthHeaders = (token) => {
     if (typeof window === 'undefined') return { 'Content-Type': 'application/json' };
     
-    const token = tokenUtils.getAccessToken();
-    
-    if (!token || tokenUtils.isTokenExpired(token)) {
+    if (!token) {
         throw new ApiError('Authentication required - please login again', 401);
     }
     
@@ -48,7 +46,7 @@ export const adminApi = {
     /**
      * Get all users with filtering and pagination
      */
-    async getUsers(params = {}) {
+    async getUsers(params = {}, token) {
         const queryString = new URLSearchParams();
         if (params.skip !== undefined) queryString.append('skip', params.skip);
         if (params.limit !== undefined) queryString.append('limit', params.limit);
@@ -56,7 +54,7 @@ export const adminApi = {
         if (params.search) queryString.append('search', params.search);
         if (params.is_active !== undefined) queryString.append('is_active', params.is_active);
         
-        const headers = await getAuthHeadersWithRefresh();
+        const headers = await getAuthHeaders(token);
         const url = `${API_BASE_URL}/admin/users${queryString.toString() ? '?' + queryString.toString() : ''}`;
         const response = await fetch(url, { headers });
         return await handleApiResponse(response);
@@ -65,8 +63,8 @@ export const adminApi = {
     /**
      * Get single user details
      */
-    async getUser(userId) {
-        const headers = await getAuthHeadersWithRefresh();
+    async getUser(userId, token) {
+        const headers = await getAuthHeaders(token);
         const response = await fetch(`${API_BASE_URL}/admin/users/${userId}`, { headers });
         return await handleApiResponse(response);
     },
@@ -74,8 +72,8 @@ export const adminApi = {
     /**
      * Update user role or status
      */
-    async updateUser(userId, updateData) {
-        const headers = await getAuthHeadersWithRefresh();
+    async updateUser(userId, updateData, token) {
+        const headers = await getAuthHeaders(token);
         const response = await fetch(`${API_BASE_URL}/admin/users/${userId}`, {
             method: 'PUT',
             headers,
@@ -87,8 +85,8 @@ export const adminApi = {
     /**
      * Deactivate/Activate user
      */
-    async toggleUserStatus(userId, isActive) {
-        const headers = await getAuthHeadersWithRefresh();
+    async toggleUserStatus(userId, isActive, token) {
+        const headers = await getAuthHeaders(token);
         const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/status`, {
             method: 'PUT',
             headers,
@@ -102,13 +100,13 @@ export const adminApi = {
     /**
      * Get all developers with analytics
      */
-    async getDevelopers(params = {}) {
+    async getDevelopers(params = {}, token) {
         const queryString = new URLSearchParams();
         if (params.skip !== undefined) queryString.append('skip', params.skip);
         if (params.limit !== undefined) queryString.append('limit', params.limit);
         if (params.sort_by) queryString.append('sort_by', params.sort_by);
         
-        const headers = await getAuthHeadersWithRefresh();
+        const headers = await getAuthHeaders(token);
         const url = `${API_BASE_URL}/admin/developers${queryString.toString() ? '?' + queryString.toString() : ''}`;
         const response = await fetch(url, { headers });
         return await handleApiResponse(response);
@@ -117,8 +115,8 @@ export const adminApi = {
     /**
      * Get developer details with earnings
      */
-    async getDeveloper(developerId) {
-        const headers = await getAuthHeadersWithRefresh();
+    async getDeveloper(developerId, token) {
+        const headers = await getAuthHeaders(token);
         const response = await fetch(`${API_BASE_URL}/admin/developers/${developerId}`, { headers });
         return await handleApiResponse(response);
     },
@@ -126,8 +124,8 @@ export const adminApi = {
     /**
      * Approve/Reject developer verification
      */
-    async updateDeveloperVerification(developerId, status, notes = '') {
-        const headers = await getAuthHeadersWithRefresh();
+    async updateDeveloperVerification(developerId, status, notes = '', token) {
+        const headers = await getAuthHeaders(token);
         const response = await fetch(`${API_BASE_URL}/admin/developers/${developerId}/verification`, {
             method: 'PUT',
             headers,
@@ -144,14 +142,14 @@ export const adminApi = {
     /**
      * Get all content (templates and components) for admin management
      */
-    async getContent(params = {}) {
+    async getContent(params = {}, token) {
         const queryString = new URLSearchParams();
         if (params.skip !== undefined) queryString.append('skip', params.skip);
         if (params.limit !== undefined) queryString.append('limit', params.limit);
         if (params.content_type) queryString.append('content_type', params.content_type);
         if (params.status) queryString.append('status', params.status);
         
-        const headers = await getAuthHeadersWithRefresh();
+        const headers = await getAuthHeaders(token);
         const url = `${API_BASE_URL}/admin/content${queryString.toString() ? '?' + queryString.toString() : ''}`;
         const response = await fetch(url, { headers });
         return await handleApiResponse(response);
@@ -160,14 +158,14 @@ export const adminApi = {
     /**
      * Get pending content for approval
      */
-    async getPendingContent(params = {}) {
+    async getPendingContent(params = {}, token) {
         const queryString = new URLSearchParams();
         if (params.skip !== undefined) queryString.append('skip', params.skip);
         if (params.limit !== undefined) queryString.append('limit', params.limit);
         if (params.content_type) queryString.append('content_type', params.content_type);
         if (params.priority) queryString.append('priority', params.priority);
         
-        const headers = await getAuthHeadersWithRefresh();
+        const headers = await getAuthHeaders(token);
         const url = `${API_BASE_URL}/admin/content/pending${queryString.toString() ? '?' + queryString.toString() : ''}`;
         const response = await fetch(url, { headers });
         return await handleApiResponse(response);
@@ -176,8 +174,8 @@ export const adminApi = {
     /**
      * Approve content
      */
-    async approveContent(contentId, approvalData = {}) {
-        const headers = await getAuthHeadersWithRefresh();
+    async approveContent(contentId, approvalData = {}, token) {
+        const headers = await getAuthHeaders(token);
         const queryString = new URLSearchParams();
         queryString.append('content_type', approvalData.content_type || 'template');
         
@@ -192,8 +190,8 @@ export const adminApi = {
     /**
      * Manage user (suspend, activate, etc.)
      */
-    async manageUser(userId, actionData) {
-        const headers = await getAuthHeadersWithRefresh();
+    async manageUser(userId, actionData, token) {
+        const headers = await getAuthHeaders(token);
         const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/manage`, {
             method: 'POST',
             headers,
@@ -205,8 +203,8 @@ export const adminApi = {
     /**
      * Delete user (admin action)
      */
-    async deleteUser(userId) {
-        const headers = await getAuthHeadersWithRefresh();
+    async deleteUser(userId, token) {
+        const headers = await getAuthHeaders(token);
         const response = await fetch(`${API_BASE_URL}/admin/users/${userId}`, {
             method: 'DELETE',
             headers
@@ -217,8 +215,8 @@ export const adminApi = {
     /**
      * Update user role or other details
      */
-    async updateUserRole(userId, role) {
-        const headers = await getAuthHeadersWithRefresh();
+    async updateUserRole(userId, role, token) {
+        const headers = await getAuthHeaders(token);
         const response = await fetch(`${API_BASE_URL}/admin/users/${userId}`, {
             method: 'PUT',
             headers,
@@ -230,8 +228,8 @@ export const adminApi = {
     /**
      * Suspend user
      */
-    async suspendUser(userId) {
-        const headers = await getAuthHeadersWithRefresh();
+    async suspendUser(userId, token) {
+        const headers = await getAuthHeaders(token);
         const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/manage`, {
             method: 'POST',
             headers,
@@ -243,8 +241,8 @@ export const adminApi = {
     /**
      * Activate user
      */
-    async activateUser(userId) {
-        const headers = await getAuthHeadersWithRefresh();
+    async activateUser(userId, token) {
+        const headers = await getAuthHeaders(token);
         const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/manage`, {
             method: 'POST',
             headers,
@@ -256,8 +254,8 @@ export const adminApi = {
     /**
      * Reject content
      */
-    async rejectContent(contentId, contentType, reason) {
-        const headers = await getAuthHeadersWithRefresh();
+    async rejectContent(contentId, contentType, reason, token) {
+        const headers = await getAuthHeaders(token);
         const response = await fetch(`${API_BASE_URL}/admin/content/reject/${contentId}`, {
             method: 'POST',
             headers,
@@ -272,14 +270,14 @@ export const adminApi = {
     /**
      * Get content approval history
      */
-    async getApprovalHistory(params = {}) {
+    async getApprovalHistory(params = {}, token) {
         const queryString = new URLSearchParams();
         if (params.skip !== undefined) queryString.append('skip', params.skip);
         if (params.limit !== undefined) queryString.append('limit', params.limit);
         if (params.status) queryString.append('status', params.status);
         if (params.reviewer_id) queryString.append('reviewer_id', params.reviewer_id);
         
-        const headers = await getAuthHeadersWithRefresh();
+        const headers = await getAuthHeaders(token);
         const url = `${API_BASE_URL}/admin/content/history${queryString.toString() ? '?' + queryString.toString() : ''}`;
         const response = await fetch(url, { headers });
         return await handleApiResponse(response);
@@ -290,13 +288,13 @@ export const adminApi = {
     /**
      * Get platform analytics
      */
-    async getAnalytics(params = {}) {
+    async getAnalytics(params = {}, token) {
         const queryString = new URLSearchParams();
         if (params.timeframe) queryString.append('timeframe', params.timeframe);
         if (params.start_date) queryString.append('start_date', params.start_date);
         if (params.end_date) queryString.append('end_date', params.end_date);
         
-        const headers = await getAuthHeadersWithRefresh();
+        const headers = await getAuthHeaders(token);
         const url = `${API_BASE_URL}/admin/analytics${queryString.toString() ? '?' + queryString.toString() : ''}`;
         const response = await fetch(url, { headers });
         return await handleApiResponse(response);
@@ -305,12 +303,12 @@ export const adminApi = {
     /**
      * Get revenue analytics
      */
-    async getRevenueAnalytics(params = {}) {
+    async getRevenueAnalytics(params = {}, token) {
         const queryString = new URLSearchParams();
         if (params.timeframe) queryString.append('timeframe', params.timeframe);
         if (params.breakdown_by) queryString.append('breakdown_by', params.breakdown_by);
         
-        const headers = await getAuthHeadersWithRefresh();
+        const headers = await getAuthHeaders(token);
         const url = `${API_BASE_URL}/admin/revenue${queryString.toString() ? '?' + queryString.toString() : ''}`;
         const response = await fetch(url, { headers });
         return await handleApiResponse(response);
@@ -319,12 +317,12 @@ export const adminApi = {
     /**
      * Get content performance analytics
      */
-    async getContentAnalytics(params = {}) {
+    async getContentAnalytics(params = {}, token) {
         const queryString = new URLSearchParams();
         if (params.timeframe) queryString.append('timeframe', params.timeframe);
         if (params.content_type) queryString.append('content_type', params.content_type);
         
-        const headers = await getAuthHeadersWithRefresh();
+        const headers = await getAuthHeaders(token);
         const url = `${API_BASE_URL}/admin/content/analytics${queryString.toString() ? '?' + queryString.toString() : ''}`;
         const response = await fetch(url, { headers });
         return await handleApiResponse(response);
@@ -335,12 +333,12 @@ export const adminApi = {
     /**
      * Get pending payouts
      */
-    async getPendingPayouts(params = {}) {
+    async getPendingPayouts(params = {}, token) {
         const queryString = new URLSearchParams();
         if (params.skip !== undefined) queryString.append('skip', params.skip);
         if (params.limit !== undefined) queryString.append('limit', params.limit);
         
-        const headers = await getAuthHeadersWithRefresh();
+        const headers = await getAuthHeaders(token);
         const url = `${API_BASE_URL}/admin/payouts/pending${queryString.toString() ? '?' + queryString.toString() : ''}`;
         const response = await fetch(url, { headers });
         return await handleApiResponse(response);
@@ -349,8 +347,8 @@ export const adminApi = {
     /**
      * Approve payout
      */
-    async approvePayout(payoutId, notes = '') {
-        const headers = await getAuthHeadersWithRefresh();
+    async approvePayout(payoutId, notes = '', token) {
+        const headers = await getAuthHeaders(token);
         const response = await fetch(`${API_BASE_URL}/admin/payouts/${payoutId}/approve`, {
             method: 'POST',
             headers,
@@ -364,8 +362,8 @@ export const adminApi = {
     /**
      * Reject payout
      */
-    async rejectPayout(payoutId, reason) {
-        const headers = await getAuthHeadersWithRefresh();
+    async rejectPayout(payoutId, reason, token) {
+        const headers = await getAuthHeaders(token);
         const response = await fetch(`${API_BASE_URL}/admin/payouts/${payoutId}/reject`, {
             method: 'POST',
             headers,
@@ -381,12 +379,12 @@ export const adminApi = {
     /**
      * Get reported comments
      */
-    async getReportedComments(params = {}) {
+    async getReportedComments(params = {}, token) {
         const queryString = new URLSearchParams();
         if (params.skip !== undefined) queryString.append('skip', params.skip);
         if (params.limit !== undefined) queryString.append('limit', params.limit);
         
-        const headers = await getAuthHeadersWithRefresh();
+        const headers = await getAuthHeaders(token);
         const url = `${API_BASE_URL}/admin/comments/reported${queryString.toString() ? '?' + queryString.toString() : ''}`;
         const response = await fetch(url, { headers });
         return await handleApiResponse(response);
@@ -395,12 +393,12 @@ export const adminApi = {
     /**
      * Get pending comments
      */
-    async getPendingComments(params = {}) {
+    async getPendingComments(params = {}, token) {
         const queryString = new URLSearchParams();
         if (params.skip !== undefined) queryString.append('skip', params.skip);
         if (params.limit !== undefined) queryString.append('limit', params.limit);
         
-        const headers = await getAuthHeadersWithRefresh();
+        const headers = await getAuthHeaders(token);
         const url = `${API_BASE_URL}/admin/comments/pending${queryString.toString() ? '?' + queryString.toString() : ''}`;
         const response = await fetch(url, { headers });
         return await handleApiResponse(response);
@@ -409,8 +407,8 @@ export const adminApi = {
     /**
      * Approve comment
      */
-    async approveComment(commentId) {
-        const headers = await getAuthHeadersWithRefresh();
+    async approveComment(commentId, token) {
+        const headers = await getAuthHeaders(token);
         const response = await fetch(`${API_BASE_URL}/admin/comments/approve/${commentId}`, {
             method: 'POST',
             headers,
@@ -421,8 +419,8 @@ export const adminApi = {
     /**
      * Reject/Hide comment
      */
-    async rejectComment(commentId, reason) {
-        const headers = await getAuthHeadersWithRefresh();
+    async rejectComment(commentId, reason, token) {
+        const headers = await getAuthHeaders(token);
         const response = await fetch(`${API_BASE_URL}/admin/comments/reject/${commentId}`, {
             method: 'POST',
             headers,
@@ -438,7 +436,7 @@ export const adminApi = {
     /**
      * Get audit logs
      */
-    async getAuditLogs(params = {}) {
+    async getAuditLogs(params = {}, token) {
         const queryString = new URLSearchParams();
         if (params.skip !== undefined) queryString.append('skip', params.skip);
         if (params.limit !== undefined) queryString.append('limit', params.limit);
@@ -447,7 +445,7 @@ export const adminApi = {
         if (params.start_date) queryString.append('start_date', params.start_date);
         if (params.end_date) queryString.append('end_date', params.end_date);
         
-        const headers = await getAuthHeadersWithRefresh();
+        const headers = await getAuthHeaders(token);
         const url = `${API_BASE_URL}/admin/audit-logs${queryString.toString() ? '?' + queryString.toString() : ''}`;
         const response = await fetch(url, { headers });
         return await handleApiResponse(response);
@@ -458,8 +456,8 @@ export const adminApi = {
     /**
      * Get platform settings
      */
-    async getSettings() {
-        const headers = await getAuthHeadersWithRefresh();
+    async getSettings(token) {
+        const headers = await getAuthHeaders(token);
         const response = await fetch(`${API_BASE_URL}/admin/settings`, { headers });
         return await handleApiResponse(response);
     },
@@ -467,8 +465,8 @@ export const adminApi = {
     /**
      * Update platform settings
      */
-    async updateSettings(settingsData) {
-        const headers = await getAuthHeadersWithRefresh();
+    async updateSettings(settingsData, token) {
+        const headers = await getAuthHeaders(token);
         const response = await fetch(`${API_BASE_URL}/admin/settings`, {
             method: 'PUT',
             headers,
@@ -482,8 +480,8 @@ export const adminApi = {
     /**
      * Get admin dashboard overview
      */
-    async getDashboardOverview() {
-        const headers = await getAuthHeadersWithRefresh();
+    async getDashboardOverview(token) {
+        const headers = await getAuthHeaders(token);
         const response = await fetch(`${API_BASE_URL}/admin/dashboard`, { headers });
         return await handleApiResponse(response);
     },
@@ -493,8 +491,8 @@ export const adminApi = {
     /**
      * Approve content (template or component)
      */
-    async approveContent(contentId, data = {}) {
-        const headers = await getAuthHeadersWithRefresh();
+    async approveContent(contentId, data = {}, token) {
+        const headers = await getAuthHeaders(token);
         const response = await fetch(`${API_BASE_URL}/admin/content/approve/${contentId}`, {
             method: 'POST',
             headers,

@@ -4,7 +4,7 @@
  * Comprehensive API integration for CodeMurf marketplace
  */
 
-import { tokenUtils, ApiError } from './api';
+import { ApiError } from './api';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -54,22 +54,14 @@ const refreshAccessToken = async () => {
     return data.access_token;
 };
 
-// Enhanced auth headers with automatic token refresh
-const getAuthHeadersWithRefresh = async () => {
+// Enhanced auth headers with Clerk authentication
+const getAuthHeaders = async (token) => {
     if (typeof window === 'undefined') return { 'Content-Type': 'application/json' };
-    
-    let token = tokenUtils.getAccessToken();
-    
-    // Check if token is expired and refresh if needed
-    if (!token || tokenUtils.isTokenExpired(token)) {
-        try {
-            token = await refreshAccessToken();
-        } catch (error) {
-            tokenUtils.clearTokens();
-            throw new ApiError('Authentication required - please login again', 401);
-        }
+
+    if (!token) {
+        throw new ApiError('Authentication required - please login again', 401);
     }
-    
+
     return {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -82,7 +74,7 @@ export const marketplaceApi = {
     /**
      * Get all templates with filtering and pagination
      */
-    async getTemplates(params = {}) {
+    async getTemplates(params = {}, token) {
         const queryString = new URLSearchParams();
         
         if (params.skip !== undefined) queryString.append('skip', params.skip);
@@ -113,7 +105,7 @@ export const marketplaceApi = {
     /**
      * Get single template by ID
      */
-    async getTemplate(id) {
+    async getTemplate(id, token) {
         try {
             const headers = await getAuthHeadersWithRefresh();
             const response = await fetch(`${API_BASE_URL}/templates/${id}`, { headers });
@@ -131,7 +123,7 @@ export const marketplaceApi = {
     /**
      * Create new template
      */
-    async createTemplate(templateData) {
+    async createTemplate(templateData, token) {
         const headers = await getAuthHeadersWithRefresh();
         const response = await fetch(`${API_BASE_URL}/templates`, {
             method: 'POST',
@@ -144,7 +136,7 @@ export const marketplaceApi = {
     /**
      * Update template
      */
-    async updateTemplate(id, templateData) {
+    async updateTemplate(id, templateData, token) {
         const headers = await getAuthHeadersWithRefresh();
         const response = await fetch(`${API_BASE_URL}/templates/${id}`, {
             method: 'PUT',
@@ -157,7 +149,7 @@ export const marketplaceApi = {
     /**
      * Delete template
      */
-    async deleteTemplate(id) {
+    async deleteTemplate(id, token) {
         const headers = await getAuthHeadersWithRefresh();
         const response = await fetch(`${API_BASE_URL}/templates/${id}`, {
             method: 'DELETE',
@@ -169,7 +161,7 @@ export const marketplaceApi = {
     /**
      * Like/Unlike template
      */
-    async toggleTemplateLike(id) {
+    async toggleTemplateLike(id, token) {
         const headers = await getAuthHeadersWithRefresh();
         const response = await fetch(`${API_BASE_URL}/templates/${id}/like`, {
             method: 'POST',
@@ -181,7 +173,7 @@ export const marketplaceApi = {
     /**
      * Get user's own templates
      */
-    async getUserTemplates(params = {}) {
+    async getUserTemplates(params = {}, token) {
         const queryString = new URLSearchParams();
         
         if (params.skip !== undefined) queryString.append('skip', params.skip);
@@ -200,7 +192,7 @@ export const marketplaceApi = {
     /**
      * Get all components with filtering and pagination
      */
-    async getComponents(params = {}) {
+    async getComponents(params = {}, token) {
         const queryString = new URLSearchParams();
         
         if (params.skip !== undefined) queryString.append('skip', params.skip);
@@ -232,7 +224,7 @@ export const marketplaceApi = {
     /**
      * Get single component by ID
      */
-    async getComponent(id) {
+    async getComponent(id, token) {
         try {
             const headers = await getAuthHeadersWithRefresh();
             const response = await fetch(`${API_BASE_URL}/components/${id}`, { headers });
@@ -250,7 +242,7 @@ export const marketplaceApi = {
     /**
      * Create new component
      */
-    async createComponent(componentData) {
+    async createComponent(componentData, token) {
         const headers = await getAuthHeadersWithRefresh();
         const response = await fetch(`${API_BASE_URL}/components`, {
             method: 'POST',
@@ -263,7 +255,7 @@ export const marketplaceApi = {
     /**
      * Update component
      */
-    async updateComponent(id, componentData) {
+    async updateComponent(id, componentData, token) {
         const headers = await getAuthHeadersWithRefresh();
         const response = await fetch(`${API_BASE_URL}/components/${id}`, {
             method: 'PUT',
@@ -276,7 +268,7 @@ export const marketplaceApi = {
     /**
      * Delete component
      */
-    async deleteComponent(id) {
+    async deleteComponent(id, token) {
         const headers = await getAuthHeadersWithRefresh();
         const response = await fetch(`${API_BASE_URL}/components/${id}`, {
             method: 'DELETE',
@@ -288,7 +280,7 @@ export const marketplaceApi = {
     /**
      * Like/Unlike component
      */
-    async toggleComponentLike(id) {
+    async toggleComponentLike(id, token) {
         const headers = await getAuthHeadersWithRefresh();
         const response = await fetch(`${API_BASE_URL}/components/${id}/like`, {
             method: 'POST',
@@ -300,7 +292,7 @@ export const marketplaceApi = {
     /**
      * Get user's own components
      */
-    async getUserComponents(params = {}) {
+    async getUserComponents(params = {}, token) {
         const queryString = new URLSearchParams();
         
         if (params.skip !== undefined) queryString.append('skip', params.skip);
@@ -319,7 +311,7 @@ export const marketplaceApi = {
     /**
      * Get template comments
      */
-    async getTemplateComments(templateId, params = {}) {
+    async getTemplateComments(templateId, params = {}, token) {
         const queryString = new URLSearchParams();
         if (params.skip !== undefined) queryString.append('skip', params.skip);
         if (params.limit !== undefined) queryString.append('limit', params.limit);
@@ -332,7 +324,7 @@ export const marketplaceApi = {
     /**
      * Create template comment
      */
-    async createTemplateComment(templateId, commentData) {
+    async createTemplateComment(templateId, commentData, token) {
         const headers = await getAuthHeadersWithRefresh();
         const response = await fetch(`${API_BASE_URL}/templates/${templateId}/comments`, {
             method: 'POST',
@@ -345,7 +337,7 @@ export const marketplaceApi = {
     /**
      * Get component comments
      */
-    async getComponentComments(componentId, params = {}) {
+    async getComponentComments(componentId, params = {}, token) {
         const queryString = new URLSearchParams();
         if (params.skip !== undefined) queryString.append('skip', params.skip);
         if (params.limit !== undefined) queryString.append('limit', params.limit);
@@ -358,7 +350,7 @@ export const marketplaceApi = {
     /**
      * Create component comment
      */
-    async createComponentComment(componentId, commentData) {
+    async createComponentComment(componentId, commentData, token) {
         const headers = await getAuthHeadersWithRefresh();
         const response = await fetch(`${API_BASE_URL}/components/${componentId}/comments`, {
             method: 'POST',
@@ -371,7 +363,7 @@ export const marketplaceApi = {
     /**
      * Update template comment
      */
-    async updateTemplateComment(templateId, commentId, commentData) {
+    async updateTemplateComment(templateId, commentId, commentData, token) {
         const headers = await getAuthHeadersWithRefresh();
         const response = await fetch(`${API_BASE_URL}/templates/${templateId}/comments/${commentId}`, {
             method: 'PUT',
@@ -384,7 +376,7 @@ export const marketplaceApi = {
     /**
      * Delete template comment
      */
-    async deleteTemplateComment(templateId, commentId) {
+    async deleteTemplateComment(templateId, commentId, token) {
         const headers = await getAuthHeadersWithRefresh();
         const response = await fetch(`${API_BASE_URL}/templates/${templateId}/comments/${commentId}`, {
             method: 'DELETE',
@@ -396,7 +388,7 @@ export const marketplaceApi = {
     /**
      * Update component comment
      */
-    async updateComponentComment(componentId, commentId, commentData) {
+    async updateComponentComment(componentId, commentId, commentData, token) {
         const headers = await getAuthHeadersWithRefresh();
         const response = await fetch(`${API_BASE_URL}/components/${componentId}/comments/${commentId}`, {
             method: 'PUT',
@@ -409,7 +401,7 @@ export const marketplaceApi = {
     /**
      * Delete component comment
      */
-    async deleteComponentComment(componentId, commentId) {
+    async deleteComponentComment(componentId, commentId, token) {
         const headers = await getAuthHeadersWithRefresh();
         const response = await fetch(`${API_BASE_URL}/components/${componentId}/comments/${commentId}`, {
             method: 'DELETE',
@@ -423,7 +415,7 @@ export const marketplaceApi = {
     /**
      * Like a template comment
      */
-    async likeTemplateComment(templateId, commentId) {
+    async likeTemplateComment(templateId, commentId, token) {
         const headers = await getAuthHeadersWithRefresh();
         const response = await fetch(`${API_BASE_URL}/templates/${templateId}/comments/${commentId}/like`, {
             method: 'POST',
@@ -435,7 +427,7 @@ export const marketplaceApi = {
     /**
      * Dislike a template comment
      */
-    async dislikeTemplateComment(templateId, commentId) {
+    async dislikeTemplateComment(templateId, commentId, token) {
         const headers = await getAuthHeadersWithRefresh();
         const response = await fetch(`${API_BASE_URL}/templates/${templateId}/comments/${commentId}/dislike`, {
             method: 'POST',
@@ -447,7 +439,7 @@ export const marketplaceApi = {
     /**
      * Like a component comment
      */
-    async likeComponentComment(componentId, commentId) {
+    async likeComponentComment(componentId, commentId, token) {
         const headers = await getAuthHeadersWithRefresh();
         const response = await fetch(`${API_BASE_URL}/components/${componentId}/comments/${commentId}/like`, {
             method: 'POST',
@@ -459,7 +451,7 @@ export const marketplaceApi = {
     /**
      * Dislike a component comment
      */
-    async dislikeComponentComment(componentId, commentId) {
+    async dislikeComponentComment(componentId, commentId, token) {
         const headers = await getAuthHeadersWithRefresh();
         const response = await fetch(`${API_BASE_URL}/components/${componentId}/comments/${commentId}/dislike`, {
             method: 'POST',
@@ -471,7 +463,7 @@ export const marketplaceApi = {
     /**
      * Vote on comment (helpful/not helpful)
      */
-    async voteComment(commentId, voteType) {
+    async voteComment(commentId, voteType, token) {
         const headers = await getAuthHeadersWithRefresh();
         const response = await fetch(`${API_BASE_URL}/comments/${commentId}/vote`, {
             method: 'POST',
@@ -484,7 +476,7 @@ export const marketplaceApi = {
     /**
      * Get comments for any item type
      */
-    async getComments(itemId, itemType, params = {}) {
+    async getComments(itemId, itemType, params = {}, token) {
         if (itemType === 'template') {
             return this.getTemplateComments(itemId, params);
         } else if (itemType === 'component') {
@@ -497,7 +489,7 @@ export const marketplaceApi = {
     /**
      * Create comment for any item type
      */
-    async createComment(itemId, itemType, commentData) {
+    async createComment(itemId, itemType, commentData, token) {
         if (itemType === 'template') {
             return this.createTemplateComment(itemId, commentData);
         } else if (itemType === 'component') {
@@ -510,7 +502,7 @@ export const marketplaceApi = {
     /**
      * Update comment for any item type
      */
-    async updateComment(commentId, commentData) {
+    async updateComment(commentId, commentData, token) {
         // Try both template and component endpoints
         try {
             const headers = await getAuthHeadersWithRefresh();
@@ -528,7 +520,7 @@ export const marketplaceApi = {
     /**
      * Delete comment for any item type
      */
-    async deleteComment(commentId) {
+    async deleteComment(commentId, token) {
         try {
             const headers = await getAuthHeadersWithRefresh();
             const response = await fetch(`${API_BASE_URL}/comments/${commentId}`, {
@@ -546,7 +538,7 @@ export const marketplaceApi = {
     /**
      * Search templates and components
      */
-    async search(query, filters = {}) {
+    async search(query, filters = {}, token) {
         const queryString = new URLSearchParams();
         queryString.append('q', query);
         
@@ -576,7 +568,7 @@ export const marketplaceApi = {
     /**
      * Get user analytics data
      */
-    async getUserAnalytics() {
+    async getUserAnalytics( token) {
         const headers = await getAuthHeadersWithRefresh();
         const response = await fetch(`${API_BASE_URL}/user/analytics`, {
             headers,
@@ -589,7 +581,7 @@ export const marketplaceApi = {
     /**
      * Get template categories
      */
-    async getTemplateCategories() {
+    async getTemplateCategories(token) {
         const response = await fetch(`${API_BASE_URL}/templates/categories`);
         return await handleApiResponse(response);
     },
@@ -597,7 +589,7 @@ export const marketplaceApi = {
     /**
      * Get component categories  
      */
-    async getComponentCategories() {
+    async getComponentCategories( token) {
         const response = await fetch(`${API_BASE_URL}/components/categories`);
         return await handleApiResponse(response);
     },
@@ -607,7 +599,7 @@ export const marketplaceApi = {
     /**
      * Get pending approvals (Admin only)
      */
-    async getPendingApprovals(params = {}) {
+    async getPendingApprovals(params = {}, token) {
         const queryString = new URLSearchParams();
         
         if (params.content_type) queryString.append('content_type', params.content_type);
@@ -625,7 +617,7 @@ export const marketplaceApi = {
     /**
      * Approve content (Admin only)
      */
-    async approveContent(approvalId, adminNotes = null) {
+    async approveContent(approvalId, adminNotes = null, token) {
         const headers = await getAuthHeadersWithRefresh();
         const response = await fetch(`${API_BASE_URL}/admin/approvals/${approvalId}/approve`, {
             method: 'POST',
@@ -638,7 +630,7 @@ export const marketplaceApi = {
     /**
      * Reject content (Admin only)
      */
-    async rejectContent(approvalId, rejectionReason, adminNotes = null) {
+    async rejectContent(approvalId, rejectionReason, adminNotes = null, token) {
         const headers = await getAuthHeadersWithRefresh();
         const response = await fetch(`${API_BASE_URL}/admin/approvals/${approvalId}/reject`, {
             method: 'POST',

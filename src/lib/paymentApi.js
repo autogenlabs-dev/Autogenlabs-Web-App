@@ -3,7 +3,7 @@
  * Handles Razorpay integration and marketplace payments
  */
 
-import { tokenUtils, ApiError } from './api';
+import { ApiError } from './api';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -26,16 +26,14 @@ const handleApiResponse = async (response) => {
     return await response.json();
 };
 
-// Enhanced auth headers with automatic token refresh
-const getAuthHeadersWithRefresh = async () => {
+// Enhanced auth headers with Clerk authentication
+const getAuthHeaders = async (token) => {
     if (typeof window === 'undefined') return { 'Content-Type': 'application/json' };
-    
-    const token = tokenUtils.getAccessToken();
-    
-    if (!token || tokenUtils.isTokenExpired(token)) {
+
+    if (!token) {
         throw new ApiError('Authentication required - please login again', 401);
     }
-    
+
     return {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -48,7 +46,7 @@ export const paymentApi = {
     /**
      * Get Razorpay configuration
      */
-    async getPaymentConfig() {
+    async getPaymentConfig(token) {
         const response = await fetch(`${API_BASE_URL}/payments/config`);
         return await handleApiResponse(response);
     },
@@ -58,8 +56,8 @@ export const paymentApi = {
     /**
      * Create Razorpay order for individual item
      */
-    async createItemOrder(itemData) {
-        const headers = await getAuthHeadersWithRefresh();
+    async createItemOrder(itemData, token) {
+        const headers = await getAuthHeaders(token);
         const response = await fetch(`${API_BASE_URL}/payments/create-item-order`, {
             method: 'POST',
             headers,
@@ -75,8 +73,8 @@ export const paymentApi = {
     /**
      * Verify individual item purchase
      */
-    async verifyItemPurchase(paymentData) {
-        const headers = await getAuthHeadersWithRefresh();
+    async verifyItemPurchase(paymentData, token) {
+        const headers = await getAuthHeaders(token);
         const response = await fetch(`${API_BASE_URL}/payments/verify-item-purchase`, {
             method: 'POST',
             headers,
@@ -96,8 +94,8 @@ export const paymentApi = {
     /**
      * Add item to cart
      */
-    async addToCart(itemData) {
-        const headers = await getAuthHeadersWithRefresh();
+    async addToCart(itemData, token) {
+        const headers = await getAuthHeaders(token);
         const response = await fetch(`${API_BASE_URL}/cart/add`, {
             method: 'POST',
             headers,
@@ -113,8 +111,8 @@ export const paymentApi = {
     /**
      * Get user's cart
      */
-    async getCart() {
-        const headers = await getAuthHeadersWithRefresh();
+    async getCart(token) {
+        const headers = await getAuthHeaders(token);
         const response = await fetch(`${API_BASE_URL}/cart`, { headers });
         return await handleApiResponse(response);
     },
@@ -122,8 +120,8 @@ export const paymentApi = {
     /**
      * Remove item from cart
      */
-    async removeFromCart(itemId) {
-        const headers = await getAuthHeadersWithRefresh();
+    async removeFromCart(itemId, token) {
+        const headers = await getAuthHeaders(token);
         const response = await fetch(`${API_BASE_URL}/cart/item/${itemId}`, {
             method: 'DELETE',
             headers,
@@ -134,8 +132,8 @@ export const paymentApi = {
     /**
      * Checkout cart (bulk purchase)
      */
-    async checkoutCart() {
-        const headers = await getAuthHeadersWithRefresh();
+    async checkoutCart(token) {
+        const headers = await getAuthHeaders(token);
         const response = await fetch(`${API_BASE_URL}/cart/checkout`, {
             method: 'POST',
             headers,
@@ -148,13 +146,13 @@ export const paymentApi = {
     /**
      * Get user's purchased items
      */
-    async getPurchasedItems(params = {}) {
+    async getPurchasedItems(params = {}, token) {
         const queryString = new URLSearchParams();
         if (params.skip !== undefined) queryString.append('skip', params.skip);
         if (params.limit !== undefined) queryString.append('limit', params.limit);
         if (params.item_type) queryString.append('item_type', params.item_type);
         
-        const headers = await getAuthHeadersWithRefresh();
+        const headers = await getAuthHeaders(token);
         const url = `${API_BASE_URL}/user/purchased-items${queryString.toString() ? '?' + queryString.toString() : ''}`;
         const response = await fetch(url, { headers });
         return await handleApiResponse(response);
@@ -163,8 +161,8 @@ export const paymentApi = {
     /**
      * Get enhanced user dashboard data
      */
-    async getUserDashboard() {
-        const headers = await getAuthHeadersWithRefresh();
+    async getUserDashboard(token) {
+        const headers = await getAuthHeaders(token);
         const response = await fetch(`${API_BASE_URL}/user/dashboard`, { headers });
         return await handleApiResponse(response);
     },
@@ -174,7 +172,7 @@ export const paymentApi = {
     /**
      * Initialize Razorpay payment
      */
-    async initializeRazorpay() {
+    async initializeRazorpay(token) {
         return new Promise((resolve) => {
             const script = document.createElement('script');
             script.src = 'https://checkout.razorpay.com/v1/checkout.js';
@@ -187,7 +185,7 @@ export const paymentApi = {
     /**
      * Process Razorpay payment for individual item
      */
-    async processItemPayment(itemData, user) {
+    async processItemPayment(itemData, user, token) {
         try {
             // Step 1: Initialize Razorpay
             const razorpayLoaded = await this.initializeRazorpay();
@@ -294,7 +292,7 @@ export const paymentApi = {
     /**
      * Process cart checkout payment
      */
-    async processCartPayment(cartData, user) {
+    async processCartPayment(cartData, user, token) {
         try {
             // Step 1: Initialize Razorpay
             const razorpayLoaded = await this.initializeRazorpay();

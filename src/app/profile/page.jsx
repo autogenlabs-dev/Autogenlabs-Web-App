@@ -1,242 +1,283 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth, useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
+import { 
+  KeyIcon, 
+  EyeIcon, 
+  EyeSlashIcon, 
+  ClipboardDocumentIcon,
+  ArrowPathIcon,
+  CreditCardIcon,
+  CurrencyDollarIcon,
+  UserGroupIcon,
+  GiftIcon
+} from '@heroicons/react/24/outline';
 
 export default function ProfilePage() {
-    const { user, updateProfile, loading, error, isAuthenticated, refreshUser } = useAuth();
-    const router = useRouter();
+  const { isLoaded, isSignedIn, getToken } = useAuth();
+  const { user } = useUser();
+  const router = useRouter();
+  
+  const [apiKey, setApiKey] = useState(null);
+  const [credits, setCredits] = useState(0.00);
+  const [loading, setLoading] = useState(true);
+  const [showKey, setShowKey] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [promoCode, setPromoCode] = useState('');
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    if (!isSignedIn) {
+      router.push('/sign-in');
+      return;
+    }
     
-    const [role, setRole] = useState(user?.role || 'user');
-    const [isEditing, setIsEditing] = useState(false);
-    const [updateLoading, setUpdateLoading] = useState(false);
-    const [updateError, setUpdateError] = useState('');
-    const [updateSuccess, setUpdateSuccess] = useState(false);
-    const [refreshing, setRefreshing] = useState(false);
-
-    useEffect(() => {
-        if (!isAuthenticated && !loading) {
-            router.push('/auth');
-            return;
-        }
+    // Load real API key from backend
+    const loadApiKey = async () => {
+      try {
+        const token = await getToken();
+        const response = await fetch('/api/user/api-key', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
         
-        // Refresh user data when component mounts to ensure latest status
-        const refreshUserData = async () => {
-            if (isAuthenticated && !loading) {
-                try {
-                    setRefreshing(true);
-                    await refreshUser();
-                } catch (error) {
-                    console.error('Failed to refresh user data:', error);
-                } finally {
-                    setRefreshing(false);
-                }
-            }
-        };
-
-        refreshUserData();
-    }, [isAuthenticated, loading, router]); // Removed refreshUser from dependencies
-
-    useEffect(() => {
-        if (user) {
-            setRole(user.role || 'user');
+        if (response.ok) {
+          const data = await response.json();
+          setApiKey(data);
+        } else {
+          console.error('Failed to load API key');
         }
-    }, [user]);
-
-    const handleRoleChange = (e) => {
-        setRole(e.target.value);
-        setUpdateError('');
-        setUpdateSuccess(false);
+      } catch (error) {
+        console.error('Error loading API key:', error);
+      } finally {
+        setCredits(0.00); // TODO: Load from user profile
+        setLoading(false);
+      }
     };
+    
+    loadApiKey();
+  }, [isLoaded, isSignedIn, router, user]);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setUpdateLoading(true);
-        setUpdateError('');
-        setUpdateSuccess(false);
+  const copyToClipboard = async (text) => {
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
-        try {
-            // Only update the role
-            await updateProfile({ role });
-            setUpdateSuccess(true);
-            setIsEditing(false);
-        } catch (error) {
-            setUpdateError(error.message || 'Failed to update role');
-        } finally {
-            setUpdateLoading(false);
+  const maskApiKey = (key) => {
+    if (!key) return '';
+    return key.substring(0, 12) + '••••••••••••' + key.substring(key.length - 4);
+  };
+
+  const regenerateApiKey = async () => {
+    try {
+      setLoading(true);
+      const token = await getToken();
+      const response = await fetch('/api/user/api-key', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
-    };
-
-    const handleCancel = () => {
-        if (user) {
-            setRole(user.role || 'user');
-        }
-        setIsEditing(false);
-        setUpdateError('');
-        setUpdateSuccess(false);
-    };
-
-    if (loading || refreshing) {
-        return (
-            <div className="min-h-screen bg-gradient-to-br from-[#0A0A0B] via-[#1a1a1a] to-[#2d1b69] flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-500 mx-auto"></div>
-                    <p className="text-white mt-4">
-                        {refreshing ? 'Loading profile...' : 'Loading...'}
-                    </p>
-                </div>
-            </div>
-        );
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setApiKey(data);
+        setCopied(false);
+        setShowKey(false);
+      } else {
+        console.error('Failed to regenerate API key');
+      }
+    } catch (error) {
+      console.error('Error regenerating API key:', error);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    if (!isAuthenticated) {
-        return null;
-    }
-
+  if (!isLoaded || !isSignedIn || loading) {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[#0A0A0B] via-[#1a1a1a] to-[#2d1b69] pt-24 pb-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-2xl mx-auto">
-                <div className="bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl rounded-xl overflow-hidden">
-                    {/* Header */}
-                    <div className="bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-8">
-                        <div className="flex items-center space-x-4">
-                            <div className="w-20 h-20 bg-white/20 backdrop-blur-lg rounded-full flex items-center justify-center border border-white/30">
-                                <span className="text-3xl font-bold text-white">
-                                    {user?.firstName?.charAt(0)?.toUpperCase() || user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase()}
-                                </span>
-                            </div>
-                            <div>
-                                <h1 className="text-3xl font-bold text-white">
-                                    {user?.name || user?.email || 'User'}
-                                </h1>
-                                <p className="text-purple-100 capitalize text-lg">
-                                    {user?.role || 'user'} Account
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+      </div>
+    );
+  }
 
-                    {/* Profile Details */}
-                    <div className="px-6 py-8">
-                        {updateSuccess && (
-                            <div className="mb-6 bg-green-500/20 border border-green-500/40 rounded-lg p-4">
-                                <div className="flex items-center">
-                                    <div className="flex-shrink-0">
-                                        <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                        </svg>
-                                    </div>
-                                    <div className="ml-3">
-                                        <p className="text-sm font-medium text-green-300">
-                                            Role updated successfully!
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
+  return (
+    <div className="min-h-screen bg-gray-900 py-8">
+      <div className="max-w-6xl mx-auto px-4 mt-12">
+        
 
-                        {updateError && (
-                            <div className="mb-6 bg-red-500/20 border border-red-500/40 rounded-lg p-4">
-                                <div className="flex items-center">
-                                    <div className="flex-shrink-0">
-                                        <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                                        </svg>
-                                    </div>
-                                    <div className="ml-3">
-                                        <p className="text-sm font-medium text-red-300">
-                                            {updateError}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        )}                        {/* User Details Display */}
-                        <div className="space-y-6 mb-8">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-300">Email</label>
-                                    <div className="px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white">
-                                        {user?.email || 'Not provided'}
-                                    </div>
-                                </div>
-                                
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-300">Full Name</label>
-                                    <div className="px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white">
-                                        {user?.name || user?.full_name || 'Not provided'}
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-300">Account Status</label>
-                                    <div className="px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white">
-                                        {user?.is_active ? (
-                                            <span className="text-green-400">Active</span>
-                                        ) : (
-                                            <span className="text-red-400">Inactive</span>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-300">Role</label>
-                                    <select
-                                        value={user?.role || 'user'}
-                                        onChange={handleRoleChange}
-                                        disabled={!isEditing}
-                                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        <option value="user" className="bg-gray-800">User</option>
-                                        <option value="developer" className="bg-gray-800">Developer</option>
-                                        <option value="admin" className="bg-gray-800">Admin</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>                        {/* Action Buttons */}
-                        <div className="flex flex-col sm:flex-row gap-3">
-                            {!isEditing ? (
-                                <button
-                                    type="button"
-                                    onClick={() => setIsEditing(true)}
-                                    className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium rounded-lg hover:from-purple-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 transform hover:scale-105"
-                                >
-                                    Update Profile
-                                </button>
-                            ) : (
-                                <>
-                                    <button
-                                        type="button"
-                                        onClick={handleSubmit}
-                                        disabled={updateLoading}
-                                        className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-medium rounded-lg hover:from-green-700 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                                    >
-                                        {updateLoading ? (
-                                            <>
-                                                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                                </svg>
-                                                Saving...
-                                            </>
-                                        ) : (
-                                            'Save Changes'
-                                        )}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={handleCancel}
-                                        disabled={updateLoading}
-                                        className="w-full sm:w-auto px-6 py-3 bg-white/10 border border-white/20 text-white font-medium rounded-lg hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        Cancel
-                                    </button>
-                                </>
-                            )}
-                        </div>
-                    </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column */}
+          <div className="lg:col-span-1">
+            {/* User Profile Card */}
+            <div className="bg-gray-800 rounded-lg p-6 mb-6">
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
+                  <span className="text-2xl font-bold text-white">
+                    {user?.firstName?.charAt(0) || 'C'}
+                  </span>
                 </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-white">
+                    {user?.fullName || user?.firstName || 'Code Murf'}
+                  </h2>
+                  <p className="text-gray-400 text-sm">{user?.primaryEmailAddress?.emailAddress}</p>
+                </div>
+              </div>
             </div>
-        </div>    );
-}
 
+            {/* Remaining Credits */}
+            <div className="bg-gray-800 rounded-lg p-6 mb-6">
+              <h3 className="text-lg font-semibold text-white mb-2">Remaining Credits</h3>
+              <div className="text-3xl font-bold text-yellow-500">${credits.toFixed(2)}</div>
+            </div>
+
+            {/* Invite Team */}
+            <div className="bg-gray-800 rounded-lg p-6">
+              <div className="flex items-center gap-2 mb-2">
+                <UserGroupIcon className="w-5 h-5 text-blue-400" />
+                <h3 className="text-lg font-semibold text-white">Invite Team Members</h3>
+              </div>
+              <p className="text-gray-400 text-sm mb-4">Centralized billing. Shared models. Security you can trust.</p>
+              <button className="w-full bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-white font-medium">
+                Invite your team
+              </button>
+            </div>
+          </div>
+
+          {/* Right Column */}
+          <div className="lg:col-span-2">
+            {/* Buy Credits */}
+            <div className="bg-gray-800 rounded-lg p-6 mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <CreditCardIcon className="w-6 h-6 text-blue-400" />
+                  <h2 className="text-xl font-semibold text-white">Buy Credits</h2>
+                </div>
+                <span className="text-sm text-gray-400">Use crypto</span>
+              </div>
+
+              {/* Promotion Banner */}
+              <div className="bg-blue-600 rounded-lg p-4 mb-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <GiftIcon className="w-5 h-5 text-white" />
+                  <span className="text-white font-semibold">Get $20 Extra on Your First Top-Up</span>
+                </div>
+                <p className="text-blue-100 text-sm">
+                  Top up any amount of credits and we'll add $20 on top of it, instantly.
+                </p>
+              </div>
+
+              {/* Credit Options */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <button className="bg-gray-700 hover:bg-gray-600 rounded-lg p-4 text-center">
+                  <div className="text-white font-semibold">Buy $10, get $30</div>
+                </button>
+                <button className="bg-gray-700 hover:bg-gray-600 rounded-lg p-4 text-center">
+                  <div className="text-white font-semibold">Buy $20, get $40</div>
+                </button>
+                <button className="bg-gray-700 hover:bg-gray-600 rounded-lg p-4 text-center">
+                  <div className="text-white font-semibold">Buy $100, get $120</div>
+                </button>
+                <button className="bg-gray-700 hover:bg-gray-600 rounded-lg p-4 text-center">
+                  <div className="text-white font-semibold">Custom</div>
+                </button>
+              </div>
+            </div>
+
+            {/* Promo Code */}
+            <div className="bg-gray-800 rounded-lg p-6 mb-6">
+              <div className="flex items-center gap-2 mb-4">
+                <GiftIcon className="w-5 h-5 text-green-400" />
+                <h3 className="text-lg font-semibold text-white">Redeem Promotional Code</h3>
+              </div>
+              <p className="text-gray-400 text-sm mb-4">Enter a promotional code to add credits to your account.</p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Enter promotional code"
+                  value={promoCode}
+                  onChange={(e) => setPromoCode(e.target.value)}
+                  className="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white"
+                />
+                <button className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg text-white">
+                  Redeem Code
+                </button>
+              </div>
+            </div>
+
+            {/* Integrations */}
+            <div className="bg-gray-800 rounded-lg p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <KeyIcon className="w-6 h-6 text-blue-400" />
+                <h2 className="text-xl font-semibold text-white">Integrations</h2>
+              </div>
+
+              {/* VS Code */}
+              <div className="bg-gray-700 rounded-lg p-4 mb-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
+                      <span className="text-white text-sm font-bold">&lt;/&gt;</span>
+                    </div>
+                    <span className="text-white font-medium">Open in VS Code</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-red-400 text-sm">
+                    <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+                    Reset Token and Sign Out
+                  </div>
+                </div>
+              </div>
+
+              {/* API Key */}
+              <div className="bg-gray-700 rounded-lg p-4">
+                <h3 className="text-white font-medium mb-2">API Key</h3>
+                <p className="text-gray-400 text-sm mb-4">
+                  Use this API key in our VS Code and Jet Brains extensions, or with the Kilo Code CLI.
+                </p>
+                
+                <div className="bg-gray-900 rounded-lg p-3 flex items-center justify-between mb-3">
+                  <span className="text-green-400 font-mono text-sm">
+                    {showKey && apiKey ? apiKey.api_key : (apiKey ? maskApiKey(apiKey.api_key) : 'Loading...')}
+                  </span>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setShowKey(!showKey)}
+                      className="text-gray-400 hover:text-white"
+                    >
+                      {showKey ? <EyeSlashIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
+                    </button>
+                    <button
+                      onClick={() => apiKey && copyToClipboard(apiKey.api_key)}
+                      className="text-gray-400 hover:text-white"
+                    >
+                      <ClipboardDocumentIcon className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={regenerateApiKey}
+                      className="text-gray-400 hover:text-white"
+                      disabled={loading}
+                    >
+                      <ArrowPathIcon className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                    </button>
+                  </div>
+                </div>
+                
+                {copied && (
+                  <p className="text-green-400 text-sm mb-3">✓ Copied to clipboard!</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

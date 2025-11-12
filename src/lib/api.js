@@ -33,59 +33,8 @@ const handleApiResponse = async (response) => {
     return await response.json();
 };
 
+// Keep authApi minimal - Clerk handles authentication
 export const authApi = {
-    /**
-     * Register a new user
-     */    async signup(userData) {
-        const response = await fetch(`${API_BASE_URL}/auth/register?t=${Date.now()}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                email: userData.email,
-                password: userData.password,
-                first_name: userData.name ? userData.name.split(' ')[0] : userData.email.split('@')[0],
-                last_name: userData.name ? (userData.name.split(' ')[1] || '') : '',
-            }),
-        });
-
-        return handleApiResponse(response);
-    },
-
-    /**
-     * Login user with email and password
-     */    async login(email, password) {
-        const response = await fetch(`${API_BASE_URL}/auth/login-json`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                email,
-                password,
-            }),
-        });
-
-        return handleApiResponse(response);
-    },
-
-    /**
-     * Refresh access token using refresh token
-     */    async refreshToken(refreshToken) {
-        const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                refresh_token: refreshToken,
-            }),
-        });
-
-        return handleApiResponse(response);
-    },
-
     /**
      * Transform backend template data to ensure consistent format
      */
@@ -100,61 +49,6 @@ export const authApi = {
             ...template,
             id: idString
         };
-    },
-
-    /**
-     * Get current user profile
-     */    async getCurrentUser(accessToken) {
-        const response = await fetch(`${API_BASE_URL}/auth/me`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-            },
-        });
-
-        const data = await handleApiResponse(response);
-        // Backend returns { user: {...} }, so extract the user data
-        return data.user || data;
-    },
-
-    /**
-     * Logout user and invalidate tokens on backend
-     */
-    async logout(accessToken) {
-        try {
-            const response = await fetch(`${API_BASE_URL}/auth/logout`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`,
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            // Even if the backend call fails, we should still clear local tokens
-            const result = await handleApiResponse(response);
-            return result;
-        } catch (error) {
-            console.warn('Backend logout failed, but continuing with local cleanup:', error);
-            // Return success anyway since local cleanup is more important
-            return { success: true, message: 'Logged out locally' };
-        }
-    },
-
-    /**
-     * Update user profile
-     */
-    async updateProfile(accessToken, profileData) {
-        const response = await fetch(`${API_BASE_URL}/users/me`, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(profileData),
-        });
-
-        return handleApiResponse(response);
     }
 };
 
@@ -335,44 +229,6 @@ export const templateApi = {
         });
 
         return handleApiResponse(response);
-    },
-};
-
-/**
- * Token management utilities
- */
-export const tokenUtils = {
-    getAccessToken() {
-        if (typeof window === 'undefined') return null;
-        return localStorage.getItem(process.env.NEXT_PUBLIC_ACCESS_TOKEN_KEY || 'access_token');
-    },
-
-    getRefreshToken() {
-        if (typeof window === 'undefined') return null;
-        return localStorage.getItem(process.env.NEXT_PUBLIC_REFRESH_TOKEN_KEY || 'refresh_token');
-    },
-
-    setTokens(accessToken, refreshToken) {
-        if (typeof window === 'undefined') return;
-        localStorage.setItem(process.env.NEXT_PUBLIC_ACCESS_TOKEN_KEY || 'access_token', accessToken);
-        localStorage.setItem(process.env.NEXT_PUBLIC_REFRESH_TOKEN_KEY || 'refresh_token', refreshToken);
-    },
-
-    clearTokens() {
-        if (typeof window === 'undefined') return;
-        localStorage.removeItem(process.env.NEXT_PUBLIC_ACCESS_TOKEN_KEY || 'access_token');
-        localStorage.removeItem(process.env.NEXT_PUBLIC_REFRESH_TOKEN_KEY || 'refresh_token');
-    },
-
-    isTokenExpired(token) {
-        if (!token) return true;
-        
-        try {
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            return Date.now() >= payload.exp * 1000;
-        } catch (error) {
-            return true;
-        }
     },
 };
 

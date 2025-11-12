@@ -2,7 +2,8 @@
  * Template API service for template management
  */
 
-import { tokenUtils, ApiError } from './api';
+import { ApiError } from './api';
+import { useAuth } from '@clerk/nextjs';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
@@ -29,50 +30,12 @@ const handleApiResponse = async (response) => {
     return data;
 };
 
-// Token refresh function
-const refreshAccessToken = async () => {
-    const refreshToken = tokenUtils.getRefreshToken();
-    if (!refreshToken) {
-        throw new ApiError('No refresh token available', 401);
-    }
-
-    const response = await fetch(`/api/auth/refresh`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            refresh_token: refreshToken,
-        }),
-    });
-
-    if (!response.ok) {
-        tokenUtils.clearTokens(); // Clear invalid tokens
-        throw new ApiError('Token refresh failed - please login again', 401);
-    }
-
-    const data = await response.json();
-    tokenUtils.setTokens(data.access_token, data.refresh_token);
-    return data.access_token;
-};
-
-// Enhanced auth headers with automatic token refresh
-const getAuthHeadersWithRefresh = async () => {
+// Enhanced auth headers with Clerk authentication
+const getAuthHeaders = async (token) => {
     if (typeof window === 'undefined') return { 'Content-Type': 'application/json' };
-    
-    
-    let token = tokenUtils.getAccessToken();
-    
-    // Check if token is expired and refresh if needed
-    if (!token || tokenUtils.isTokenExpired(token)) {
-        const refreshToken = tokenUtils.getRefreshToken();
-        
-        try {
-            token = await refreshAccessToken();
-        } catch (error) {
-            tokenUtils.clearTokens();
-            throw new ApiError('Authentication required - please login again', 401);
-        }
+
+    if (!token) {
+        throw new ApiError('Authentication required - please login again', 401);
     }
 
     return {
@@ -82,7 +45,7 @@ const getAuthHeadersWithRefresh = async () => {
 };
 
 /**
- * Get authentication token from localStorage (deprecated - use getAuthHeadersWithRefresh instead)
+ * Get authentication token from Clerk (use getAuthHeaders instead)
  */
 const getAuthToken = () => {
     if (typeof window === 'undefined') return null;
@@ -93,9 +56,9 @@ export const templateApi = {
     /**
      * Create a new template
      */
-    async createTemplate(templateData) {
+    async createTemplate(templateData, token) {
         try {
-            const headers = await getAuthHeadersWithRefresh();
+            const headers = await getAuthHeaders(token);
 
             const response = await fetch(`/api/templates`, {
                 method: 'POST',
@@ -112,7 +75,7 @@ export const templateApi = {
     /**
      * Get all templates with optional filtering
      */
-    async getTemplates(params = {}) {
+    async getTemplates(params = {}, token) {
         const queryParams = new URLSearchParams();
         
         // Add query parameters (only add non-null, non-undefined, non-empty values)
@@ -145,7 +108,7 @@ export const templateApi = {
     /**
      * Get a specific template by ID
      */
-    async getTemplate(templateId) {
+    async getTemplate(templateId, token) {
         const url = `/api/templates/${templateId}`;
         
         const response = await fetch(url, {
@@ -168,9 +131,9 @@ export const templateApi = {
     /**
      * Update an existing template
      */
-    async updateTemplate(templateId, templateData) {
+    async updateTemplate(templateId, templateData, token) {
         try {
-            const headers = await getAuthHeadersWithRefresh();
+            const headers = await getAuthHeaders(token);
 
             const response = await fetch(`/api/templates/${templateId}`, {
                 method: 'PUT',
@@ -187,9 +150,9 @@ export const templateApi = {
     /**
      * Delete a template
      */
-    async deleteTemplate(templateId) {
+    async deleteTemplate(templateId, token) {
         try {
-            const headers = await getAuthHeadersWithRefresh();
+            const headers = await getAuthHeaders(token);
 
             const response = await fetch(`/api/templates/${templateId}`, {
                 method: 'DELETE',
@@ -205,9 +168,9 @@ export const templateApi = {
     /**
      * Get templates created by the current user
      */
-    async getMyTemplates(params = {}) {
+    async getMyTemplates(params = {}, token) {
         try {
-            const headers = await getAuthHeadersWithRefresh();
+            const headers = await getAuthHeaders(token);
 
             const queryParams = new URLSearchParams();
             if (params.page !== undefined) queryParams.append('page', params.page);
@@ -232,9 +195,9 @@ export const templateApi = {
     /**
      * Toggle like status for a template
      */
-    async toggleLike(templateId) {
+    async toggleLike(templateId, token) {
         try {
-            const headers = await getAuthHeadersWithRefresh();
+            const headers = await getAuthHeaders(token);
 
             const response = await fetch(`/api/templates/${templateId}/like`, {
                 method: 'POST',
@@ -250,9 +213,9 @@ export const templateApi = {
     /**
      * Record a template download
      */
-    async downloadTemplate(templateId) {
+    async downloadTemplate(templateId, token) {
         try {
-            const headers = await getAuthHeadersWithRefresh();
+            const headers = await getAuthHeaders(token);
 
             const response = await fetch(`/api/templates/${templateId}/download`, {
                 method: 'POST',
@@ -270,63 +233,63 @@ export const templateApi = {
     /**
      * Get featured templates
      */
-    async getFeaturedTemplates(limit = 10) {
+    async getFeaturedTemplates(limit = 10, token) {
         return this.getTemplates({ featured: true, limit });
     },
 
     /**
      * Get popular templates
      */
-    async getPopularTemplates(limit = 10) {
+    async getPopularTemplates(limit = 10, token) {
         return this.getTemplates({ popular: true, limit });
     },
 
     /**
      * Get free templates
      */
-    async getFreeTemplates(params = {}) {
+    async getFreeTemplates(params = {}, token) {
         return this.getTemplates({ ...params, plan_type: 'Free' });
     },
 
     /**
      * Get paid templates
      */
-    async getPaidTemplates(params = {}) {
+    async getPaidTemplates(params = {}, token) {
         return this.getTemplates({ ...params, plan_type: 'Paid' });
     },
 
     /**
      * Search templates
      */
-    async searchTemplates(searchQuery, params = {}) {
+    async searchTemplates(searchQuery, params = {}, token) {
         return this.getTemplates({ ...params, search: searchQuery });
     },
 
     /**
      * Get templates by category
      */
-    async getTemplatesByCategory(category, params = {}) {
+    async getTemplatesByCategory(category, params = {}, token) {
         return this.getTemplates({ ...params, category });
     },
 
     /**
      * Get templates by type
      */
-    async getTemplatesByType(type, params = {}) {
+    async getTemplatesByType(type, params = {}, token) {
         return this.getTemplates({ ...params, type });
     },
 
     /**
      * Get all templates (alias for getTemplates)
      */
-    async getAllTemplates(params = {}) {
+    async getAllTemplates(params = {}, token) {
         return this.getTemplates(params);
     },
 
     /**
      * Get template categories
      */
-    async getTemplateCategories() {
+    async getTemplateCategories(token) {
         const response = await fetch(`/api/templates/categories`, {
             method: 'GET',
             headers: {
@@ -395,7 +358,7 @@ export const templateApi = {
     /**
      * Transform frontend form data to backend format
      */
-    async transformFormDataToBackend(formData) {
+    async transformFormDataToBackend(formData, token) {
         try {
             // No preview images processing - using live URL for preview
             let previewImages = [];
@@ -430,7 +393,7 @@ export const templateApi = {
     /**
      * Get template statistics
      */
-    async getTemplateStats() {
+    async getTemplateStats(token) {
         const response = await fetch(`/api/templates/stats`, {
             method: 'GET',
             headers: {
