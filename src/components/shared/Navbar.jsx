@@ -25,6 +25,16 @@ const Navbar = () => {
     setMounted(true);
   }, []);
 
+  // Debug auth state changes
+  useEffect(() => {
+    console.log('🔍 Navbar Auth State:', { 
+      loading, 
+      isAuthenticated, 
+      hasUser: !!user,
+      userName: user?.firstName || user?.name
+    });
+  }, [loading, isAuthenticated, user]);
+
   useEffect(() => {
     let ticking = false;
 
@@ -287,7 +297,8 @@ const Navbar = () => {
             <Link href="/components" className="text-gray-300 text-sm font-medium">Components</Link>
           </div>
           <div className="flex items-center space-x-4">
-            <div className="w-8 h-8 bg-gray-300 rounded-full animate-pulse"></div>
+            {/* Show placeholder during initial mount */}
+            <div className="w-8 h-8 bg-gray-700/50 rounded-full"></div>
           </div>
         </div>
       </nav>
@@ -430,8 +441,11 @@ const Navbar = () => {
           )}
 
           {loading ? (
-            <div className="animate-pulse">
-              <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
+            // Loading state with reduced animation
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gray-700/50 rounded-full flex items-center justify-center">
+                <div className="w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+              </div>
             </div>
           ) : isAuthenticated ? (
             /* User Menu */

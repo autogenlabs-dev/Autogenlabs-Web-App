@@ -26,10 +26,20 @@ export const AuthProvider = ({ children }) => {
 
     // Sync Clerk state with our context
     useEffect(() => {
+        // Add timeout to prevent infinite loading
+        const timeout = setTimeout(() => {
+            if (!clerkLoaded) {
+                console.warn('⚠️ Clerk took too long to load, setting loading to false');
+                setLoading(false);
+            }
+        }, 3000); // 3 second timeout
+
         if (!clerkLoaded) {
             setLoading(true);
-            return;
+            return () => clearTimeout(timeout);
         }
+
+        clearTimeout(timeout);
 
         if (clerkIsSignedIn && clerkUser) {
             // Transform Clerk user to our user format
@@ -44,9 +54,11 @@ export const AuthProvider = ({ children }) => {
                 ...clerkUser
             };
             
+            console.log('✅ User authenticated:', userState);
             setUser(userState);
             setLoading(false);
         } else {
+            console.log('ℹ️ No user signed in');
             setUser(null);
             setLoading(false);
         }
