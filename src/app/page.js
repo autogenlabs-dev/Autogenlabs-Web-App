@@ -36,9 +36,9 @@ export default function Home() {
           <DynamicThreeSteps />
         </StaggeredItem>
 
-        <StaggeredItem>
+        {/* <StaggeredItem>
           <DynamicTipOne />
-        </StaggeredItem>
+        </StaggeredItem> */}
 
         <StaggeredItem>
           <DynamicTipTwo />
