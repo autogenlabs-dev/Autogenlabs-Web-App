@@ -60,6 +60,13 @@ const AuthGuard = ({ children }) => {
 
   // Always call useEffect - don't conditionally call hooks
   useEffect(() => {
+    console.log('🛡️ AuthGuard State:', { 
+      pathname, 
+      loading, 
+      isAuthenticated, 
+      isProtectedRoute 
+    });
+
     // For auth page, completely bypass AuthGuard logic
     if (pathname === '/auth') {
       return;
@@ -72,6 +79,7 @@ const AuthGuard = ({ children }) => {
 
     // If user is not authenticated and trying to access protected route
     if (!isAuthenticated && isProtectedRoute) {
+      console.log('🔒 Redirecting to auth - protected route accessed while not authenticated');
       // Store the intended URL in localStorage so we can redirect back after login
       if (typeof window !== 'undefined') {
         localStorage.setItem('intendedUrl', pathname);
@@ -86,16 +94,19 @@ const AuthGuard = ({ children }) => {
 
   // For auth page, always return children immediately
   if (pathname === '/auth') {
+    console.log('✅ AuthGuard: Rendering auth page');
     return children;
   }
 
   // For public routes, show children immediately without waiting for auth
   if (!isProtectedRoute) {
+    console.log('✅ AuthGuard: Rendering public route:', pathname);
     return children;
   }
 
   // Show loading spinner only for protected routes while checking authentication
   if (loading) {
+    console.log('⏳ AuthGuard: Showing loading spinner for protected route');
     return (
       <div className="min-h-screen bg-[linear-gradient(180deg,#0D0B12_0%,#040406_100%)] text-white flex items-center justify-center">
         <div className="text-center">
@@ -114,6 +125,7 @@ const AuthGuard = ({ children }) => {
 
   // For protected routes, only render if authenticated
   if (isProtectedRoute && !isAuthenticated) {
+    console.log('🔒 AuthGuard: Showing redirect screen for protected route');
     // Return loading state while redirecting to login
     return (
       <div className="min-h-screen bg-[linear-gradient(180deg,#0D0B12_0%,#040406_100%)] text-white flex items-center justify-center">
@@ -131,6 +143,7 @@ const AuthGuard = ({ children }) => {
     );
   }
 
+  console.log('✅ AuthGuard: Rendering protected authenticated content');
   return children;
 };
 

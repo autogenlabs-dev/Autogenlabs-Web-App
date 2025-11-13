@@ -24,6 +24,8 @@ import { LazyComponent } from "../components/ui/LazyLoader";
 import { OptimizedComponent, StaggeredContainer, StaggeredItem, PreloadedComponent } from "../components/ui/OptimizedLoader";
 
 export default function Home() {
+  console.log('🏠 Home Page: Rendering');
+  
   return (
     <div className="bg-[linear-gradient(180deg,_#040406_50%,_#09080D_100%)]">
       {/* Critical - Load immediately */}
