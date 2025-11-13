@@ -12,11 +12,10 @@ export default function SignInPage() {
             card: "shadow-xl",
           },
         }}
-        routing="path"
-        path="/sign-in"
-        signUpUrl="/sign-up"
-        afterSignInUrl="/profile"
-        afterSignUpUrl="/profile"
+  routing="path"
+  path="/sign-in"
+  signUpUrl="/sign-up"
+  fallbackRedirectUrl="/profile"
       />
     </div>
   );
