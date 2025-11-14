@@ -15,6 +15,8 @@ export function SignInSuccessHandler() {
   const { isSignedIn, isLoaded } = useAuth()
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [deepLink, setDeepLink] = useState<string | null>(null)
+  const [showOpenButton, setShowOpenButton] = useState(false)
 
   useEffect(() => {
     const source = searchParams.get('source')
@@ -37,16 +39,26 @@ export function SignInSuccessHandler() {
           throw new Error(data.error || 'Failed to generate auth token')
         }
 
-        // Redirect to VS Code with deep link
-        console.log('✅ Redirecting to VS Code:', data.deepLink)
-        window.location.href = data.deepLink
-
-        // Show success message and redirect to dashboard after 2 seconds
-        setTimeout(() => {
-          router.push('/dashboard')
-        }, 2000)
+        console.log('✅ VS Code deep link ready:', data.deepLink)
+        setDeepLink(data.deepLink)
+        
+        // Try automatic redirect first
+        try {
+          window.location.href = data.deepLink
+          
+          // After 2 seconds, show manual button if still on page
+          setTimeout(() => {
+            setShowOpenButton(true)
+            setProcessing(false)
+          }, 2000)
+        } catch (err) {
+          // If automatic redirect fails, show button immediately
+          console.log('Automatic redirect failed, showing manual button')
+          setShowOpenButton(true)
+          setProcessing(false)
+        }
       } catch (err) {
-        console.error('❌ Error redirecting to VS Code:', err)
+        console.error('❌ Error generating auth token:', err)
         setError(err instanceof Error ? err.message : 'Unknown error')
         setProcessing(false)
       }
@@ -54,6 +66,24 @@ export function SignInSuccessHandler() {
 
     handleVSCodeRedirect()
   }, [isSignedIn, isLoaded, searchParams, processing, router])
+
+  const handleOpenVSCode = () => {
+    if (deepLink) {
+      // Create a temporary link and click it
+      const link = document.createElement('a')
+      link.href = deepLink
+      link.target = '_blank'
+      link.rel = 'noopener noreferrer'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      
+      // Redirect to dashboard after opening VS Code
+      setTimeout(() => {
+        router.push('/dashboard')
+      }, 1500)
+    }
+  }
 
   // Don't render anything if not from VS Code
   const source = searchParams.get('source')
@@ -65,16 +95,42 @@ export function SignInSuccessHandler() {
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-8 max-w-md mx-4 shadow-xl">
         <div className="flex flex-col items-center gap-4">
-          {processing && !error && (
+          {processing && !showOpenButton && !error && (
             <>
               <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
               <h2 className="text-xl font-semibold text-gray-900">Connecting to VS Code...</h2>
               <p className="text-gray-600 text-center">
-                Please allow the browser to open VS Code when prompted.
+                Generating authentication token...
               </p>
-              <p className="text-sm text-gray-500 text-center">
-                If nothing happens, check your browser&apos;s popup blocker.
+            </>
+          )}
+
+          {showOpenButton && !error && (
+            <>
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                <svg className="w-8 h-8 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M23.15 2.587L18.21.21a1.494 1.494 0 0 0-1.705.29l-9.46 8.63-4.12-3.128a.999.999 0 0 0-1.276.057L.327 7.261A1 1 0 0 0 .326 8.74L3.899 12 .326 15.26a1 1 0 0 0 .001 1.479L1.65 17.94a.999.999 0 0 0 1.276.057l4.12-3.128 9.46 8.63a1.492 1.492 0 0 0 1.704.29l4.942-2.377A1.5 1.5 0 0 0 24 20.06V3.939a1.5 1.5 0 0 0-.85-1.352zm-5.146 14.861L10.826 12l7.178-5.448v10.896z"/>
+                </svg>
+              </div>
+              <h2 className="text-xl font-semibold text-gray-900">Ready to Open VS Code!</h2>
+              <p className="text-gray-600 text-center">
+                Click the button below to open VS Code and complete authentication.
               </p>
+              <button
+                onClick={handleOpenVSCode}
+                className="mt-2 px-8 py-3 bg-blue-500 text-white text-lg font-semibold rounded-lg hover:bg-blue-600 active:scale-95 transition-all shadow-lg flex items-center gap-3"
+              >
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M23.15 2.587L18.21.21a1.494 1.494 0 0 0-1.705.29l-9.46 8.63-4.12-3.128a.999.999 0 0 0-1.276.057L.327 7.261A1 1 0 0 0 .326 8.74L3.899 12 .326 15.26a1 1 0 0 0 .001 1.479L1.65 17.94a.999.999 0 0 0 1.276.057l4.12-3.128 9.46 8.63a1.492 1.492 0 0 0 1.704.29l4.942-2.377A1.5 1.5 0 0 0 24 20.06V3.939a1.5 1.5 0 0 0-.85-1.352zm-5.146 14.861L10.826 12l7.178-5.448v10.896z"/>
+                </svg>
+                Open VS Code Extension
+              </button>
+              <button
+                onClick={() => router.push('/dashboard')}
+                className="mt-2 text-sm text-gray-500 hover:text-gray-700 underline"
+              >
+                Skip and go to dashboard
+              </button>
             </>
           )}
           
