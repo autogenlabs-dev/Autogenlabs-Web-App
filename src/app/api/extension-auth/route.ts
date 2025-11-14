@@ -12,6 +12,18 @@ if (!JWT_SECRET) {
 
 export async function GET(request: NextRequest) {
   try {
+    // Check if JWT_SECRET is configured
+    if (!JWT_SECRET) {
+      console.error('❌ JWT_SECRET is not configured!')
+      return NextResponse.json(
+        { 
+          error: 'Server configuration error',
+          message: 'JWT_SECRET is not configured. Please set the JWT_SECRET environment variable.'
+        },
+        { status: 500 }
+      )
+    }
+
     // Verify user is authenticated with Clerk
     const { userId } = await auth()
     if (!userId) {

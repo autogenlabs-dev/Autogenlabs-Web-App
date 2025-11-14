@@ -23,14 +23,14 @@ const AuthForm = ({
             if (isSignIn && signInLoaded) {
                 await signIn.authenticateWithRedirect({
                     strategy: provider === 'google' ? 'oauth_google' : 'oauth_github',
-                    redirectUrl: '/sso-callback',
-                    redirectUrlComplete: '/dashboard'
+                    continueSignUpUrl: '/sso-callback',
+                    fallbackRedirectUrl: '/dashboard'
                 });
             } else if (signUpLoaded) {
                 await signUp.authenticateWithRedirect({
                     strategy: provider === 'google' ? 'oauth_google' : 'oauth_github',
-                    redirectUrl: '/sso-callback',
-                    redirectUrlComplete: '/dashboard'
+                    continueSignUpUrl: '/sso-callback',
+                    fallbackRedirectUrl: '/dashboard'
                 });
             }
         } catch (error) {
