@@ -1,6 +1,7 @@
 'use client';
 
 import { SignIn } from '@clerk/nextjs';
+import { SignInSuccessHandler } from '../../../components/auth/SignInSuccessHandler';
 
 export default function SignInPage() {
   return (
@@ -17,6 +18,7 @@ export default function SignInPage() {
   signUpUrl="/sign-up"
   fallbackRedirectUrl="/profile"
       />
+      <SignInSuccessHandler />
     </div>
   );
 }
