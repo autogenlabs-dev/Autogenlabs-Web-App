@@ -143,3 +143,6 @@ temp/
 # ========================================
 config.local.js
 config.local.json
+
+# clerk configuration (can include secrets)
+/.clerk/
