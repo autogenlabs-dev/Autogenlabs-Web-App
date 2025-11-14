@@ -1,7 +1,7 @@
 'use client';
 
 import { SignIn } from '@clerk/nextjs';
-import { SignInSuccessHandler } from '@/components/SignInSuccessHandler';
+import { SignInSuccessHandler } from '../../../components/auth/SignInSuccessHandler';
 
 export default function SignInPage() {
   return (
