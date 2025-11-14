@@ -23,9 +23,18 @@ export async function GET() {
 			return NextResponse.json({ error: "User not found" }, { status: 404 })
 		}
 
-		// Create JWT payload with user information
+		// Create JWT payload matching VS Code extension's expected format
+		// Extension expects: { r: { u: userId, o?: orgId, t: 'auth' }, iss, sub, iat, exp, v }
 		const payload = {
-			userId: user.id,
+			iss: "codemurf", // Issuer
+			sub: user.id, // Subject - User ID
+			v: 1, // Version
+			r: {
+				u: user.id, // User ID (required by extension)
+				t: "auth", // Token type: auth token
+				// o: undefined  // Organization ID (optional)
+			},
+			// Additional user info for extension use
 			email: user.emailAddresses[0]?.emailAddress || "",
 			firstName: user.firstName || "",
 			lastName: user.lastName || "",
