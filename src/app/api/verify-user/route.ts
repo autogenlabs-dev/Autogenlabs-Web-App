@@ -24,8 +24,9 @@ export async function POST(request: Request) {
     }
 
     // Call backend
-    console.log('[verify-user API] Calling backend at http://localhost:8000/api/verify-user')
-    const resp = await fetch('http://localhost:8000/api/verify-user', {
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000'
+    console.log('[verify-user API] Calling backend at', `${backendUrl}/api/verify-user`)
+    const resp = await fetch(`${backendUrl}/api/verify-user`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token }),
