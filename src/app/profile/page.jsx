@@ -47,7 +47,9 @@ export default function ProfilePage() {
         
         if (response.ok) {
           const data = await response.json();
-          setApiKey(data);
+          console.log('[Profile] API key data:', data);
+          // Store the glm_api_key from backend response
+          setApiKey(data.glm_api_key);
         } else {
           console.error('Failed to load API key');
         }
@@ -87,7 +89,8 @@ export default function ProfilePage() {
       
       if (response.ok) {
         const data = await response.json();
-        setApiKey(data);
+        console.log('[Profile] Regenerated API key:', data);
+        setApiKey(data.glm_api_key);
         setCopied(false);
         setShowKey(false);
       } else {
@@ -245,7 +248,7 @@ export default function ProfilePage() {
                 
                 <div className="bg-gray-900 rounded-lg p-3 flex items-center justify-between mb-3">
                   <span className="text-green-400 font-mono text-sm">
-                    {showKey && apiKey ? apiKey.api_key : (apiKey ? maskApiKey(apiKey.api_key) : 'Loading...')}
+                    {showKey && apiKey ? apiKey : (apiKey ? maskApiKey(apiKey) : 'Loading...')}
                   </span>
                   <div className="flex gap-2">
                     <button
@@ -255,7 +258,7 @@ export default function ProfilePage() {
                       {showKey ? <EyeSlashIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
                     </button>
                     <button
-                      onClick={() => apiKey && copyToClipboard(apiKey.api_key)}
+                      onClick={() => apiKey && copyToClipboard(apiKey)}
                       className="text-gray-400 hover:text-white"
                     >
                       <ClipboardDocumentIcon className="w-4 h-4" />

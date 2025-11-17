@@ -1,7 +1,8 @@
-'use client';
+"use client";
 
 import { ClerkProvider } from '@clerk/nextjs';
 import { useEffect } from 'react';
+import VerifyOnLoad from './VerifyOnLoad';
 
 export default function ClerkProviderWrapper({ children }) {
   useEffect(() => {
@@ -15,6 +16,8 @@ export default function ClerkProviderWrapper({ children }) {
       console.log('🔑 Key type:', publishableKey.startsWith('pk_live_') ? 'Production' : 'Development');
     }
   }, []);
+
+
 
   return (
     <ClerkProvider
@@ -32,6 +35,7 @@ export default function ClerkProviderWrapper({ children }) {
       signInFallbackRedirectUrl={process.env.NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL || '/dashboard'}
       signUpFallbackRedirectUrl={process.env.NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL || '/profile'}
     >
+      <VerifyOnLoad />
       {children}
     </ClerkProvider>
   );
