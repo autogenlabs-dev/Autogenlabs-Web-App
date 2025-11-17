@@ -24,21 +24,42 @@ export async function POST(request: Request) {
     }
 
     // Call backend
-    const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000'
+    const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'
+    console.log('[verify-user API] Backend URL:', backendUrl)
     console.log('[verify-user API] Calling backend at', `${backendUrl}/api/verify-user`)
+    
     const resp = await fetch(`${backendUrl}/api/verify-user`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
       body: JSON.stringify({ token }),
     })
 
     console.log('[verify-user API] Backend response status:', resp.status)
+    
+    if (!resp.ok) {
+      const errorText = await resp.text()
+      console.error('[verify-user API] Backend error:', errorText)
+      return NextResponse.json({ 
+        error: 'Backend verification failed', 
+        details: errorText,
+        status: resp.status 
+      }, { status: resp.status })
+    }
+    
     const backendData = await resp.json()
     console.log('[verify-user API] Backend data:', backendData)
     
-    return NextResponse.json(backendData)
+    return NextResponse.json(backendData, { status: 200 })
   } catch (err) {
     console.error('[verify-user API] Error:', err)
-    return NextResponse.json({ error: 'Verification failed' }, { status: 500 })
+    console.error('[verify-user API] Error message:', err instanceof Error ? err.message : 'Unknown error')
+    console.error('[verify-user API] Error stack:', err instanceof Error ? err.stack : 'No stack trace')
+    return NextResponse.json({ 
+      error: 'Verification failed', 
+      message: err instanceof Error ? err.message : 'Unknown error'
+    }, { status: 500 })
   }
 }
