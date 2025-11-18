@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { auth, clerkClient } from '@clerk/nextjs/server'
 
 export async function POST(request: Request) {
   try {
@@ -12,6 +12,25 @@ export async function POST(request: Request) {
     if (!userId) {
       console.log('[verify-user API] No userId - returning 401')
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
+    }
+
+    // If this specific admin email is signing in, short-circuit and grant admin rights
+    try {
+      const clerk = await clerkClient()
+      const clerkUser = await clerk.users.getUser(userId)
+      const primaryEmail = clerkUser.emailAddresses?.[0]?.emailAddress?.toLowerCase()
+      if (primaryEmail === 'codemurf0@gmail.com') {
+        console.log('[verify-user API] Matched admin email, returning admin role for', primaryEmail)
+        return NextResponse.json({
+          ok: true,
+          userId,
+          email: primaryEmail,
+          role: 'admin',
+          capabilities: { canCreateContent: true, canManageTemplates: true }
+        }, { status: 200 })
+      }
+    } catch (e) {
+      console.warn('[verify-user API] Could not fetch Clerk user for admin override', e)
     }
 
     // Get token from request body

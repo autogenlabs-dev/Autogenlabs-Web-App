@@ -6,7 +6,7 @@
 
 import { ApiError } from './api';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '') + '/api';
 
 const handleApiResponse = async (response) => {
     if (!response.ok) {
@@ -27,7 +27,43 @@ const handleApiResponse = async (response) => {
     return await response.json();
 };
 
-// Token refresh function
+// Minimal local token utilities used when the app stores tokens in localStorage.
+// This is a lightweight compatibility layer — the preferred flow remains using Clerk's getToken
+// on the client and passing the token into API methods when needed.
+const tokenUtils = {
+    getAccessToken() {
+        try {
+            return typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+        } catch (e) {
+            return null;
+        }
+    },
+    getRefreshToken() {
+        try {
+            return typeof window !== 'undefined' ? localStorage.getItem('refresh_token') : null;
+        } catch (e) {
+            return null;
+        }
+    },
+    setTokens(access, refresh) {
+        try {
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('access_token', access || '');
+                if (refresh) localStorage.setItem('refresh_token', refresh);
+            }
+        } catch (e) {}
+    },
+    clearTokens() {
+        try {
+            if (typeof window !== 'undefined') {
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+            }
+        } catch (e) {}
+    }
+};
+
+// Token refresh function (best-effort): attempts to call backend refresh endpoint
 const refreshAccessToken = async () => {
     const refreshToken = tokenUtils.getRefreshToken();
     if (!refreshToken) {
@@ -54,18 +90,34 @@ const refreshAccessToken = async () => {
     return data.access_token;
 };
 
-// Enhanced auth headers with Clerk authentication
+// Enhanced auth headers helper that will use provided token or fall back to stored access token
 const getAuthHeaders = async (token) => {
     if (typeof window === 'undefined') return { 'Content-Type': 'application/json' };
 
-    if (!token) {
+    const access = token || tokenUtils.getAccessToken();
+    if (!access) {
         throw new ApiError('Authentication required - please login again', 401);
     }
 
     return {
-        'Authorization': `Bearer ${token}`,
+        'Authorization': `Bearer ${access}`,
         'Content-Type': 'application/json',
     };
+};
+
+// Backwards-compatible: try to get headers, refreshing token when necessary
+const getAuthHeadersWithRefresh = async (token) => {
+    try {
+        return await getAuthHeaders(token);
+    } catch (err) {
+        // Try to refresh the token once
+        try {
+            const newToken = await refreshAccessToken();
+            return await getAuthHeaders(newToken);
+        } catch (refreshErr) {
+            throw err; // rethrow original auth error
+        }
+    }
 };
 
 export const marketplaceApi = {

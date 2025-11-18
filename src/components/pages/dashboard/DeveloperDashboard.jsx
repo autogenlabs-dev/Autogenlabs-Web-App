@@ -25,6 +25,7 @@ import {
     Clock
 } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
+import { useAuth as useClerkAuth } from '@clerk/nextjs';
 import { developerApi } from '../../../lib/developerApi';
 import { marketplaceApi } from '../../../lib/marketplaceApi';
 import ProtectedRoute from '../../shared/ProtectedRoute';
@@ -82,42 +83,52 @@ const DeveloperDashboard = () => {
             let componentsData = [];
 
             try {
-                // Get user's templates
-                const templatesResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/templates/user/my-templates`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-                        'Content-Type': 'application/json'
+                // Get user's templates via marketplaceApi with Clerk token
+                try {
+                    const { getToken } = useClerkAuth();
+                    const token = await getToken();
+                    const tplResp = await fetch(`${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '')}/api/templates/user/my-templates`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    if (tplResp.ok) {
+                        const templatesResult = await tplResp.json();
+                        templatesData = templatesResult.templates || [];
                     }
-                });
-                
-                if (templatesResponse.ok) {
-                    const templatesResult = await templatesResponse.json();
-                    templatesData = templatesResult.templates || [];
+                } catch (tokenErr) {
+                    console.warn('No Clerk token available for templates:', tokenErr);
                 }
             } catch (error) {
                 console.warn('Failed to load templates:', error);
             }
 
             try {
-                // Get user's components
-                console.log('🔍 Fetching components from:', `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/components/user/my-components?skip=0&limit=100`);
-                const componentsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/components/user/my-components?skip=0&limit=100`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-                        'Content-Type': 'application/json'
+                // Get user's components via marketplaceApi with Clerk token
+                try {
+                    const { getToken } = useClerkAuth();
+                    const token = await getToken();
+                    const compResp = await fetch(`${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '')}/api/components/user/my-components?skip=0&limit=100`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    console.log('🔍 Components response status:', compResp.status);
+
+                    if (compResp.ok) {
+                        const componentsResult = await compResp.json();
+                        console.log('🔍 Components API response:', componentsResult);
+                        componentsData = componentsResult.components || [];
+                        console.log('🔍 Components data extracted:', componentsData);
+                    } else {
+                        const errorText = await compResp.text();
+                        console.error('❌ Components API error:', errorText);
                     }
-                });
-                
-                console.log('🔍 Components response status:', componentsResponse.status);
-                
-                if (componentsResponse.ok) {
-                    const componentsResult = await componentsResponse.json();
-                    console.log('🔍 Components API response:', componentsResult);
-                    componentsData = componentsResult.components || [];
-                    console.log('🔍 Components data extracted:', componentsData);
-                } else {
-                    const errorText = await componentsResponse.text();
-                    console.error('❌ Components API error:', errorText);
+                } catch (tokenErr) {
+                    console.warn('No Clerk token available for components:', tokenErr);
                 }
             } catch (error) {
                 console.error('❌ Failed to load components:', error);

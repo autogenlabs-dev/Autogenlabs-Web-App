@@ -1,4 +1,4 @@
-'use client';
+ 'use client';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Grid3X3, List, Star, Download, Eye, Heart, Code, Filter, Trash2, Edit, MessageSquare } from 'lucide-react';
@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { marketplaceApi } from '../../../lib/marketplaceApi';
 import { useAuth } from '../../../contexts/AuthContext';
+import { useAuth as useClerkAuth } from '@clerk/nextjs';
 import { useNotification } from '../../../contexts/NotificationContext';
 import LiveComponentPreview from '../../ui/LiveComponentPreview';
 
@@ -29,10 +30,11 @@ const ComponentGallery = () => {
   const [showMyContent, setShowMyContent] = useState(false);
 
   // Determine create/see permissions. Backwards-compatible: `canCreateContent` comes from AuthContext
-  const canCreateComponents = authIsAdmin || !!canCreateContent || !!user;
+  // Do NOT allow all authenticated users by default; require capability or admin/legacy developer flag
+  const canCreateComponents = authIsAdmin || !!canCreateContent || !!user?.canCreateContent || !!user?.legacyIsDeveloper;
 
-  // All authenticated users (or those with capability) can see their components
-  const canSeeMyComponents = authIsAdmin || !!canCreateContent || !!user;
+  // Only admin, capability holders, or legacy developer users may see "My Components"
+  const canSeeMyComponents = authIsAdmin || !!canCreateContent || !!user?.canCreateContent || !!user?.legacyIsDeveloper;
   
   // Helper function to check if edit/delete icons should be shown
   const shouldShowEditDelete = (component) => {
@@ -227,10 +229,15 @@ const ComponentGallery = () => {
       if (showMyContent && canSeeMyComponents) {
         console.log('🔍 Using getUserComponents endpoint');
         // Use dedicated endpoint for user's own components
-        response = await marketplaceApi.getUserComponents({
-          limit: 100,
-          skip: 0
-        });
+        // Try to get Clerk token for auth
+        try {
+          const { getToken } = useClerkAuth();
+          const token = await getToken();
+          response = await marketplaceApi.getUserComponents({ limit: 100, skip: 0 }, token);
+        } catch (tErr) {
+          console.warn('No Clerk token available, attempting unauthenticated call', tErr);
+          response = await marketplaceApi.getUserComponents({ limit: 100, skip: 0 });
+        }
       } else {
         console.log('🔍 Using getComponents endpoint');
         // Use main endpoint for all approved components

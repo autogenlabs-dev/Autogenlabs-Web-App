@@ -1,4 +1,4 @@
-'use client';
+ 'use client';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Grid3X3, List, Star, Download, Eye, Code, Trash2, Edit } from 'lucide-react';
@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { marketplaceApi } from '../../../lib/marketplaceApi';
 import { useAuth } from '../../../contexts/AuthContext';
+import { useAuth as useClerkAuth } from '@clerk/nextjs';
 import { useNotification } from '../../../contexts/NotificationContext';
 
 const TemplateGallery = () => {
@@ -25,12 +26,11 @@ const TemplateGallery = () => {
   const [filteredTemplates, setFilteredTemplates] = useState([]);
   const [showMyContent, setShowMyContent] = useState(false);
 
-  // All authenticated users can create templates
-  // Determine create/see permissions
-  const canCreateTemplates = authIsAdmin || !!canCreateContent || !!user;
+  // Determine create/see permissions. Only admin, capability holders, or legacy developer users may create/see their templates
+  const canCreateTemplates = authIsAdmin || !!canCreateContent || !!user?.canCreateContent || !!user?.legacyIsDeveloper;
 
-  // All authenticated users (or those with capability) can see their templates
-  const canSeeMyTemplates = authIsAdmin || !!canCreateContent || !!user;
+  // Only admin, capability holders, or legacy developer users may see "My Templates"
+  const canSeeMyTemplates = authIsAdmin || !!canCreateContent || !!user?.canCreateContent || !!user?.legacyIsDeveloper;
   
   // Helper function to check if edit/delete icons should be shown
   const shouldShowEditDelete = (template) => {
@@ -93,10 +93,14 @@ const TemplateGallery = () => {
       let response;
       if (showMyContent && canSeeMyTemplates) {
         // Use dedicated endpoint for user's own templates
-        response = await marketplaceApi.getUserTemplates({
-          limit: 100,
-          skip: 0
-        });
+        try {
+          const { getToken } = useClerkAuth();
+          const token = await getToken();
+          response = await marketplaceApi.getUserTemplates({ limit: 100, skip: 0 }, token);
+        } catch (tErr) {
+          console.warn('No Clerk token available, attempting unauthenticated call', tErr);
+          response = await marketplaceApi.getUserTemplates({ limit: 100, skip: 0 });
+        }
       } else {
         // Use main endpoint for all approved templates
         response = await marketplaceApi.getTemplates({

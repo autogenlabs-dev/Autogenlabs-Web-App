@@ -57,6 +57,9 @@ export const AuthProvider = ({ children }) => {
                 rawRole === 'developer'
             );
 
+            // Determine organization-level role (if present) from Clerk public metadata
+            const rawOrgRole = clerkUser?.publicMetadata?.orgRole || clerkUser?.publicMetadata?.org_role || clerkUser?.publicMetadata?.organizationRole || null;
+
             // Transform Clerk user to our user format
             const userState = {
                 id: clerkUser.id,
@@ -70,6 +73,8 @@ export const AuthProvider = ({ children }) => {
                 canCreateContent,
                 // Legacy indicator (so existing checks can be migrated incrementally)
                 legacyIsDeveloper: rawRole === 'developer',
+                // Organization level role (optional)
+                orgRole: rawOrgRole,
                 avatar: clerkUser.imageUrl || '/public/logoAuto.webp',
                 ...clerkUser
             };
@@ -127,6 +132,11 @@ export const AuthProvider = ({ children }) => {
         canCreateContent: !!user?.canCreateContent,
         isUser: user?.role === 'user' || !!user?.legacyIsDeveloper
     };
+
+    // Debug log for organization role (helpful during migration)
+    if (process.env.NODE_ENV !== 'production') {
+        console.log('AuthContext debug - orgRole:', user?.orgRole, 'role:', user?.role, 'canCreateContent:', user?.canCreateContent);
+    }
 
     return (
         <AuthContext.Provider value={value}>
