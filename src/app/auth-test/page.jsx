@@ -51,12 +51,14 @@ export default function AuthTest() {
         console.log('templateApi.getTemplates error:', error.message);
       }
 
-      // Test developerApi
+      // Test developerApi (only if user has developer capabilities)
       try {
+        // We can't access our AuthContext here (this page uses Clerk useAuth), so call developerApi
+        // but tolerate 403/401 if the user isn't permitted.
         const developerData = await developerApi.getDeveloperData(token);
         console.log('developerApi.getDeveloperData success:', developerData);
       } catch (error) {
-        console.log('developerApi.getDeveloperData error:', error.message);
+        console.log('developerApi.getDeveloperData error (may be unauthorized):', error.message);
       }
 
       // Test paymentApi

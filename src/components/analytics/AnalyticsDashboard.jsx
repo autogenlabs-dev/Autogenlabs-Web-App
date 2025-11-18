@@ -33,7 +33,7 @@ import { adminApi } from '../../lib/adminApi';
 import { developerApi } from '../../lib/developerApi';
 
 const AnalyticsDashboard = ({ userRole = 'user', period = '7d' }) => {
-    const { user } = useAuth();
+    const { user, canCreateContent } = useAuth();
     const [analytics, setAnalytics] = useState(null);
     const [loading, setLoading] = useState(true);
     const [selectedMetric, setSelectedMetric] = useState(null);
@@ -45,6 +45,11 @@ const AnalyticsDashboard = ({ userRole = 'user', period = '7d' }) => {
         { value: '90d', label: '3 Months' },
         { value: '1y', label: '1 Year' }
     ];
+
+    // Determine whether to render the legacy "developer" view. This accepts either the
+    // incoming `userRole` prop being 'developer' or the currently signed in user having
+    // the create-content capability (migration-friendly).
+    const isDeveloperView = userRole === 'developer' || !!user?.canCreateContent || !!canCreateContent || !!user?.legacyIsDeveloper;
 
     useEffect(() => {
         fetchAnalytics();
@@ -59,9 +64,8 @@ const AnalyticsDashboard = ({ userRole = 'user', period = '7d' }) => {
                 case 'admin':
                     data = await adminApi.getAnalytics(timeRange);
                     break;
+                // Treat legacy 'developer' as regular user analytics (capability-based users)
                 case 'developer':
-                    data = await developerApi.getAnalytics(timeRange);
-                    break;
                 default:
                     data = await marketplaceApi.getUserAnalytics(timeRange);
                     break;
@@ -229,7 +233,7 @@ const AnalyticsDashboard = ({ userRole = 'user', period = '7d' }) => {
                     <h1 className="text-2xl font-bold text-white">Analytics Dashboard</h1>
                     <p className="text-gray-400 mt-1">
                         {userRole === 'admin' && 'Platform-wide insights and performance metrics'}
-                        {userRole === 'developer' && 'Your content performance and earnings'}
+                        {isDeveloperView && 'Your content performance and earnings'}
                         {userRole === 'user' && 'Your activity and spending insights'}
                     </p>
                 </div>
@@ -285,7 +289,7 @@ const AnalyticsDashboard = ({ userRole = 'user', period = '7d' }) => {
                     </>
                 )}
 
-                {userRole === 'developer' && currentAnalytics?.overview && (
+                {isDeveloperView && currentAnalytics?.overview && (
                     <>
                         <MetricCard
                             title="Total Items"
@@ -358,7 +362,7 @@ const AnalyticsDashboard = ({ userRole = 'user', period = '7d' }) => {
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-lg font-semibold text-white">
                             {userRole === 'admin' && 'User Growth & Revenue'}
-                            {userRole === 'developer' && 'Earnings Over Time'}
+                            {isDeveloperView && 'Earnings Over Time'}
                             {userRole === 'user' && 'Spending History'}
                         </h3>
                         <LineChart className="w-5 h-5 text-blue-400" />
@@ -366,7 +370,7 @@ const AnalyticsDashboard = ({ userRole = 'user', period = '7d' }) => {
                     <SimpleChart
                         data={currentAnalytics?.charts?.[
                             userRole === 'admin' ? 'userGrowth' :
-                            userRole === 'developer' ? 'earnings' :
+                            isDeveloperView ? 'earnings' :
                             'spendingHistory'
                         ]}
                         type="line"
@@ -379,7 +383,7 @@ const AnalyticsDashboard = ({ userRole = 'user', period = '7d' }) => {
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-lg font-semibold text-white">
                             {userRole === 'admin' && 'Category Distribution'}
-                            {userRole === 'developer' && 'Item Performance'}
+                            {isDeveloperView && 'Item Performance'}
                             {userRole === 'user' && 'Download Categories'}
                         </h3>
                         <PieChart className="w-5 h-5 text-green-400" />
@@ -387,7 +391,7 @@ const AnalyticsDashboard = ({ userRole = 'user', period = '7d' }) => {
                     <SimpleChart
                         data={currentAnalytics?.charts?.[
                             userRole === 'admin' ? 'categories' :
-                            userRole === 'developer' ? 'itemPerformance' :
+                            isDeveloperView ? 'itemPerformance' :
                             'downloadedCategories'
                         ]}
                         type="pie"
@@ -430,7 +434,7 @@ const AnalyticsDashboard = ({ userRole = 'user', period = '7d' }) => {
                 </div>
             )}
 
-            {userRole === 'developer' && (
+            {isDeveloperView && (
                 <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
                     <h3 className="text-lg font-semibold text-white mb-6">Your Item Performance</h3>
                     <div className="overflow-x-auto">
@@ -474,7 +478,7 @@ const AnalyticsDashboard = ({ userRole = 'user', period = '7d' }) => {
                         <div className="flex justify-between">
                             <span className="text-gray-400">Conversion Rate</span>
                             <span className="text-white">
-                                {userRole === 'admin' ? '3.2%' : userRole === 'developer' ? '4.7%' : '12.5%'}
+                                {userRole === 'admin' ? '3.2%' : isDeveloperView ? '4.7%' : '12.5%'}
                             </span>
                         </div>
                         <div className="flex justify-between">
@@ -484,7 +488,7 @@ const AnalyticsDashboard = ({ userRole = 'user', period = '7d' }) => {
                         <div className="flex justify-between">
                             <span className="text-gray-400">Active Sessions</span>
                             <span className="text-white">
-                                {userRole === 'admin' ? '1,247' : userRole === 'developer' ? '89' : '23'}
+                                {userRole === 'admin' ? '1,247' : isDeveloperView ? '89' : '23'}
                             </span>
                         </div>
                     </div>
@@ -529,7 +533,7 @@ const AnalyticsDashboard = ({ userRole = 'user', period = '7d' }) => {
                                 </div>
                             </>
                         )}
-                        {userRole === 'developer' && (
+                        {isDeveloperView && (
                             <>
                                 <div className="flex items-center space-x-2">
                                     <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>

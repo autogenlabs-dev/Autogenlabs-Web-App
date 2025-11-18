@@ -495,7 +495,6 @@ const AdminDashboard = () => {
                                 >
                                     <option value="all">All Users</option>
                                     <option value="user">Regular Users</option>
-                                    <option value="developer">Developers</option>
                                     <option value="admin">Administrators</option>
                                 </select>
                             </div>
@@ -523,7 +522,6 @@ const AdminDashboard = () => {
                                                 <td className="py-3 px-4">
                                                     <span className={`inline-block px-2 py-1 text-xs rounded-full ${
                                                         user.role === 'admin' ? 'bg-red-500/20 text-red-400' :
-                                                        user.role === 'developer' ? 'bg-green-500/20 text-green-400' :
                                                         'bg-blue-500/20 text-blue-400'
                                                     }`}>
                                                         {user.role}
@@ -791,7 +789,6 @@ const AdminDashboard = () => {
                                 <label className="block text-gray-300 text-sm font-medium mb-1">Role</label>
                                 <span className={`inline-block px-2 py-1 text-xs rounded-full ${
                                     selectedUser.role === 'admin' ? 'bg-red-500/20 text-red-400' :
-                                    selectedUser.role === 'developer' ? 'bg-green-500/20 text-green-400' :
                                     'bg-blue-500/20 text-blue-400'
                                 }`}>
                                     {selectedUser.role}

@@ -26,7 +26,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { developerApi } from '../../lib/developerApi';
 
 const TemplateUploadForm = ({ onSuccess, onCancel }) => {
-    const { user } = useAuth();
+    const { user, canCreateContent, isAdmin, isDeveloper } = useAuth();
     const { showSuccess, showError, showWarning } = useNotification();
     const [currentStep, setCurrentStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -177,7 +177,13 @@ const TemplateUploadForm = ({ onSuccess, onCancel }) => {
         if (!validateStep(4)) return;
 
         try {
-            setIsSubmitting(true);
+                // Ensure user has permission to upload (backwards-compatible with legacy developer role)
+                if (!(isAdmin || canCreateContent || isDeveloper || user?.legacyIsDeveloper)) {
+                    showError('You do not have permission to upload content.');
+                    return;
+                }
+
+                setIsSubmitting(true);
             setUploadProgress(0);
 
             // Create FormData for file upload

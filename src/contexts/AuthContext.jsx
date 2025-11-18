@@ -42,6 +42,21 @@ export const AuthProvider = ({ children }) => {
         clearTimeout(timeout);
 
         if (clerkIsSignedIn && clerkUser) {
+            // Determine raw role from Clerk public metadata (or fallback to 'user')
+            const rawRole = clerkUser?.publicMetadata?.role || clerkUser?.role || 'user';
+
+            // Normalize developer -> user so the app only uses 'admin' and 'user'
+            const normalizedRole = rawRole === 'developer' ? 'user' : rawRole;
+
+            // Derive permission flags (backwards-compatible). If user was a legacy 'developer'
+            // give them the create-content capability so they keep their privileges.
+            const canCreateContent = !!(
+                clerkUser?.publicMetadata?.canCreate ||
+                clerkUser?.publicMetadata?.can_create ||
+                clerkUser?.publicMetadata?.capabilities?.create_content ||
+                rawRole === 'developer'
+            );
+
             // Transform Clerk user to our user format
             const userState = {
                 id: clerkUser.id,
@@ -49,11 +64,16 @@ export const AuthProvider = ({ children }) => {
                 firstName: clerkUser.firstName || clerkUser.fullName?.split(' ')[0] || clerkUser.username || 'User',
                 lastName: clerkUser.lastName || clerkUser.fullName?.split(' ').slice(1).join(' ') || '',
                 email: clerkUser.primaryEmailAddress?.emailAddress || '',
-                role: 'user', // Default role, can be updated from backend
+                // Only keep 'admin' or 'user' in the role field
+                role: normalizedRole,
+                // Provide a capability flag so components can check permissions instead of role === 'developer'
+                canCreateContent,
+                // Legacy indicator (so existing checks can be migrated incrementally)
+                legacyIsDeveloper: rawRole === 'developer',
                 avatar: clerkUser.imageUrl || '/public/logoAuto.webp',
                 ...clerkUser
             };
-            
+
             console.log('✅ User authenticated:', userState);
             setUser(userState);
             setLoading(false);
@@ -101,8 +121,11 @@ export const AuthProvider = ({ children }) => {
         clearError,
         isAuthenticated: clerkIsSignedIn && !!user,
         isAdmin: user?.role === 'admin',
-        isDeveloper: user?.role === 'developer',
-        isUser: user?.role === 'user'
+        // Backwards-compatible: legacyIsDeveloper indicates the original role before normalization
+        isDeveloper: !!user?.legacyIsDeveloper,
+        // Capability flag that should be used instead of checking for a 'developer' role
+        canCreateContent: !!user?.canCreateContent,
+        isUser: user?.role === 'user' || !!user?.legacyIsDeveloper
     };
 
     return (

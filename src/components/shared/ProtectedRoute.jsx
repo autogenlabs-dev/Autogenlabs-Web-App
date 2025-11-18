@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 const ProtectedRoute = ({ children, allowedRoles = [], requiredRole = null }) => {
-    const { isAuthenticated, user, loading } = useAuth();
+    const { isAuthenticated, user, loading, canCreateContent, isAdmin, isDeveloper } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
@@ -15,16 +15,27 @@ const ProtectedRoute = ({ children, allowedRoles = [], requiredRole = null }) =>
 
     useEffect(() => {
         if (!loading && isAuthenticated && user) {
-            // Check single required role
-            if (requiredRole && user.role !== requiredRole) {
-                router.push('/unauthorized');
-                return;
+            // Handle legacy 'developer' requirement by checking capability flag
+            if (requiredRole) {
+                if (requiredRole === 'developer') {
+                    if (!(isAdmin || canCreateContent || isDeveloper)) {
+                        router.push('/unauthorized');
+                        return;
+                    }
+                } else if (user.role !== requiredRole) {
+                    router.push('/unauthorized');
+                    return;
+                }
             }
-            
-            // Check multiple allowed roles
-            if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
-                router.push('/unauthorized');
-                return;
+
+            // Check multiple allowed roles. If 'developer' is present, treat it as capability check.
+            if (allowedRoles.length > 0) {
+                const allowed = allowedRoles.includes(user.role);
+                const developerAllowed = allowedRoles.includes('developer') && (isAdmin || canCreateContent || isDeveloper);
+                if (!allowed && !developerAllowed) {
+                    router.push('/unauthorized');
+                    return;
+                }
             }
         }
     }, [isAuthenticated, loading, user, allowedRoles, requiredRole, router]);
@@ -46,12 +57,18 @@ const ProtectedRoute = ({ children, allowedRoles = [], requiredRole = null }) =>
 
     // Check role requirements after user is loaded
     if (user) {
-        if (requiredRole && user.role !== requiredRole) {
-            return null; // Redirect will happen in useEffect
+        if (requiredRole) {
+            if (requiredRole === 'developer') {
+                if (!(isAdmin || canCreateContent || isDeveloper)) return null;
+            } else if (user.role !== requiredRole) {
+                return null; // Redirect will happen in useEffect
+            }
         }
-        
-        if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
-            return null; // Redirect will happen in useEffect
+
+        if (allowedRoles.length > 0) {
+            const allowed = allowedRoles.includes(user.role);
+            const developerAllowed = allowedRoles.includes('developer') && (isAdmin || canCreateContent || isDeveloper);
+            if (!allowed && !developerAllowed) return null;
         }
     }
 

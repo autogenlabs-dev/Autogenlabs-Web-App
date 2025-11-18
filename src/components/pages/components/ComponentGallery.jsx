@@ -10,7 +10,7 @@ import { useNotification } from '../../../contexts/NotificationContext';
 import LiveComponentPreview from '../../ui/LiveComponentPreview';
 
 const ComponentGallery = () => {
-  const { user } = useAuth();
+  const { user, canCreateContent, isAdmin: authIsAdmin } = useAuth();
   const { showSuccess, showError } = useNotification();
   const [mounted, setMounted] = useState(false);
   const [components, setComponents] = useState([]);
@@ -28,47 +28,37 @@ const ComponentGallery = () => {
   const [expandedPreview, setExpandedPreview] = useState(null);
   const [showMyContent, setShowMyContent] = useState(false);
 
-  // Check if user can create components (developer or admin)
-  const canCreateComponents = user?.role === 'developer' || user?.role === 'admin';
-  
-  // Check if user can see My Components section (developer or admin)
-  const canSeeMyComponents = user?.role === 'developer' || user?.role === 'admin';
+  // Determine create/see permissions. Backwards-compatible: `canCreateContent` comes from AuthContext
+  const canCreateComponents = authIsAdmin || !!canCreateContent || !!user;
+
+  // All authenticated users (or those with capability) can see their components
+  const canSeeMyComponents = authIsAdmin || !!canCreateContent || !!user;
   
   // Helper function to check if edit/delete icons should be shown
   const shouldShowEditDelete = (component) => {
-    const isAdmin = user?.role === 'admin';
-    const isDeveloper = user?.role === 'developer';
-    const isUser = user?.role === 'user' || !user?.role;
-    
-    // Users can never edit/delete
-    if (isUser) return false;
+    const isAdmin = authIsAdmin || user?.role === 'admin';
     
     // Admin can edit/delete any component
     if (isAdmin) return true;
     
-    // Developer can only edit/delete their own components if not approved
-    if (isDeveloper) {
-      const componentUserId = component.user_id || component.userId || component.creator_id;
-      const currentUserId = user?.id || user?._id;
-      const isOwnComponent = String(componentUserId) === String(currentUserId);
-      const isApproved = component.status === 'approved' || component.approval_status === 'approved';
-      
-      // Developer can edit/delete own components only if not approved
-      return isOwnComponent && !isApproved;
-    }
+    // Regular users can only edit/delete their own components if not approved
+    const componentUserId = component.user_id || component.userId || component.creator_id;
+    const currentUserId = user?.id || user?._id;
+    const isOwnComponent = String(componentUserId) === String(currentUserId);
+    const isApproved = component.status === 'approved' || component.approval_status === 'approved';
     
-    return false;
+    // Users can edit/delete own components only if not approved
+    return isOwnComponent && !isApproved;
   };
   
   // Debug logging
-  console.log('🔍 ComponentGallery Debug:', {
+    console.log('🔍 ComponentGallery Debug:', {
     user,
     userRole: user?.role,
     canCreateComponents,
     canSeeMyComponents,
     showMyContent,
-    isAdmin: user?.role === 'admin',
-    isDeveloper: user?.role === 'developer'
+    isAdmin: authIsAdmin || user?.role === 'admin'
   });
 
   // Component categories

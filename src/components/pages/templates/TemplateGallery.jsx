@@ -9,7 +9,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { useNotification } from '../../../contexts/NotificationContext';
 
 const TemplateGallery = () => {
-  const { user } = useAuth();
+  const { user, canCreateContent, isAdmin: authIsAdmin } = useAuth();
   const { showSuccess, showError } = useNotification();
   const [mounted, setMounted] = useState(false);
   const [templates, setTemplates] = useState([]);
@@ -25,36 +25,28 @@ const TemplateGallery = () => {
   const [filteredTemplates, setFilteredTemplates] = useState([]);
   const [showMyContent, setShowMyContent] = useState(false);
 
-  // Check if user can create templates (developer or admin)
-  const canCreateTemplates = user?.role === 'developer' || user?.role === 'admin';
-  
-  // Check if user can see My Templates section (developer or admin)
-  const canSeeMyTemplates = user?.role === 'developer' || user?.role === 'admin';
+  // All authenticated users can create templates
+  // Determine create/see permissions
+  const canCreateTemplates = authIsAdmin || !!canCreateContent || !!user;
+
+  // All authenticated users (or those with capability) can see their templates
+  const canSeeMyTemplates = authIsAdmin || !!canCreateContent || !!user;
   
   // Helper function to check if edit/delete icons should be shown
   const shouldShowEditDelete = (template) => {
-    const isAdmin = user?.role === 'admin';
-    const isDeveloper = user?.role === 'developer';
-    const isUser = user?.role === 'user' || !user?.role;
-    
-    // Users can never edit/delete
-    if (isUser) return false;
+    const isAdmin = authIsAdmin || user?.role === 'admin';
     
     // Admin can edit/delete any template
     if (isAdmin) return true;
     
-    // Developer can only edit/delete their own templates if not approved
-    if (isDeveloper) {
-      const templateUserId = template.user_id || template.userId || template.creator_id;
-      const currentUserId = user?.id || user?._id;
-      const isOwnTemplate = String(templateUserId) === String(currentUserId);
-      const isApproved = template.status === 'approved' || template.approval_status === 'approved';
-      
-      // Developer can edit/delete own templates only if not approved
-      return isOwnTemplate && !isApproved;
-    }
+    // Regular users can only edit/delete their own templates if not approved
+    const templateUserId = template.user_id || template.userId || template.creator_id;
+    const currentUserId = user?.id || user?._id;
+    const isOwnTemplate = String(templateUserId) === String(currentUserId);
+    const isApproved = template.status === 'approved' || template.approval_status === 'approved';
     
-    return false;
+    // Users can edit/delete own templates only if not approved
+    return isOwnTemplate && !isApproved;
   };
   
   // Debug logging
@@ -64,8 +56,7 @@ const TemplateGallery = () => {
     canCreateTemplates,
     canSeeMyTemplates,
     showMyContent,
-    isAdmin: user?.role === 'admin',
-    isDeveloper: user?.role === 'developer'
+    isAdmin: authIsAdmin || user?.role === 'admin'
   });
 
   // Template categories

@@ -8,7 +8,7 @@ import DeveloperDashboard from '../../components/pages/dashboard/DeveloperDashbo
 import AdminDashboard from '../../components/pages/dashboard/AdminDashboard';
 
 const Dashboard = () => {
-    const { user, loading } = useAuth();
+    const { user, loading, canCreateContent, isAdmin, isDeveloper } = useAuth();
     const router = useRouter();
 
     // Show loading while auth is loading
@@ -31,14 +31,18 @@ const Dashboard = () => {
             return null; // ProtectedRoute will handle redirect
         }
 
-        switch (user.role) {
-            case 'admin':
-                return <AdminDashboard />;
-            case 'developer':
-                return <DeveloperDashboard />;
-            default:
-                return <EnhancedUserDashboard />;
+        // Admin gets admin dashboard
+        if (user.role === 'admin' || isAdmin) {
+            return <AdminDashboard />;
         }
+
+        // Users with the create-content capability (legacy developers) see the DeveloperDashboard
+        if (canCreateContent || isDeveloper || user?.legacyIsDeveloper) {
+            return <DeveloperDashboard />;
+        }
+
+        // All other users see the enhanced user dashboard
+        return <EnhancedUserDashboard />;
     };
 
     return (
