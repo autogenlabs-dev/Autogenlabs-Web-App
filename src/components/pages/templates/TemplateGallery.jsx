@@ -25,11 +25,11 @@ const TemplateGallery = () => {
   const [filteredTemplates, setFilteredTemplates] = useState([]);
   const [showMyContent, setShowMyContent] = useState(false);
 
-  // Check if user can create templates (developer or admin)
-  const canCreateTemplates = user?.role === 'developer' || user?.role === 'admin';
+  // Check if user can create templates (developer, admin or regular user)
+  const canCreateTemplates = user?.role === 'developer' || user?.role === 'admin' || user?.role === 'user';
   
-  // Check if user can see My Templates section (developer or admin)
-  const canSeeMyTemplates = user?.role === 'developer' || user?.role === 'admin';
+  // Check if user can see My Templates section (developer, admin or regular user)
+  const canSeeMyTemplates = user?.role === 'developer' || user?.role === 'admin' || user?.role === 'user';
   
   // Helper function to check if edit/delete icons should be shown
   const shouldShowEditDelete = (template) => {

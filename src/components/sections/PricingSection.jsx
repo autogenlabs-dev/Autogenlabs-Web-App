@@ -5,6 +5,7 @@ import { paymentApi } from '../../lib/api';
 import { useAuth } from '@clerk/nextjs';
 
 const PricingSection = () => {
+  const { getToken } = useAuth();
   const [hoveredPlan, setHoveredPlan] = useState(null);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -92,7 +93,6 @@ const PricingSection = () => {
 
     // Handle Pro and Ultra plan payments with Razorpay
     // Get Clerk session token
-    const { getToken } = useAuth();
     const token = await getToken();
     
     if (!token) {

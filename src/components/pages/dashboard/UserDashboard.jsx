@@ -1,6 +1,6 @@
 /**
- * Enhanced User Dashboard Page
- * Includes purchase history, recommendations, and account details
+ * User Dashboard Page
+ * For regular users and developers to manage purchases, templates, and account
  */
 
 'use client';
@@ -23,8 +23,8 @@ import { marketplaceApi } from '../../../lib/marketplaceApi';
 import ProtectedRoute from '../../shared/ProtectedRoute';
 import AnalyticsDashboard from '../../analytics/AnalyticsDashboard';
 
-const EnhancedUserDashboard = () => {
-    const { user } = useAuth();
+const UserDashboard = () => {
+    const { user, getToken } = useAuth();
     const [dashboardData, setDashboardData] = useState(null);
     const [purchasedItems, setPurchasedItems] = useState([]);
     const [recommendations, setRecommendations] = useState([]);
@@ -46,11 +46,18 @@ const EnhancedUserDashboard = () => {
     const loadDashboardData = async () => {
         try {
             setLoading(true);
+            const token = await getToken();
+            
+            if (!token) {
+                console.warn('⚠️ No auth token available for loadDashboardData');
+                setLoading(false);
+                return;
+            }
             
             // Load user dashboard data
             const [dashboardResponse, purchasesResponse] = await Promise.all([
-                paymentApi.getUserDashboard(),
-                paymentApi.getPurchasedItems({ limit: 20 })
+                paymentApi.getUserDashboard(token),
+                paymentApi.getPurchasedItems({ limit: 20 }, token)
             ]);
 
             setDashboardData(dashboardResponse);
@@ -98,20 +105,23 @@ const EnhancedUserDashboard = () => {
             value: `₹${dashboardData.total_spent_inr || 0}`,
             icon: IndianRupee,
             color: 'green'
-        },
-        {
-            title: 'Templates Owned',
-            value: dashboardData.templates_owned || 0,
-            icon: TrendingUp,
-            color: 'purple'
-        },
-        {
-            title: 'Components Owned',
-            value: dashboardData.components_owned || 0,
-            icon: Star,
-            color: 'orange'
         }
     ] : [];
+
+    const handleFixAdminRole = async () => {
+        try {
+            const response = await fetch('/api/admin/fix-role', { method: 'POST' });
+            const data = await response.json();
+            if (response.ok) {
+                alert('Role updated! Please sign out and sign in again.');
+                window.location.reload();
+            } else {
+                alert('Failed: ' + data.error);
+            }
+        } catch (e) {
+            alert('Error: ' + e.message);
+        }
+    };
 
     if (loading) {
         return (
@@ -133,6 +143,22 @@ const EnhancedUserDashboard = () => {
             <div className="min-h-screen bg-gradient-to-br from-[#0A0A0B] via-[#1a1a1a] to-[#2d1b69] pt-24 pb-12 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto">
                     
+                    {/* Admin Fix Button for codemurf0@gmail.com */}
+                    {user?.email === 'codemurf0@gmail.com' && (
+                        <div className="mb-8 p-4 bg-red-900/30 border border-red-500/50 rounded-xl flex items-center justify-between">
+                            <div>
+                                <h3 className="text-white font-bold">Admin Access Recovery</h3>
+                                <p className="text-gray-300 text-sm">Your email is recognized as an admin, but your role metadata might be missing.</p>
+                            </div>
+                            <button 
+                                onClick={handleFixAdminRole}
+                                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                            >
+                                Fix Admin Role & Reload
+                            </button>
+                        </div>
+                    )}
+
                     {/* Header */}
                     <div className="bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl rounded-xl overflow-hidden mb-8">
                         <div className="bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-8">
@@ -384,5 +410,5 @@ const EnhancedUserDashboard = () => {
     );
 };
 
-export default EnhancedUserDashboard;
+export default UserDashboard;
 

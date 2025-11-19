@@ -3,8 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import ProtectedRoute from '../../components/shared/ProtectedRoute';
-import EnhancedUserDashboard from '../../components/pages/dashboard/EnhancedUserDashboard';
-import DeveloperDashboard from '../../components/pages/dashboard/DeveloperDashboard';
+import UserDashboard from '../../components/pages/dashboard/UserDashboard';
 import AdminDashboard from '../../components/pages/dashboard/AdminDashboard';
 
 const Dashboard = () => {
@@ -25,20 +24,31 @@ const Dashboard = () => {
         );
     }
 
+    // Debug log to check user role
+    useEffect(() => {
+        if (user) {
+            console.log('📊 Dashboard Page - User Role Check:', {
+                role: user.role,
+                email: user.email,
+                firstName: user.firstName,
+                isAdmin: user.role === 'admin'
+            });
+        }
+    }, [user]);
+
     // Render appropriate dashboard based on user role
     const renderDashboard = () => {
         if (!user) {
             return null; // ProtectedRoute will handle redirect
         }
 
-        switch (user.role) {
-            case 'admin':
-                return <AdminDashboard />;
-            case 'developer':
-                return <DeveloperDashboard />;
-            default:
-                return <EnhancedUserDashboard />;
+        console.log('🎯 Rendering dashboard for role:', user.role);
+
+        // Only two dashboards: Admin for admins, User for everyone else
+        if (user.role === 'admin') {
+            return <AdminDashboard />;
         }
+        return <UserDashboard />;
     };
 
     return (

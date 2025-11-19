@@ -28,11 +28,11 @@ const ComponentGallery = () => {
   const [expandedPreview, setExpandedPreview] = useState(null);
   const [showMyContent, setShowMyContent] = useState(false);
 
-  // Check if user can create components (developer or admin)
-  const canCreateComponents = user?.role === 'developer' || user?.role === 'admin';
+  // Check if user can create components (developer, admin or regular user)
+  const canCreateComponents = user?.role === 'developer' || user?.role === 'admin' || user?.role === 'user';
   
-  // Check if user can see My Components section (developer or admin)
-  const canSeeMyComponents = user?.role === 'developer' || user?.role === 'admin';
+  // Check if user can see My Components section (developer, admin or regular user)
+  const canSeeMyComponents = user?.role === 'developer' || user?.role === 'admin' || user?.role === 'user';
   
   // Helper function to check if edit/delete icons should be shown
   const shouldShowEditDelete = (component) => {

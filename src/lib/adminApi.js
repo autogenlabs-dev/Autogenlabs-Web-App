@@ -55,7 +55,7 @@ export const adminApi = {
         if (params.is_active !== undefined) queryString.append('is_active', params.is_active);
         
         const headers = await getAuthHeaders(token);
-        const url = `${API_BASE_URL}/admin/users${queryString.toString() ? '?' + queryString.toString() : ''}`;
+        const url = `${API_BASE_URL}/api/admin/users${queryString.toString() ? '?' + queryString.toString() : ''}`;
         const response = await fetch(url, { headers });
         return await handleApiResponse(response);
     },
@@ -65,7 +65,7 @@ export const adminApi = {
      */
     async getUser(userId, token) {
         const headers = await getAuthHeaders(token);
-        const response = await fetch(`${API_BASE_URL}/admin/users/${userId}`, { headers });
+        const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}`, { headers });
         return await handleApiResponse(response);
     },
 
@@ -74,7 +74,7 @@ export const adminApi = {
      */
     async updateUser(userId, updateData, token) {
         const headers = await getAuthHeaders(token);
-        const response = await fetch(`${API_BASE_URL}/admin/users/${userId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}`, {
             method: 'PUT',
             headers,
             body: JSON.stringify(updateData),
@@ -87,7 +87,7 @@ export const adminApi = {
      */
     async toggleUserStatus(userId, isActive, token) {
         const headers = await getAuthHeaders(token);
-        const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/status`, {
+        const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}/status`, {
             method: 'PUT',
             headers,
             body: JSON.stringify({ is_active: isActive }),
@@ -107,7 +107,7 @@ export const adminApi = {
         if (params.sort_by) queryString.append('sort_by', params.sort_by);
         
         const headers = await getAuthHeaders(token);
-        const url = `${API_BASE_URL}/admin/developers${queryString.toString() ? '?' + queryString.toString() : ''}`;
+        const url = `${API_BASE_URL}/api/admin/developers${queryString.toString() ? '?' + queryString.toString() : ''}`;
         const response = await fetch(url, { headers });
         return await handleApiResponse(response);
     },
@@ -117,7 +117,7 @@ export const adminApi = {
      */
     async getDeveloper(developerId, token) {
         const headers = await getAuthHeaders(token);
-        const response = await fetch(`${API_BASE_URL}/admin/developers/${developerId}`, { headers });
+        const response = await fetch(`${API_BASE_URL}/api/admin/developers/${developerId}`, { headers });
         return await handleApiResponse(response);
     },
 
@@ -126,7 +126,7 @@ export const adminApi = {
      */
     async updateDeveloperVerification(developerId, status, notes = '', token) {
         const headers = await getAuthHeaders(token);
-        const response = await fetch(`${API_BASE_URL}/admin/developers/${developerId}/verification`, {
+        const response = await fetch(`${API_BASE_URL}/api/admin/developers/${developerId}/verification`, {
             method: 'PUT',
             headers,
             body: JSON.stringify({
@@ -150,7 +150,7 @@ export const adminApi = {
         if (params.status) queryString.append('status', params.status);
         
         const headers = await getAuthHeaders(token);
-        const url = `${API_BASE_URL}/admin/content${queryString.toString() ? '?' + queryString.toString() : ''}`;
+        const url = `${API_BASE_URL}/api/admin/content${queryString.toString() ? '?' + queryString.toString() : ''}`;
         const response = await fetch(url, { headers });
         return await handleApiResponse(response);
     },
@@ -166,24 +166,8 @@ export const adminApi = {
         if (params.priority) queryString.append('priority', params.priority);
         
         const headers = await getAuthHeaders(token);
-        const url = `${API_BASE_URL}/admin/content/pending${queryString.toString() ? '?' + queryString.toString() : ''}`;
+        const url = `${API_BASE_URL}/api/admin/content/pending${queryString.toString() ? '?' + queryString.toString() : ''}`;
         const response = await fetch(url, { headers });
-        return await handleApiResponse(response);
-    },
-
-    /**
-     * Approve content
-     */
-    async approveContent(contentId, approvalData = {}, token) {
-        const headers = await getAuthHeaders(token);
-        const queryString = new URLSearchParams();
-        queryString.append('content_type', approvalData.content_type || 'template');
-        
-        const response = await fetch(`${API_BASE_URL}/admin/content/${contentId}/approve?${queryString.toString()}`, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify(approvalData),
-        });
         return await handleApiResponse(response);
     },
 
@@ -192,7 +176,7 @@ export const adminApi = {
      */
     async manageUser(userId, actionData, token) {
         const headers = await getAuthHeaders(token);
-        const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/manage`, {
+        const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}/manage`, {
             method: 'POST',
             headers,
             body: JSON.stringify(actionData),
@@ -205,7 +189,7 @@ export const adminApi = {
      */
     async deleteUser(userId, token) {
         const headers = await getAuthHeaders(token);
-        const response = await fetch(`${API_BASE_URL}/admin/users/${userId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}`, {
             method: 'DELETE',
             headers
         });
@@ -217,7 +201,7 @@ export const adminApi = {
      */
     async updateUserRole(userId, role, token) {
         const headers = await getAuthHeaders(token);
-        const response = await fetch(`${API_BASE_URL}/admin/users/${userId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}`, {
             method: 'PUT',
             headers,
             body: JSON.stringify({ role }),
@@ -230,7 +214,7 @@ export const adminApi = {
      */
     async suspendUser(userId, token) {
         const headers = await getAuthHeaders(token);
-        const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/manage`, {
+        const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}/manage`, {
             method: 'POST',
             headers,
             body: JSON.stringify({ action: 'suspend' }),
@@ -243,7 +227,7 @@ export const adminApi = {
      */
     async activateUser(userId, token) {
         const headers = await getAuthHeaders(token);
-        const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/manage`, {
+        const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}/manage`, {
             method: 'POST',
             headers,
             body: JSON.stringify({ action: 'activate' }),
@@ -256,7 +240,7 @@ export const adminApi = {
      */
     async rejectContent(contentId, contentType, reason, token) {
         const headers = await getAuthHeaders(token);
-        const response = await fetch(`${API_BASE_URL}/admin/content/reject/${contentId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/admin/content/reject/${contentId}`, {
             method: 'POST',
             headers,
             body: JSON.stringify({
@@ -278,7 +262,7 @@ export const adminApi = {
         if (params.reviewer_id) queryString.append('reviewer_id', params.reviewer_id);
         
         const headers = await getAuthHeaders(token);
-        const url = `${API_BASE_URL}/admin/content/history${queryString.toString() ? '?' + queryString.toString() : ''}`;
+        const url = `${API_BASE_URL}/api/admin/content/history${queryString.toString() ? '?' + queryString.toString() : ''}`;
         const response = await fetch(url, { headers });
         return await handleApiResponse(response);
     },
@@ -295,7 +279,7 @@ export const adminApi = {
         if (params.end_date) queryString.append('end_date', params.end_date);
         
         const headers = await getAuthHeaders(token);
-        const url = `${API_BASE_URL}/admin/analytics${queryString.toString() ? '?' + queryString.toString() : ''}`;
+        const url = `${API_BASE_URL}/api/admin/analytics${queryString.toString() ? '?' + queryString.toString() : ''}`;
         const response = await fetch(url, { headers });
         return await handleApiResponse(response);
     },
@@ -309,7 +293,7 @@ export const adminApi = {
         if (params.breakdown_by) queryString.append('breakdown_by', params.breakdown_by);
         
         const headers = await getAuthHeaders(token);
-        const url = `${API_BASE_URL}/admin/revenue${queryString.toString() ? '?' + queryString.toString() : ''}`;
+        const url = `${API_BASE_URL}/api/admin/revenue${queryString.toString() ? '?' + queryString.toString() : ''}`;
         const response = await fetch(url, { headers });
         return await handleApiResponse(response);
     },
@@ -323,7 +307,7 @@ export const adminApi = {
         if (params.content_type) queryString.append('content_type', params.content_type);
         
         const headers = await getAuthHeaders(token);
-        const url = `${API_BASE_URL}/admin/content/analytics${queryString.toString() ? '?' + queryString.toString() : ''}`;
+        const url = `${API_BASE_URL}/api/admin/content/analytics${queryString.toString() ? '?' + queryString.toString() : ''}`;
         const response = await fetch(url, { headers });
         return await handleApiResponse(response);
     },
@@ -339,7 +323,7 @@ export const adminApi = {
         if (params.limit !== undefined) queryString.append('limit', params.limit);
         
         const headers = await getAuthHeaders(token);
-        const url = `${API_BASE_URL}/admin/payouts/pending${queryString.toString() ? '?' + queryString.toString() : ''}`;
+        const url = `${API_BASE_URL}/api/admin/payouts/pending${queryString.toString() ? '?' + queryString.toString() : ''}`;
         const response = await fetch(url, { headers });
         return await handleApiResponse(response);
     },
@@ -349,7 +333,7 @@ export const adminApi = {
      */
     async approvePayout(payoutId, notes = '', token) {
         const headers = await getAuthHeaders(token);
-        const response = await fetch(`${API_BASE_URL}/admin/payouts/${payoutId}/approve`, {
+        const response = await fetch(`${API_BASE_URL}/api/admin/payouts/${payoutId}/approve`, {
             method: 'POST',
             headers,
             body: JSON.stringify({
@@ -364,7 +348,7 @@ export const adminApi = {
      */
     async rejectPayout(payoutId, reason, token) {
         const headers = await getAuthHeaders(token);
-        const response = await fetch(`${API_BASE_URL}/admin/payouts/${payoutId}/reject`, {
+        const response = await fetch(`${API_BASE_URL}/api/admin/payouts/${payoutId}/reject`, {
             method: 'POST',
             headers,
             body: JSON.stringify({
@@ -385,7 +369,7 @@ export const adminApi = {
         if (params.limit !== undefined) queryString.append('limit', params.limit);
         
         const headers = await getAuthHeaders(token);
-        const url = `${API_BASE_URL}/admin/comments/reported${queryString.toString() ? '?' + queryString.toString() : ''}`;
+        const url = `${API_BASE_URL}/api/admin/comments/reported${queryString.toString() ? '?' + queryString.toString() : ''}`;
         const response = await fetch(url, { headers });
         return await handleApiResponse(response);
     },
@@ -399,7 +383,7 @@ export const adminApi = {
         if (params.limit !== undefined) queryString.append('limit', params.limit);
         
         const headers = await getAuthHeaders(token);
-        const url = `${API_BASE_URL}/admin/comments/pending${queryString.toString() ? '?' + queryString.toString() : ''}`;
+        const url = `${API_BASE_URL}/api/admin/comments/pending${queryString.toString() ? '?' + queryString.toString() : ''}`;
         const response = await fetch(url, { headers });
         return await handleApiResponse(response);
     },
@@ -409,7 +393,7 @@ export const adminApi = {
      */
     async approveComment(commentId, token) {
         const headers = await getAuthHeaders(token);
-        const response = await fetch(`${API_BASE_URL}/admin/comments/approve/${commentId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/admin/comments/approve/${commentId}`, {
             method: 'POST',
             headers,
         });
@@ -421,7 +405,7 @@ export const adminApi = {
      */
     async rejectComment(commentId, reason, token) {
         const headers = await getAuthHeaders(token);
-        const response = await fetch(`${API_BASE_URL}/admin/comments/reject/${commentId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/admin/comments/reject/${commentId}`, {
             method: 'POST',
             headers,
             body: JSON.stringify({
@@ -446,7 +430,7 @@ export const adminApi = {
         if (params.end_date) queryString.append('end_date', params.end_date);
         
         const headers = await getAuthHeaders(token);
-        const url = `${API_BASE_URL}/admin/audit-logs${queryString.toString() ? '?' + queryString.toString() : ''}`;
+        const url = `${API_BASE_URL}/api/admin/audit-logs${queryString.toString() ? '?' + queryString.toString() : ''}`;
         const response = await fetch(url, { headers });
         return await handleApiResponse(response);
     },
@@ -458,7 +442,7 @@ export const adminApi = {
      */
     async getSettings(token) {
         const headers = await getAuthHeaders(token);
-        const response = await fetch(`${API_BASE_URL}/admin/settings`, { headers });
+        const response = await fetch(`${API_BASE_URL}/api/admin/settings`, { headers });
         return await handleApiResponse(response);
     },
 
@@ -467,7 +451,7 @@ export const adminApi = {
      */
     async updateSettings(settingsData, token) {
         const headers = await getAuthHeaders(token);
-        const response = await fetch(`${API_BASE_URL}/admin/settings`, {
+        const response = await fetch(`${API_BASE_URL}/api/admin/settings`, {
             method: 'PUT',
             headers,
             body: JSON.stringify(settingsData),
@@ -482,7 +466,7 @@ export const adminApi = {
      */
     async getDashboardOverview(token) {
         const headers = await getAuthHeaders(token);
-        const response = await fetch(`${API_BASE_URL}/admin/dashboard`, { headers });
+        const response = await fetch(`${API_BASE_URL}/api/admin/dashboard`, { headers });
         return await handleApiResponse(response);
     },
 
@@ -493,7 +477,7 @@ export const adminApi = {
      */
     async approveContent(contentId, data = {}, token) {
         const headers = await getAuthHeaders(token);
-        const response = await fetch(`${API_BASE_URL}/admin/content/approve/${contentId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/admin/content/approve/${contentId}`, {
             method: 'POST',
             headers,
             body: JSON.stringify({
@@ -503,7 +487,59 @@ export const adminApi = {
             })
         });
         return await handleApiResponse(response);
-    }
+    },
+
+    // ==================== MANAGED API KEYS ====================
+    
+    /**
+     * Bulk add managed API keys
+     * POST /api/admin/managed-api-keys
+     */
+    async addManagedApiKeys(keysData, token) {
+        const headers = await getAuthHeaders(token);
+        const response = await fetch(`${API_BASE_URL}/api/admin/managed-api-keys`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(keysData), // { keys: ["sk-1", "sk-2"], label: "GLM cluster" }
+        });
+        return await handleApiResponse(response);
+    },
+
+    /**
+     * Get all managed API keys with assignment status
+     * GET /api/admin/managed-api-keys
+     */
+    async getManagedApiKeys(token) {
+        const headers = await getAuthHeaders(token);
+        const response = await fetch(`${API_BASE_URL}/api/admin/managed-api-keys`, { headers });
+        return await handleApiResponse(response);
+    },
+
+    /**
+     * Deactivate a managed API key
+     * POST /api/admin/managed-api-keys/{id}/deactivate
+     */
+    async deactivateManagedApiKey(keyId, token) {
+        const headers = await getAuthHeaders(token);
+        const response = await fetch(`${API_BASE_URL}/api/admin/managed-api-keys/${keyId}/deactivate`, {
+            method: 'POST',
+            headers,
+        });
+        return await handleApiResponse(response);
+    },
+
+    /**
+     * Force refresh a user's managed API key
+     * POST /api/admin/users/{user_id}/managed-api-key/refresh
+     */
+    async refreshUserManagedApiKey(userId, token) {
+        const headers = await getAuthHeaders(token);
+        const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}/managed-api-key/refresh`, {
+            method: 'POST',
+            headers,
+        });
+        return await handleApiResponse(response);
+    },
 };
 
 export { ApiError };

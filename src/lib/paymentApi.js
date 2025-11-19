@@ -31,8 +31,12 @@ const getAuthHeaders = async (token) => {
     if (typeof window === 'undefined') return { 'Content-Type': 'application/json' };
 
     if (!token) {
-        throw new ApiError('Authentication required - please login again', 401);
+        console.error('❌ getAuthHeaders: Token is missing or invalid', { token });
+        throw new ApiError('Client-side: Authentication required - please login again', 401);
     }
+
+    // Log token type for debugging (remove in production)
+    // console.log('🔑 getAuthHeaders token type:', typeof token, token ? 'present' : 'missing');
 
     return {
         'Authorization': `Bearer ${token}`,

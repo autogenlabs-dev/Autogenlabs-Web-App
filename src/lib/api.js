@@ -408,3 +408,95 @@ export const paymentApi = {
         return handleApiResponse(response);
     },
 };
+
+/**
+ * Managed API Keys - User Functions
+ */
+export const managedApiKeyApi = {
+    /**
+     * Get user's assigned managed API key (auto-assigns if not exists)
+     * GET /api/users/me/managed-api-key
+     */
+    async getManagedApiKey(accessToken) {
+        const response = await fetch(`${API_BASE_URL}/api/users/me/managed-api-key`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        return handleApiResponse(response);
+    },
+
+    /**
+     * Refresh user's managed API key (release current, get next available)
+     * POST /api/users/me/managed-api-key/refresh
+     */
+    async refreshManagedApiKey(accessToken) {
+        const response = await fetch(`${API_BASE_URL}/api/users/me/managed-api-key/refresh`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        return handleApiResponse(response);
+    },
+};
+
+/**
+ * User Profile API - Unified profile with all keys
+ */
+export const userProfileApi = {
+    /**
+     * Get unified user profile including all API keys
+     * GET /api/users/me
+     * Returns: managed_api_key, openrouter_api_key, glm_api_key, capabilities
+     */
+    async getUserProfile(accessToken) {
+        const response = await fetch(`${API_BASE_URL}/api/users/me`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        return handleApiResponse(response);
+    },
+
+    /**
+     * Update GLM API key (paid users only)
+     * POST /api/users/me/glm-api-key?api_key=xxx
+     */
+    async updateGLMApiKey(accessToken, apiKey) {
+        const response = await fetch(`${API_BASE_URL}/api/users/me/glm-api-key?api_key=${encodeURIComponent(apiKey)}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        return handleApiResponse(response);
+    },
+
+    /**
+     * Refresh OpenRouter API key
+     * POST /api/users/me/openrouter-api-key/refresh
+     */
+    async refreshOpenRouterApiKey(accessToken) {
+        const response = await fetch(`${API_BASE_URL}/api/users/me/openrouter-api-key/refresh`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        return handleApiResponse(response);
+    },
+};
+

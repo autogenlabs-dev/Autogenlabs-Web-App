@@ -29,15 +29,17 @@ import {
     MessageSquare,
     Crown,
     Award,
-    Activity
+    Activity,
+    Key
 } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { adminApi } from '../../../lib/adminApi';
 import ProtectedRoute from '../../shared/ProtectedRoute';
 import AnalyticsDashboard from '../../analytics/AnalyticsDashboard';
+import ManagedApiKeysTab from './ManagedApiKeysTab';
 
 const AdminDashboard = () => {
-    const { user } = useAuth();
+    const { user, getToken } = useAuth();
     const router = useRouter();
     const { showSuccess, showError, showWarning, showInfo } = useNotification();
     const [dashboardData, setDashboardData] = useState(null);
@@ -67,35 +69,129 @@ const AdminDashboard = () => {
         { id: 'analytics', label: 'Analytics', icon: BarChart3 },
         { id: 'users', label: 'Users', icon: Users },
         { id: 'content', label: 'Content', icon: Package },
+        { id: 'api-keys', label: 'API Keys', icon: Key },
         { id: 'settings', label: 'Settings', icon: Settings }
     ];
 
     useEffect(() => {
-        loadAdminData();
-    }, []);
+        // Only load data if getToken is available
+        if (getToken && typeof getToken === 'function') {
+            loadAdminData();
+        } else {
+            console.warn('⚠️ getToken not available yet, skipping loadAdminData');
+        }
+    }, [getToken]);
 
     const loadAdminData = async () => {
         try {
             setLoading(true);
             
-            const [usersResponse, contentResponse, analyticsResponse] = await Promise.all([
-                adminApi.getUsers({ limit: 100 }),
-                adminApi.getContent({ limit: 100 }),
-                adminApi.getAnalytics()
-            ]);
+            const token = await getToken();
+            if (!token) {
+                console.warn('⚠️ No auth token available for AdminDashboard');
+                setLoading(false);
+                return;
+            }
 
-            console.log('Admin API Responses:', {
-                usersResponse,
-                contentResponse, 
-                analyticsResponse
-            });
+            console.log('🔑 AdminDashboard: Token obtained, fetching users...');
 
-            setUsers(usersResponse.users || []);
-            setContent(contentResponse.content || []);
-            setAnalytics(analyticsResponse);
+            // Fetch real users from Clerk via our API endpoint
+            try {
+                const usersResponse = await fetch('/api/admin/users?limit=100', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                console.log('📡 Users API response status:', usersResponse.status);
+
+                if (usersResponse.ok) {
+                    const usersData = await usersResponse.json();
+                    console.log('✅ Loaded users from Clerk:', usersData);
+                    setUsers(usersData.users || []);
+                    
+                    // Update analytics with real user count
+                    setAnalytics({
+                        total_users: usersData.total || usersData.users?.length || 0,
+                        total_content: 0,
+                        approved_content: 0,
+                        pending_content: 0,
+                        total_templates: 0,
+                        total_revenue: 0,
+                        active_users: usersData.users?.filter(u => u.status === 'active').length || 0,
+                        users: { total: usersData.total || usersData.users?.length || 0 },
+                        content: {
+                            totals: {
+                                all_content: 0,
+                                approved_content: 0,
+                                pending_content: 0
+                            }
+                        }
+                    });
+                } else {
+                    const errorText = await usersResponse.text();
+                    console.error('❌ Failed to fetch users:', usersResponse.status, errorText);
+                    throw new Error(`Failed to fetch users: ${usersResponse.status}`);
+                }
+            } catch (fetchError) {
+                console.error('❌ Error fetching users from Clerk:', fetchError);
+                // Fallback to placeholder data
+                setUsers([
+                    {
+                        id: user.id,
+                        name: user.name || user.firstName,
+                        email: user.email,
+                        role: user.role,
+                        status: 'active',
+                        created_at: new Date().toISOString()
+                    }
+                ]);
+                
+                setAnalytics({
+                    total_users: 1,
+                    total_content: 0,
+                    approved_content: 0,
+                    pending_content: 0,
+                    total_templates: 0,
+                    total_revenue: 0,
+                    active_users: 1,
+                    users: { total: 1 },
+                    content: {
+                        totals: {
+                            all_content: 0,
+                            approved_content: 0,
+                            pending_content: 0
+                        }
+                    }
+                });
+            }
+            
+            // Content endpoints not implemented yet
+            setContent([]);
 
         } catch (error) {
-            console.error('Failed to load admin data:', error);
+            console.error('❌ Failed to load admin data (outer catch):', error);
+            // Set minimal data on error
+            setUsers([]);
+            setContent([]);
+            setAnalytics({
+                total_users: 0,
+                total_content: 0,
+                approved_content: 0,
+                pending_content: 0,
+                total_templates: 0,
+                total_revenue: 0,
+                active_users: 0,
+                users: { total: 0 },
+                content: {
+                    totals: {
+                        all_content: 0,
+                        approved_content: 0,
+                        pending_content: 0
+                    }
+                }
+            });
         } finally {
             setLoading(false);
         }
@@ -103,6 +199,13 @@ const AdminDashboard = () => {
 
     const handleApproveContent = async (contentId) => {
         try {
+            console.log('Approving content with ID:', contentId);
+            const token = await getToken();
+            if (!token) {
+                showError('Authentication required');
+                return;
+            }
+            
             // Find the content item to get its type
             const contentItem = content.find(item => item.id === contentId);
             const contentType = contentItem?.content_type || 'template';
@@ -110,7 +213,7 @@ const AdminDashboard = () => {
             await adminApi.approveContent(contentId, { 
                 status: 'approved',
                 content_type: contentType 
-            });
+            }, token);
             
             // Update content list
             setContent(content.map(item => 
@@ -126,6 +229,12 @@ const AdminDashboard = () => {
 
     const handleRejectContent = async (contentId, reason) => {
         try {
+            const token = await getToken();
+            if (!token) {
+                showError('Authentication required');
+                return;
+            }
+            
             // Find the content item to get its type
             const contentItem = content.find(item => item.id === contentId);
             const contentType = contentItem?.content_type || 'template';
@@ -134,7 +243,7 @@ const AdminDashboard = () => {
                 status: 'rejected',
                 rejection_reason: reason,
                 content_type: contentType 
-            });
+            }, token);
             
             // Update content list
             setContent(content.map(item => 
@@ -150,11 +259,26 @@ const AdminDashboard = () => {
 
     const handleManageUser = async (userId, action) => {
         try {
-            await adminApi.manageUser(userId, { action });
+            const token = await getToken();
+            if (!token) {
+                showError('Authentication required');
+                return;
+            }
             
-            // Reload users to show updated status
-            const usersResponse = await adminApi.getUsers({ limit: 100 });
-            setUsers(usersResponse.users || []);
+            await adminApi.manageUser(userId, { action }, token);
+            
+            // Reload users via our API endpoint
+            const usersResponse = await fetch('/api/admin/users?limit=100', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                }
+            });
+            
+            if (usersResponse.ok) {
+                const usersData = await usersResponse.json();
+                setUsers(usersData.users || []);
+            }
             
             showSuccess(`User ${action} successfully!`);
         } catch (error) {
@@ -189,12 +313,27 @@ const AdminDashboard = () => {
         if (!selectedUser) return;
 
         try {
+            const token = await getToken();
+            if (!token) {
+                showError('Authentication required');
+                return;
+            }
+            
             console.log('Attempting to delete user:', selectedUser.id, selectedUser.email);
-            await adminApi.deleteUser(selectedUser.id);
+            await adminApi.deleteUser(selectedUser.id, token);
             
             // Reload users
-            const usersResponse = await adminApi.getUsers({ limit: 100 });
-            setUsers(usersResponse.users || []);
+            const usersResponse = await fetch('/api/admin/users?limit=100', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                }
+            });
+            
+            if (usersResponse.ok) {
+                const usersData = await usersResponse.json();
+                setUsers(usersData.users || []);
+            }
             
             setShowDeleteModal(false);
             setSelectedUser(null);
@@ -210,20 +349,35 @@ const AdminDashboard = () => {
         if (!selectedUser) return;
 
         try {
+            const token = await getToken();
+            if (!token) {
+                showError('Authentication required');
+                return;
+            }
+            
             // Update user role if changed
             if (userFormData.role !== selectedUser.role) {
-                await adminApi.updateUserRole(selectedUser.id, userFormData.role);
+                await adminApi.updateUserRole(selectedUser.id, userFormData.role, token);
             }
 
             // Update user status if changed
             if (userFormData.status !== selectedUser.status) {
                 const action = userFormData.status === 'active' ? 'activate' : 'suspend';
-                await adminApi.manageUser(selectedUser.id, { action });
+                await adminApi.manageUser(selectedUser.id, { action }, token);
             }
             
             // Reload users
-            const usersResponse = await adminApi.getUsers({ limit: 100 });
-            setUsers(usersResponse.users || []);
+            const usersResponse = await fetch('/api/admin/users?limit=100', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                }
+            });
+            
+            if (usersResponse.ok) {
+                const usersData = await usersResponse.json();
+                setUsers(usersData.users || []);
+            }
             
             setShowEditModal(false);
             setSelectedUser(null);
@@ -236,11 +390,26 @@ const AdminDashboard = () => {
 
     const handleSuspendUser = async (userId) => {
         try {
-            await adminApi.suspendUser(userId);
+            const token = await getToken();
+            if (!token) {
+                showError('Authentication required');
+                return;
+            }
+            
+            await adminApi.suspendUser(userId, token);
             
             // Reload users
-            const usersResponse = await adminApi.getUsers({ limit: 100 });
-            setUsers(usersResponse.users || []);
+            const usersResponse = await fetch('/api/admin/users?limit=100', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                }
+            });
+            
+            if (usersResponse.ok) {
+                const usersData = await usersResponse.json();
+                setUsers(usersData.users || []);
+            }
             
             showSuccess('User suspended successfully!');
         } catch (error) {
@@ -701,6 +870,17 @@ const AdminDashboard = () => {
                     {activeTab === 'analytics' && (
                         <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6">
                             <AnalyticsDashboard userRole="admin" />
+                        </div>
+                    )}
+
+                    {activeTab === 'api-keys' && (
+                        <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6">
+                            <ManagedApiKeysTab 
+                                getToken={getToken}
+                                showSuccess={showSuccess}
+                                showError={showError}
+                                showInfo={showInfo}
+                            />
                         </div>
                     )}
 

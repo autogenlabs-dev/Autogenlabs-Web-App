@@ -25,7 +25,7 @@ export const CartProvider = ({ children }) => {
     const [cartTotal, setCartTotal] = useState(0);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, getToken } = useAuth();
 
     // Load cart on auth change
     useEffect(() => {
@@ -44,15 +44,32 @@ export const CartProvider = ({ children }) => {
     };
 
     const loadCart = async () => {
-        if (!isAuthenticated) return;
+        if (!isAuthenticated) {
+            console.log('ℹ️ Skipping loadCart - user not authenticated');
+            return;
+        }
+
+        if (!getToken || typeof getToken !== 'function') {
+            console.warn('⚠️ getToken is not available yet');
+            return;
+        }
         
         try {
             setLoading(true);
-            const cartData = await paymentApi.getCart();
+            const token = await getToken();
+            
+            if (!token) {
+                console.warn('⚠️ No auth token available for loadCart');
+                setLoading(false);
+                return;
+            }
+
+            const cartData = await paymentApi.getCart(token);
             updateCartState(cartData);
         } catch (error) {
-            console.error('Failed to load cart:', error);
-            if (error.status !== 404) { // 404 means empty cart, which is normal
+            // Don't show auth errors or 404s as actual errors
+            if (error.status !== 404 && !error.message?.includes('Authentication required')) {
+                console.error('Failed to load cart:', error);
                 setError(error.message);
             }
         } finally {
@@ -76,45 +93,72 @@ export const CartProvider = ({ children }) => {
             throw new Error('Please login to add items to cart');
         }
 
+        if (!getToken || typeof getToken !== 'function') {
+            throw new Error('Authentication system not ready');
+        }
+
         try {
             setLoading(true);
             setError(null);
+            const token = await getToken();
             
             const cartData = await paymentApi.addToCart({
                 item_id: item.id,
                 item_type: item.type, // 'template' or 'component'
                 price_inr: item.pricing_inr || item.pricingINR || 0
-            });
+            }, token);
             
             updateCartState(cartData);
             return { success: true, message: 'Item added to cart successfully' };
         } catch (error) {
-            setError(error.message);
-            return { success: false, error: error.message };
+            console.error('Failed to add to cart:', error);
+            setError(error.message || 'Failed to add item to cart');
+            throw error;
         } finally {
             setLoading(false);
         }
     };
 
     const removeFromCart = async (itemId) => {
+        if (!isAuthenticated) return;
+
+        if (!getToken || typeof getToken !== 'function') {
+            console.warn('⚠️ getToken is not available yet');
+            return;
+        }
+
         try {
             setLoading(true);
-            setError(null);
-            
-            await paymentApi.removeFromCart(itemId);
-            await loadCart(); // Reload cart after removal
-            
-            return { success: true, message: 'Item removed from cart' };
+            const token = await getToken();
+            const cartData = await paymentApi.removeFromCart(itemId, token);
+            updateCartState(cartData);
         } catch (error) {
-            setError(error.message);
-            return { success: false, error: error.message };
+            console.error('Failed to remove from cart:', error);
+            throw error;
         } finally {
             setLoading(false);
         }
     };
 
-    const clearCart = () => {
-        resetCart();
+    const clearCart = async () => {
+        if (!isAuthenticated) return;
+
+        if (!getToken || typeof getToken !== 'function') {
+            console.warn('⚠️ getToken is not available yet');
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const token = await getToken();
+            await paymentApi.clearCart(token);
+            resetCart();
+        } catch (error) {
+            console.error('Failed to clear cart:', error);
+            throw error;
+        } finally {
+            setLoading(false);
+        }
     };
 
     const isItemInCart = (itemId) => {
@@ -189,4 +233,3 @@ export const CartProvider = ({ children }) => {
         </CartContext.Provider>
     );
 };
-

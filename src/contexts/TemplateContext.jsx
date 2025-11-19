@@ -14,7 +14,7 @@ export const useTemplate = () => {
 };
 
 export const TemplateProvider = ({ children }) => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, getToken } = useAuth();
   const [templates, setTemplates] = useState([]);
   const [myTemplates, setMyTemplates] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -71,23 +71,43 @@ export const TemplateProvider = ({ children }) => {
 
   // Load user's templates
   const loadMyTemplates = useCallback(async (params = {}) => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated) {
+      console.log('ℹ️ Skipping loadMyTemplates - user not authenticated');
+      return { templates: [] };
+    }
+
+    // Safety check: ensure getToken is available
+    if (!getToken || typeof getToken !== 'function') {
+      console.warn('⚠️ getToken is not available yet');
+      return { templates: [] };
+    }
     
     try {
       setLoading(true);
       setError(null);
       
-      const response = await templateApi.getMyTemplates(params);
+      const token = await getToken();
+      
+      if (!token) {
+        console.warn('⚠️ No auth token available for loadMyTemplates');
+        setLoading(false);
+        return { templates: [] };
+      }
+
+      const response = await templateApi.getMyTemplates(params, token);
       setMyTemplates(response.templates || []);
       return response;
     } catch (err) {
-      console.error('Error loading my templates:', err);
-      setError(err.message || 'Failed to load your templates');
+      // Don't show auth errors as actual errors - they're expected when not logged in
+      if (!err.message?.includes('Authentication required')) {
+        console.error('Error loading my templates:', err);
+        setError(err.message || 'Failed to load your templates');
+      }
       return { templates: [] };
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, getToken]);
 
   // Create a new template
   const createTemplate = async (templateData) => {
@@ -96,11 +116,16 @@ export const TemplateProvider = ({ children }) => {
       throw new Error('Authentication required');
     }
 
+    if (!getToken || typeof getToken !== 'function') {
+      throw new Error('Authentication system not ready');
+    }
+
     try {
       setLoading(true);
       setError(null);
       
-      const response = await templateApi.createTemplate(templateData);  // Fixed: removed accessToken parameter
+      const token = await getToken();
+      const response = await templateApi.createTemplate(templateData, token);
       
       // Add to myTemplates if successful
       if (response) {
@@ -124,11 +149,16 @@ export const TemplateProvider = ({ children }) => {
       throw new Error('Authentication required');
     }
 
+    if (!getToken || typeof getToken !== 'function') {
+      throw new Error('Authentication system not ready');
+    }
+
     try {
       setLoading(true);
       setError(null);
       
-      const response = await templateApi.updateTemplate(templateId, templateData);
+      const token = await getToken();
+      const response = await templateApi.updateTemplate(templateId, templateData, token);
       
       // Update in both templates and myTemplates
       setTemplates(prev => prev.map(t => t.id === templateId ? response : t));
@@ -150,11 +180,16 @@ export const TemplateProvider = ({ children }) => {
       throw new Error('Authentication required');
     }
 
+    if (!getToken || typeof getToken !== 'function') {
+      throw new Error('Authentication system not ready');
+    }
+
     try {
       setLoading(true);
       setError(null);
       
-      await templateApi.deleteTemplate(templateId);
+      const token = await getToken();
+      await templateApi.deleteTemplate(templateId, token);
       
       // Remove from both templates and myTemplates
       setTemplates(prev => prev.filter(t => t.id !== templateId));
@@ -176,8 +211,13 @@ export const TemplateProvider = ({ children }) => {
       throw new Error('Authentication required');
     }
 
+    if (!getToken || typeof getToken !== 'function') {
+      throw new Error('Authentication system not ready');
+    }
+
     try {
-      const response = await templateApi.toggleLike(templateId);
+      const token = await getToken();
+      const response = await templateApi.toggleLike(templateId, token);
       
       // Update like count in templates
       setTemplates(prev => prev.map(t => 
@@ -200,20 +240,16 @@ export const TemplateProvider = ({ children }) => {
       throw new Error('Authentication required');
     }
 
+    if (!getToken || typeof getToken !== 'function') {
+      throw new Error('Authentication system not ready');
+    }
+
     try {
-      const response = await templateApi.downloadTemplate(templateId);
-      
-      // Update download count in templates
-      setTemplates(prev => prev.map(t => 
-        t.id === templateId 
-          ? { ...t, downloads: response.total_downloads }
-          : t
-      ));
-      
+      const token = await getToken();
+      const response = await templateApi.downloadTemplate(templateId, token);
       return response;
     } catch (err) {
       console.error('Error downloading template:', err);
-      setError(err.message || 'Failed to download template');
       throw err;
     }
   };
