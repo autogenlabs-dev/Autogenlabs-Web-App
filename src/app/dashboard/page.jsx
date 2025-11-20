@@ -3,12 +3,19 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import ProtectedRoute from '../../components/shared/ProtectedRoute';
-import UserDashboard from '../../components/pages/dashboard/UserDashboard';
 import AdminDashboard from '../../components/pages/dashboard/AdminDashboard';
 
 const Dashboard = () => {
     const { user, loading } = useAuth();
     const router = useRouter();
+
+    // Redirect non-admin users to profile page
+    useEffect(() => {
+        if (!loading && user && user.role !== 'admin') {
+            console.log('🔄 Non-admin user detected, redirecting to /profile');
+            router.push('/profile');
+        }
+    }, [user, loading, router]);
 
     // Show loading while auth is loading
     if (loading) {
@@ -36,24 +43,14 @@ const Dashboard = () => {
         }
     }, [user]);
 
-    // Render appropriate dashboard based on user role
-    const renderDashboard = () => {
-        if (!user) {
-            return null; // ProtectedRoute will handle redirect
-        }
-
-        console.log('🎯 Rendering dashboard for role:', user.role);
-
-        // Only two dashboards: Admin for admins, User for everyone else
-        if (user.role === 'admin') {
-            return <AdminDashboard />;
-        }
-        return <UserDashboard />;
-    };
+    // Only render admin dashboard - regular users are redirected to /profile
+    if (!user || user.role !== 'admin') {
+        return null; // Will redirect in useEffect above
+    }
 
     return (
         <ProtectedRoute>
-            {renderDashboard()}
+            <AdminDashboard />
         </ProtectedRoute>
     );
 };

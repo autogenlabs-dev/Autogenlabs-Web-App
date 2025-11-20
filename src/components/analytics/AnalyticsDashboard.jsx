@@ -57,19 +57,35 @@ const AnalyticsDashboard = ({ userRole = 'user', period = '7d' }) => {
 
             switch (userRole) {
                 case 'admin':
-                    data = await adminApi.getAnalytics(timeRange);
+                    try {
+                        data = await adminApi.getAnalytics(timeRange);
+                    } catch (error) {
+                        console.warn('Admin analytics API not available, using mock data');
+                        data = null;
+                    }
                     break;
                 case 'developer':
-                    data = await developerApi.getAnalytics(timeRange);
+                    try {
+                        data = await developerApi.getAnalytics(timeRange);
+                    } catch (error) {
+                        console.warn('Developer analytics API not available, using mock data');
+                        data = null;
+                    }
                     break;
                 default:
-                    data = await marketplaceApi.getUserAnalytics(timeRange);
+                    console.log('User analytics - using mock data');
+                    data = null;
                     break;
             }
 
-            setAnalytics(data);
+            if (!data) {
+                setAnalytics(null);
+            } else {
+                setAnalytics(data);
+            }
         } catch (error) {
             console.error('Failed to fetch analytics:', error);
+            setAnalytics(null);
         } finally {
             setLoading(false);
         }

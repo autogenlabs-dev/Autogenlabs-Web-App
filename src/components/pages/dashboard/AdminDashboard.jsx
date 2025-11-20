@@ -74,13 +74,16 @@ const AdminDashboard = () => {
     ];
 
     useEffect(() => {
-        // Only load data if getToken is available
-        if (getToken && typeof getToken === 'function') {
+        if (getToken && typeof getToken === 'function' && user?.role === 'admin') {
             loadAdminData();
-        } else {
+        } else if (!getToken || typeof getToken !== 'function') {
             console.warn('⚠️ getToken not available yet, skipping loadAdminData');
+            setLoading(false);
+        } else if (user?.role !== 'admin') {
+            console.warn('⚠️ User is not admin, stopping load');
+            setLoading(false);
         }
-    }, [getToken]);
+    }, [getToken, user?.role]);
 
     const loadAdminData = async () => {
         try {
@@ -136,17 +139,20 @@ const AdminDashboard = () => {
                 }
             } catch (fetchError) {
                 console.error('❌ Error fetching users from Clerk:', fetchError);
-                // Fallback to placeholder data
-                setUsers([
-                    {
-                        id: user.id,
-                        name: user.name || user.firstName,
-                        email: user.email,
-                        role: user.role,
-                        status: 'active',
-                        created_at: new Date().toISOString()
-                    }
-                ]);
+                if (user) {
+                    setUsers([
+                        {
+                            id: user.id,
+                            name: user.name || user.firstName,
+                            email: user.email,
+                            role: user.role,
+                            status: 'active',
+                            created_at: new Date().toISOString()
+                        }
+                    ]);
+                } else {
+                    setUsers([]);
+                }
                 
                 setAnalytics({
                     total_users: 1,
