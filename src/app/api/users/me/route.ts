@@ -19,8 +19,8 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
-    // Get Clerk token
-    const token = await getToken();
+    // Get Clerk token with JWT template (ensures 'kid' header is present)
+    const token = await getToken({ template: 'jwt-template-name' });
     console.log('[users/me API] Token obtained, length:', token?.length || 0);
     
     if (!token) {

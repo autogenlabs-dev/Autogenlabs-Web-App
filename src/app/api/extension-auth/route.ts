@@ -1,31 +1,11 @@
-// API route to generate JWT tokens for VS Code extension authentication
+// API route to generate auth tokens for VS Code extension
 import { auth, currentUser } from '@clerk/nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
-import jwt from 'jsonwebtoken'
-
-// JWT secret for signing tokens - must match the secret in VS Code extension
-const JWT_SECRET = process.env.JWT_SECRET
-
-if (!JWT_SECRET) {
-  console.error('⚠️ JWT_SECRET is not configured! VS Code extension authentication will not work.')
-}
 
 export async function GET(request: NextRequest) {
   try {
-    // Check if JWT_SECRET is configured
-    if (!JWT_SECRET) {
-      console.error('❌ JWT_SECRET is not configured!')
-      return NextResponse.json(
-        { 
-          error: 'Server configuration error',
-          message: 'JWT_SECRET is not configured. Please set the JWT_SECRET environment variable.'
-        },
-        { status: 500 }
-      )
-    }
-
     // Verify user is authenticated with Clerk
-    const { userId } = await auth()
+    const { userId, getToken } = await auth()
     if (!userId) {
       return NextResponse.json(
         { error: 'Not authenticated' },
@@ -42,36 +22,23 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Get the session from Clerk
-    const authData = await auth()
-    const sessionToken = authData.sessionId
-
-    // Create payload for VS Code extension
-    const payload = {
-      userId: user.id,
-      email: user.emailAddresses[0]?.emailAddress,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      username: user.username,
-      clerkSessionId: sessionToken,
-      iat: Math.floor(Date.now() / 1000),
-      exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60), // 24 hours
+    // Get the Clerk session token with JWT template (ensures 'kid' header is present)
+    // Template name must match the one created in Clerk Dashboard
+    const clerkToken = await getToken({ template: 'jwt-template-name' })
+    if (!clerkToken) {
+      return NextResponse.json(
+        { error: 'Failed to get session token' },
+        { status: 500 }
+      )
     }
 
-    // Sign JWT with HMAC-SHA256
-    const token = jwt.sign(payload, JWT_SECRET!, {
-      algorithm: 'HS256',
-    })
-
-    // Generate deep link for VS Code
-    // Format: vscode://publisher.extension/auth?token=<JWT>
-    // TODO: Update with your actual VS Code extension publisher and name
-    const deepLink = `vscode://codemurf.codemurf/auth?token=${token}`
+    // Generate deep link for VS Code with the Clerk token
+    const deepLink = `vscode://codemurf.codemurf/auth?token=${clerkToken}`
 
     return NextResponse.json({
       success: true,
       deepLink,
-      token, // Include token for debugging (can be removed in production)
+      token: clerkToken, // Pass the Clerk token directly
       user: {
         id: user.id,
         email: user.emailAddresses[0]?.emailAddress,

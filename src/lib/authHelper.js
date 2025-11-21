@@ -15,7 +15,7 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 export async function fetchWithAuth(path, init = {}) {
   // Dynamic import to avoid SSR issues
   const { getToken } = await import('@clerk/nextjs');
-  const token = await getToken();
+  const token = await getToken({ template: 'codemurf' });
   
   if (!token) {
     throw new Error('Missing Clerk token - user not authenticated');
@@ -46,7 +46,7 @@ export async function fetchWithAuth(path, init = {}) {
  */
 export async function fetchWithAuthServer(req, path, init = {}) {
   const { getToken } = getAuth(req);
-  const token = await getToken();
+  const token = await getToken({ template: 'jwt-template-name' });
   
   if (!token) {
     throw new Error('Missing Clerk token - user not authenticated');
@@ -77,7 +77,7 @@ export async function fetchWithAuthServer(req, path, init = {}) {
  */
 export async function verifyUserWithClerk() {
   const { getToken } = await import('@clerk/nextjs');
-  const token = await getToken();
+  const token = await getToken({ template: 'jwt-template-name' });
   
   if (!token) {
     throw new Error('Not authenticated');
