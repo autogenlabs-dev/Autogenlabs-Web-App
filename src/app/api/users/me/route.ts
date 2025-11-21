@@ -20,7 +20,8 @@ export async function GET(request: Request) {
     }
 
     // Get Clerk token with JWT template (ensures 'kid' header is present)
-    const token = await getToken({ template: 'jwt-template-name' });
+    // Falls back to default token if template doesn't exist yet
+    const token = await getToken({ template: 'codemurf' }).catch(() => getToken());
     console.log('[users/me API] Token obtained, length:', token?.length || 0);
     
     if (!token) {

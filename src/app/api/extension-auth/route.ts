@@ -23,8 +23,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Get the Clerk session token with JWT template (ensures 'kid' header is present)
-    // Template name must match the one created in Clerk Dashboard
-    const clerkToken = await getToken({ template: 'jwt-template-name' })
+    // Falls back to default token if template doesn't exist yet
+    const clerkToken = await getToken({ template: 'codemurf' }).catch(() => getToken())
     if (!clerkToken) {
       return NextResponse.json(
         { error: 'Failed to get session token' },

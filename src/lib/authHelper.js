@@ -46,7 +46,7 @@ export async function fetchWithAuth(path, init = {}) {
  */
 export async function fetchWithAuthServer(req, path, init = {}) {
   const { getToken } = getAuth(req);
-  const token = await getToken({ template: 'jwt-template-name' });
+  const token = await getToken({ template: 'codemurf' }).catch(() => getToken());
   
   if (!token) {
     throw new Error('Missing Clerk token - user not authenticated');
@@ -77,7 +77,7 @@ export async function fetchWithAuthServer(req, path, init = {}) {
  */
 export async function verifyUserWithClerk() {
   const { getToken } = await import('@clerk/nextjs');
-  const token = await getToken({ template: 'jwt-template-name' });
+  const token = await getToken({ template: 'codemurf' }).catch(() => getToken());
   
   if (!token) {
     throw new Error('Not authenticated');
